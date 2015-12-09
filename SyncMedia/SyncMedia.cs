@@ -42,8 +42,7 @@ namespace SyncMedia
         private void SyncMedia_Load(object sender, EventArgs e)
         {
             Device = Environment.MachineName;
-            User = Environment.UserName;
-
+            User = Environment.UserName; ;
             SourceFolderTextbox.Text = XmlData.ReadSetting("SourceFolder");
             if (SourceFolderTextbox.Text != string.Empty)
             {
@@ -58,6 +57,11 @@ namespace SyncMedia
                 if (File.Exists(@DestinationFolderTextbox.Text + Device + @".xml"))
                 {
                     StoredHashes = XmlData.GetHashesList(XmlDatabase).ToList();
+                    string ESL = XmlData.ReadSetting("EmergencySave");
+                    if (ESL != string.Empty)
+                    {
+                        StoredHashes = hashes.Union(XmlData.GetHashesList(ESL)).ToList();
+                    }
                 }
             }
 
@@ -387,8 +391,8 @@ namespace SyncMedia
             Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories).OrderBy(Filename => Filename).Select(f => new { FileName = f, FileHash = Convert.ToBase64String(ImageHash(f)) }).AsParallel().ToList();
             TotalFilesLabel.Text = MediaCount.ToString() + "/" + MediaCount.ToString();
             MediaCount = 0;
-            OneFileLabel.Text = "All Media Checked and Moved.  Close and re-open the application to sync more files";
-            XmlData.CreateXmlDoc(XmlDatabase, hashes.Union(StoredHashes).ToList());
+            hashes = hashes.Union(StoredHashes).ToList();
+            XmlData.CreateXmlDoc(XmlDatabase, hashes);
             OneFileLabel.Text = "All Media Checked and Moved.  Close and re-open the application to sync more files";
         }
 

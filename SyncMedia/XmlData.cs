@@ -3,26 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using System.Configuration;
+using System.IO;
 
 
 namespace SyncMedia
 {
     public class XmlData
     {
-        //public interface IAllMedia
-        //{
-        //    String Hash { get; set; }
-        //}
-
-        //public class AllMedia : IAllMedia
-        //{
-        //    public AllMedia(string hash)
-        //    {
-        //        this.Hash = hash;
-        //    }
-        //    public string Hash { get; set; }
-        //}
-
         public static string ReadSetting(string key)
         {
             try
@@ -61,8 +48,16 @@ namespace SyncMedia
             return "Success";
         }
 
-        public static string CreateXmlDoc(string file, List<string> hashlist)
+        public static string CreateXmlDoc(string filen, List<string> hashlist)
         {
+            bool emergency = false;
+            if (filen == string.Empty)
+            {
+                //Emergency save the hashes to the user MyPicture directory and attempt to reload it on next launch.
+                AddUpdateAppSettings("EmergencySave", @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\" + Environment.MachineName + @".xml");
+                filen = @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\" + Environment.MachineName + @".xml";
+                emergency = true;
+            }
             try
             {
                 XDocument xdoc = new XDocument(new XElement("hashes", from hash in hashlist
@@ -70,7 +65,22 @@ namespace SyncMedia
                                                                       ));
 
 
-                xdoc.Save(@file);
+                xdoc.Save(@filen);
+                try
+                {
+                    File.SetAttributes(filen, File.GetAttributes(filen) | FileAttributes.Hidden);
+                    if (emergency == false)
+                    {
+                        File.Delete(@ReadSetting("EmergencySave"));
+                        AddUpdateAppSettings("EmergencySave","");
+                    }
+
+                }
+                catch (Exception)
+                {
+
+                    throw;
+                }
             }
             catch (Exception)
             {
@@ -86,14 +96,6 @@ namespace SyncMedia
             XElement po = XElement.Load(file);
            return from el in po.Elements("hash")
                 select el.Value.ToString();
-
-            //return XDocument.Load(file)
-            //.Elements("hash")
-            //.Select(f => new T
-            //{
-            //    Hash = f.Element("Hash").Value,
-            //});
-
         }
     }
 }
