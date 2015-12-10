@@ -54,8 +54,8 @@ namespace SyncMedia
             if (filen == string.Empty)
             {
                 //Emergency save the hashes to the user MyPicture directory and attempt to reload it on next launch.
-                AddUpdateAppSettings("EmergencySave", @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\" + Environment.MachineName + @".xml");
-                filen = @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\" + Environment.MachineName + @".xml";
+                AddUpdateAppSettings("EmergencySave", @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\MediaSync_SaveFile_" + Environment.MachineName + @".xml");
+                filen = @Environment.GetFolderPath(Environment.SpecialFolder.MyPictures) + @"\MediaSync_SaveFile_" + Environment.MachineName + @".xml";
                 emergency = true;
             }
             try
@@ -64,11 +64,9 @@ namespace SyncMedia
                                                                       select new XElement("hash", hash)
                                                                       ));
 
-
-                xdoc.Save(@filen);
+                xdoc.Save(filen);
                 try
                 {
-                    File.SetAttributes(filen, File.GetAttributes(filen) | FileAttributes.Hidden);
                     if (emergency == false)
                     {
                         File.Delete(@ReadSetting("EmergencySave"));
@@ -78,13 +76,12 @@ namespace SyncMedia
                 }
                 catch (Exception)
                 {
-
                     throw;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                var sd = ex.Message;
                 return "Error";
             }
             return "Saved";

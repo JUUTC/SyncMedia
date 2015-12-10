@@ -52,9 +52,9 @@ namespace SyncMedia
             DestinationFolderTextbox.Text = XmlData.ReadSetting("DestinationFolder");
             if (DestinationFolderTextbox.Text != string.Empty)
             {
-                XmlDatabase = @DestinationFolderTextbox.Text + Device + @".xml";
+                XmlDatabase = @DestinationFolderTextbox.Text + "MediaSync_SaveFile_" + Device + @".xml";
                 CreateDirectory(DestinationFolderTextbox);
-                if (File.Exists(@DestinationFolderTextbox.Text + Device + @".xml"))
+                if (File.Exists(@DestinationFolderTextbox.Text + "MediaSync_SaveFile_" + Device + @".xml"))
                 {
                     StoredHashes = XmlData.GetHashesList(XmlDatabase).ToList();
                     string ESL = XmlData.ReadSetting("EmergencySave");
