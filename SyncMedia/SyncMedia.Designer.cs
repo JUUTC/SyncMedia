@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.UpdateNamingButton = new System.Windows.Forms.Button();
             this.MainPanel = new System.Windows.Forms.Panel();
             this.dataGridViewPreview = new System.Windows.Forms.DataGridView();
@@ -49,6 +50,13 @@
             this.RejectLabel = new System.Windows.Forms.Label();
             this.RejectFolderTextbox = new System.Windows.Forms.TextBox();
             this.RejectfolderBrowser = new System.Windows.Forms.FolderBrowserDialog();
+            this.FilterImagesCheckbox = new System.Windows.Forms.CheckBox();
+            this.FilterVideosCheckbox = new System.Windows.Forms.CheckBox();
+            this.PauseButton = new System.Windows.Forms.Button();
+            this.CancelButton = new System.Windows.Forms.Button();
+            this.SearchTextbox = new System.Windows.Forms.TextBox();
+            this.SearchLabel = new System.Windows.Forms.Label();
+            this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
             this.MainPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridViewPreview)).BeginInit();
             this.SuspendLayout();
@@ -212,11 +220,95 @@
             this.RejectFolderTextbox.TabIndex = 18;
             this.RejectFolderTextbox.Click += new System.EventHandler(this.RejectFolderTextbox_Clicked);
             // 
+            // FilterImagesCheckbox
+            // 
+            this.FilterImagesCheckbox.AutoSize = true;
+            this.FilterImagesCheckbox.Checked = true;
+            this.FilterImagesCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.FilterImagesCheckbox.Location = new System.Drawing.Point(188, 105);
+            this.FilterImagesCheckbox.Name = "FilterImagesCheckbox";
+            this.FilterImagesCheckbox.Size = new System.Drawing.Size(60, 17);
+            this.FilterImagesCheckbox.TabIndex = 21;
+            this.FilterImagesCheckbox.Text = "Images";
+            this.FilterImagesCheckbox.UseVisualStyleBackColor = true;
+            this.FilterImagesCheckbox.CheckedChanged += new System.EventHandler(this.FilterImagesCheckbox_CheckedChanged);
+            // 
+            // FilterVideosCheckbox
+            // 
+            this.FilterVideosCheckbox.AutoSize = true;
+            this.FilterVideosCheckbox.Checked = true;
+            this.FilterVideosCheckbox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.FilterVideosCheckbox.Location = new System.Drawing.Point(254, 105);
+            this.FilterVideosCheckbox.Name = "FilterVideosCheckbox";
+            this.FilterVideosCheckbox.Size = new System.Drawing.Size(59, 17);
+            this.FilterVideosCheckbox.TabIndex = 22;
+            this.FilterVideosCheckbox.Text = "Videos";
+            this.FilterVideosCheckbox.UseVisualStyleBackColor = true;
+            this.FilterVideosCheckbox.CheckedChanged += new System.EventHandler(this.FilterVideosCheckbox_CheckedChanged);
+            // 
+            // PauseButton
+            // 
+            this.PauseButton.Enabled = false;
+            this.PauseButton.Location = new System.Drawing.Point(382, 441);
+            this.PauseButton.Name = "PauseButton";
+            this.PauseButton.Size = new System.Drawing.Size(75, 23);
+            this.PauseButton.TabIndex = 23;
+            this.PauseButton.Text = "Pause";
+            this.PauseButton.UseVisualStyleBackColor = true;
+            this.PauseButton.Click += new System.EventHandler(this.PauseButton_Click);
+            // 
+            // CancelButton
+            // 
+            this.CancelButton.Enabled = false;
+            this.CancelButton.Location = new System.Drawing.Point(463, 441);
+            this.CancelButton.Name = "CancelButton";
+            this.CancelButton.Size = new System.Drawing.Size(75, 23);
+            this.CancelButton.TabIndex = 24;
+            this.CancelButton.Text = "Cancel";
+            this.CancelButton.UseVisualStyleBackColor = true;
+            this.CancelButton.Click += new System.EventHandler(this.CancelButton_Click);
+            // 
+            // SearchLabel
+            // 
+            this.SearchLabel.AutoSize = true;
+            this.SearchLabel.Location = new System.Drawing.Point(319, 106);
+            this.SearchLabel.Name = "SearchLabel";
+            this.SearchLabel.Size = new System.Drawing.Size(44, 13);
+            this.SearchLabel.TabIndex = 25;
+            this.SearchLabel.Text = "Search:";
+            // 
+            // SearchTextbox
+            // 
+            this.SearchTextbox.Location = new System.Drawing.Point(369, 103);
+            this.SearchTextbox.Name = "SearchTextbox";
+            this.SearchTextbox.Size = new System.Drawing.Size(236, 20);
+            this.SearchTextbox.TabIndex = 26;
+            this.SearchTextbox.TextChanged += new System.EventHandler(this.SearchTextbox_TextChanged);
+            // 
+            // Setup Tooltips
+            // 
+            this.toolTip1.SetToolTip(this.SourceFolderTextbox, "Select the folder containing media files to sync");
+            this.toolTip1.SetToolTip(this.DestinationFolderTextbox, "Select the destination folder for organized media");
+            this.toolTip1.SetToolTip(this.RejectFolderTextbox, "Select the folder for duplicate files");
+            this.toolTip1.SetToolTip(this.FilterImagesCheckbox, "Include image files:\r\nClassic: .jpg, .png, .bmp, .gif, .tif, .tiff\r\nModern: .webp, .heic, .heif, .avif, .jxl");
+            this.toolTip1.SetToolTip(this.FilterVideosCheckbox, "Include video files:\r\nClassic: .mov, .mp4, .wmv, .avi, .m4v, .mpg, .mpeg\r\nModern: .webm, .mkv, .flv, .ts, .mts, .3gp, .ogv, .vob");
+            this.toolTip1.SetToolTip(this.PauseButton, "Pause the sync operation (resumes from current position)");
+            this.toolTip1.SetToolTip(this.CancelButton, "Cancel the sync operation");
+            this.toolTip1.SetToolTip(this.SearchTextbox, "Filter results by searching for text");
+            this.toolTip1.SetToolTip(this.HashAll, "Start syncing media files from source to destination");
+            this.toolTip1.SetToolTip(this.UpdateNamingButton, "Scan source folder and update the naming list");
+            // 
             // SyncMedia
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(617, 476);
+            this.Controls.Add(this.SearchTextbox);
+            this.Controls.Add(this.SearchLabel);
+            this.Controls.Add(this.CancelButton);
+            this.Controls.Add(this.PauseButton);
+            this.Controls.Add(this.FilterVideosCheckbox);
+            this.Controls.Add(this.FilterImagesCheckbox);
             this.Controls.Add(this.SetFolderReject);
             this.Controls.Add(this.RejectLabel);
             this.Controls.Add(this.RejectFolderTextbox);
@@ -267,6 +359,13 @@
         private System.Windows.Forms.Label RejectLabel;
         private System.Windows.Forms.TextBox RejectFolderTextbox;
         private System.Windows.Forms.FolderBrowserDialog RejectfolderBrowser;
+        private System.Windows.Forms.CheckBox FilterImagesCheckbox;
+        private System.Windows.Forms.CheckBox FilterVideosCheckbox;
+        private System.Windows.Forms.Button PauseButton;
+        private System.Windows.Forms.Button CancelButton;
+        private System.Windows.Forms.TextBox SearchTextbox;
+        private System.Windows.Forms.Label SearchLabel;
+        private System.Windows.Forms.ToolTip toolTip1;
     }
 }
 
