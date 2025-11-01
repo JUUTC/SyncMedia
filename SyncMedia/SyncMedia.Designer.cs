@@ -290,8 +290,8 @@
             this.toolTip1.SetToolTip(this.SourceFolderTextbox, "Select the folder containing media files to sync");
             this.toolTip1.SetToolTip(this.DestinationFolderTextbox, "Select the destination folder for organized media");
             this.toolTip1.SetToolTip(this.RejectFolderTextbox, "Select the folder for duplicate files");
-            this.toolTip1.SetToolTip(this.FilterImagesCheckbox, "Include image files (.jpg, .png, .bmp, .gif, .tif, .tiff)");
-            this.toolTip1.SetToolTip(this.FilterVideosCheckbox, "Include video files (.mov, .mp4, .wmv, .avi, .m4v, .mpg, .mpeg)");
+            this.toolTip1.SetToolTip(this.FilterImagesCheckbox, "Include image files:\r\nClassic: .jpg, .png, .bmp, .gif, .tif, .tiff\r\nModern: .webp, .heic, .heif, .avif, .jxl");
+            this.toolTip1.SetToolTip(this.FilterVideosCheckbox, "Include video files:\r\nClassic: .mov, .mp4, .wmv, .avi, .m4v, .mpg, .mpeg\r\nModern: .webm, .mkv, .flv, .ts, .mts, .3gp, .ogv, .vob");
             this.toolTip1.SetToolTip(this.PauseButton, "Pause the sync operation (resumes from current position)");
             this.toolTip1.SetToolTip(this.CancelButton, "Cancel the sync operation");
             this.toolTip1.SetToolTip(this.SearchTextbox, "Filter results by searching for text");

@@ -32,20 +32,40 @@ namespace SyncMedia
         string AMFullName = "";
         
         // Optimized: Use HashSet for O(1) lookup instead of multiple string comparisons
+        // Updated: Added modern formats (WebP, HEIC, AVIF, JPEG XL for images; WebM, MKV, etc. for videos)
         private static readonly HashSet<string> ImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff"
+            // Classic formats
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff",
+            // Modern formats (2010+)
+            ".webp",        // Google WebP (2010)
+            ".heic", ".heif", // Apple HEIC/HEIF (2015)
+            ".avif",        // AV1 Image Format (2019)
+            ".jxl"          // JPEG XL (2021)
         };
         
         private static readonly HashSet<string> VideoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
-            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg"
+            // Classic formats
+            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg",
+            // Modern/additional formats (2010+)
+            ".webm",        // Google WebM (2010)
+            ".mkv",         // Matroska (popular 2010+)
+            ".flv",         // Flash Video
+            ".ts", ".mts",  // MPEG Transport Stream
+            ".3gp", ".3g2", // Mobile formats
+            ".ogv",         // Ogg Video
+            ".vob"          // DVD Video Object
         };
         
         private static readonly HashSet<string> AllMediaExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
         {
+            // Images
             ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff",
-            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg"
+            ".webp", ".heic", ".heif", ".avif", ".jxl",
+            // Videos
+            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg",
+            ".webm", ".mkv", ".flv", ".ts", ".mts", ".3gp", ".3g2", ".ogv", ".vob"
         };
         
         // Optimized: Batch UI updates to reduce Application.DoEvents() calls
@@ -64,11 +84,21 @@ namespace SyncMedia
         // UX Enhancement: Filter options
         private bool _filterImages = true;
         private bool _filterVideos = true;
+        
+        // Gamification: Achievement and points system
+        private int _totalPoints = 0;
+        private int _sessionPoints = 0;
+        private int _totalFilesLifetime = 0;
+        private int _totalDuplicatesLifetime = 0;
+        private long _totalBytesLifetime = 0;
+        private List<string> _achievements = new List<string>();
         #endregion
+        
         public SyncMedia()
 
         {
             InitializeComponent();
+            LoadGamificationData();
         }
 
        
@@ -106,6 +136,125 @@ namespace SyncMedia
             {
                 CreateDirectory(RejectFolderTextbox);
                 ValidateFolder(RejectFolderTextbox.Text, RejectFolderTextbox);
+            }
+        }
+        
+        // Gamification: Load saved progress
+        private void LoadGamificationData()
+        {
+            try
+            {
+                _totalPoints = int.Parse(XmlData.ReadSetting("TotalPoints") ?? "0");
+                _totalFilesLifetime = int.Parse(XmlData.ReadSetting("TotalFilesLifetime") ?? "0");
+                _totalDuplicatesLifetime = int.Parse(XmlData.ReadSetting("TotalDuplicatesLifetime") ?? "0");
+                _totalBytesLifetime = long.Parse(XmlData.ReadSetting("TotalBytesLifetime") ?? "0");
+                
+                string achievementsStr = XmlData.ReadSetting("Achievements");
+                if (!string.IsNullOrEmpty(achievementsStr))
+                {
+                    _achievements = achievementsStr.Split('|').ToList();
+                }
+            }
+            catch
+            {
+                // First time user - initialize with defaults
+                _totalPoints = 0;
+                _totalFilesLifetime = 0;
+                _totalDuplicatesLifetime = 0;
+                _totalBytesLifetime = 0;
+                _achievements = new List<string>();
+            }
+        }
+        
+        // Gamification: Save progress
+        private void SaveGamificationData()
+        {
+            XmlData.AddUpdateAppSettings("TotalPoints", _totalPoints.ToString());
+            XmlData.AddUpdateAppSettings("TotalFilesLifetime", _totalFilesLifetime.ToString());
+            XmlData.AddUpdateAppSettings("TotalDuplicatesLifetime", _totalDuplicatesLifetime.ToString());
+            XmlData.AddUpdateAppSettings("TotalBytesLifetime", _totalBytesLifetime.ToString());
+            XmlData.AddUpdateAppSettings("Achievements", string.Join("|", _achievements));
+        }
+        
+        // Gamification: Award points and check achievements
+        private void AwardPointsAndCheckAchievements()
+        {
+            _sessionPoints = 0;
+            
+            // Points system
+            _sessionPoints += _totalFilesProcessed * 10;  // 10 points per file
+            _sessionPoints += _duplicatesFound * 5;        // 5 points per duplicate found
+            _sessionPoints += (int)(_totalBytesProcessed / (1024 * 1024)); // 1 point per MB
+            
+            // Speed bonus
+            var elapsed = DateTime.Now - _syncStartTime;
+            if (elapsed.TotalMinutes > 0)
+            {
+                var filesPerMinute = _totalFilesProcessed / elapsed.TotalMinutes;
+                if (filesPerMinute > 10) _sessionPoints += 50; // Speed demon bonus
+            }
+            
+            _totalPoints += _sessionPoints;
+            _totalFilesLifetime += _totalFilesProcessed;
+            _totalDuplicatesLifetime += _duplicatesFound;
+            _totalBytesLifetime += _totalBytesProcessed;
+            
+            // Check for new achievements
+            List<string> newAchievements = new List<string>();
+            
+            if (_totalFilesLifetime >= 100 && !_achievements.Contains("Century"))
+            {
+                _achievements.Add("Century");
+                newAchievements.Add("🏆 Century - Synced 100 files!");
+            }
+            
+            if (_totalFilesLifetime >= 1000 && !_achievements.Contains("Millennium"))
+            {
+                _achievements.Add("Millennium");
+                newAchievements.Add("🏆 Millennium - Synced 1,000 files!");
+            }
+            
+            if (_totalFilesLifetime >= 10000 && !_achievements.Contains("Epic"))
+            {
+                _achievements.Add("Epic");
+                newAchievements.Add("🏆 Epic Organizer - Synced 10,000 files!");
+            }
+            
+            if (_totalBytesLifetime > 1024L * 1024L * 1024L && !_achievements.Contains("Gigabyte"))
+            {
+                _achievements.Add("Gigabyte");
+                newAchievements.Add("🏆 Gigabyte Club - Synced 1 GB!");
+            }
+            
+            if (_totalBytesLifetime > 10L * 1024L * 1024L * 1024L && !_achievements.Contains("TenGigs"))
+            {
+                _achievements.Add("TenGigs");
+                newAchievements.Add("🏆 Data Master - Synced 10 GB!");
+            }
+            
+            if (_totalDuplicatesLifetime >= 50 && !_achievements.Contains("DupeHunter"))
+            {
+                _achievements.Add("DupeHunter");
+                newAchievements.Add("🏆 Dupe Hunter - Found 50 duplicates!");
+            }
+            
+            if (_totalFilesProcessed >= 100 && _errorsEncountered == 0 && !_achievements.Contains("Flawless"))
+            {
+                _achievements.Add("Flawless");
+                newAchievements.Add("🏆 Flawless Victory - 100+ files with 0 errors!");
+            }
+            
+            SaveGamificationData();
+            
+            // Show achievements
+            if (newAchievements.Count > 0)
+            {
+                MessageBox.Show(
+                    $"🎉 NEW ACHIEVEMENTS! 🎉\n\n{string.Join("\n", newAchievements)}\n\nTotal Points: {_totalPoints:N0}",
+                    "Achievement Unlocked!",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Information
+                );
             }
         }
 
@@ -539,7 +688,11 @@ namespace SyncMedia
             UpdateDataGridView(forceUpdate: true);
             
             var elapsed = DateTime.Now - _syncStartTime;
-            OneFileLabel.Text = $"Completed! Processed: {_totalFilesProcessed} files ({_totalBytesProcessed / (1024.0 * 1024.0):F2} MB) in {elapsed:hh\\:mm\\:ss} | Duplicates: {_duplicatesFound} | Errors: {_errorsEncountered}";
+            
+            // Gamification: Award points and check achievements
+            AwardPointsAndCheckAchievements();
+            
+            OneFileLabel.Text = $"Completed! Processed: {_totalFilesProcessed} files ({_totalBytesProcessed / (1024.0 * 1024.0):F2} MB) in {elapsed:hh\\:mm\\:ss} | Duplicates: {_duplicatesFound} | Errors: {_errorsEncountered} | 🎯 Points: +{_sessionPoints:N0} (Total: {_totalPoints:N0})";
             
             // Re-enable controls
             HashAll.Enabled = true;
@@ -615,7 +768,8 @@ namespace SyncMedia
             nodate = Regex.Replace(nodate, @"[\d-]", string.Empty);
             nodate = nodate.ToLower();
             
-            // Remove all file extensions in one pass
+            // Remove all file extensions in one pass (classic + modern formats)
+            // Classic image formats
             nodate = nodate.Replace(".mp", string.Empty);
             nodate = nodate.Replace(".jpg", string.Empty);
             nodate = nodate.Replace(".jpeg", string.Empty);
@@ -625,6 +779,13 @@ namespace SyncMedia
             nodate = nodate.Replace(".gif", string.Empty);
             nodate = nodate.Replace(".tif", string.Empty);
             nodate = nodate.Replace(".tiff", string.Empty);
+            // Modern image formats
+            nodate = nodate.Replace(".webp", string.Empty);
+            nodate = nodate.Replace(".heic", string.Empty);
+            nodate = nodate.Replace(".heif", string.Empty);
+            nodate = nodate.Replace(".avif", string.Empty);
+            nodate = nodate.Replace(".jxl", string.Empty);
+            // Classic video formats
             nodate = nodate.Replace(".mov", string.Empty);
             nodate = nodate.Replace(".mp4", string.Empty);
             nodate = nodate.Replace(".wmv", string.Empty);
@@ -632,6 +793,17 @@ namespace SyncMedia
             nodate = nodate.Replace(".m4v", string.Empty);
             nodate = nodate.Replace(".mpg", string.Empty);
             nodate = nodate.Replace(".mpeg", string.Empty);
+            // Modern video formats
+            nodate = nodate.Replace(".webm", string.Empty);
+            nodate = nodate.Replace(".mkv", string.Empty);
+            nodate = nodate.Replace(".flv", string.Empty);
+            nodate = nodate.Replace(".ts", string.Empty);
+            nodate = nodate.Replace(".mts", string.Empty);
+            nodate = nodate.Replace(".3gp", string.Empty);
+            nodate = nodate.Replace(".3g2", string.Empty);
+            nodate = nodate.Replace(".ogv", string.Empty);
+            nodate = nodate.Replace(".vob", string.Empty);
+            // Special characters
             nodate = nodate.Replace(",", string.Empty);
             nodate = nodate.Replace(".", string.Empty);
             nodate = nodate.Replace("/", string.Empty);
