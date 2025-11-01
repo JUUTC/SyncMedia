@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using SyncMedia.Helpers;
 
 
 
@@ -489,120 +490,124 @@ namespace SyncMedia
             string finalFileName = string.Empty;
             string norootdir = srcImageFile.Replace(SourceFolderTextbox.Text, "");
             var srcHash = new byte[1];
-            using (var cryptoSHA1 = SHA1.Create())
+            
+            // Optimization: Get file metadata (potentially from cache)
+            FileInfo fsd = new FileInfo(srcImageFile);
+            AMFullName = fsd.Name;
+            long AMLength = fsd.Length;
+            string AMType = fsd.Extension.ToLower();
+            
+            // Skip non-media files
+            if (AMType == ".db")
             {
+                var srchash = new byte[1];
+                return srchash;
+            }
+            
+            // Process based on file type
+            if (ImageFileTypes(AMType))
+            {
+                video = false;
                 using (var fs = new FileStream(srcImageFile, FileMode.Open, FileAccess.Read))
                 {
-
-                    try
-                    {
-                        FileInfo fsd = new FileInfo(srcImageFile);
-                        AMFullName = fsd.Name;
-                        long AMLength = fsd.Length;
-                        string AMType = fsd.Extension.ToLower();
-                        if (AMType == ".db")
-                        {
-                            var srchash = new byte[1];
-                            return srchash;
-                        }
-                        if (ImageFileTypes(AMType))
-                        {
-                            video = false;
-                            using (Image myImage = Image.FromStream(fs, false, false))
-                            {
-                                try
-                                {
-                                    PropertyItem propItem = myImage.GetPropertyItem(36867);
-                                    string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
-                                    FileDateTime = DateTime.Parse(dateTaken);
-                                    year = FileDateTime.Year.ToString("0000");
-                                    month = FileDateTime.Month.ToString("00");
-                                    CheckCreateFolderStructureImage(year, month);
-                                }
-                                catch (Exception)
-                                {
-                                    // throw;
-                                }
-                            }
-                        }
-                        else if (VideoFileTypes(AMType))
-                        {
-                            video = true;
-                            FileDateTime = fsd.LastWriteTime;
-                            vyear = FileDateTime.Year.ToString("0000");
-                            vmonth = FileDateTime.Month.ToString("00");
-                            try
-                            {
-                                CheckCreateFolderStructureVideo(vyear, vmonth);
-                            }
-                            catch (Exception)
-                            {
-
-                                // throw;
-                            }
-                        }
-                        else
-                        {
-                            var srchash = new byte[1];
-                            return srchash;
-                        }
-                        OneFileLabel.Text = norootdir + " hashing...";
-                        srcHash = cryptoSHA1.ComputeHash(fs);
-                        SyncProgress.PerformStep();
-                        
-                        if (StoredHashes.Exists(x => x == Convert.ToBase64String(srcHash)) || hashes.Exists(x => x == Convert.ToBase64String(srcHash)))
-                        {
-                            fs.Close();
-                            fsd.MoveTo(RejectFolderTextbox.Text + "\\" + AMFullName);
-                            RejectMediaWriteToGrid(AMFullName);
-                            var srchash = new byte[1];
-                            return srchash;
-                        }
-                        thisfilename = AddtoList(srcImageFile, true);
-                        if (thisfilename.Length != 0)
-                        {
-                            thisfilename = " " + thisfilename;
-                        }
-                        fs.Close();
-                        if (video)
-                        {
-                            finalFileName = SessionMediaCountFormat(FileDateTime, thisfilename, fsd);
-                            finalFileName = MoveVideoUpdateStatusGrid(vyear, vmonth, FileDateTime, finalFileName, fsd);
-                        }
-                        else
-                        {
-                            finalFileName = SessionMediaCountFormat(FileDateTime, thisfilename, fsd);
-                            finalFileName = MoveImageUpdateStatusGrid(year, month, FileDateTime, finalFileName, fsd);
-                        }
-
-                        // UX Enhancement: Track statistics
-                        _totalFilesProcessed++;
-                        _totalBytesProcessed += AMLength;
-                        
-                        hashes.Add(Convert.ToBase64String(srcHash));
-                        UpdateProgressInfo();
-                        // Optimized: UI updates are now batched in UpdateDataGridView()
-                        return srcHash;
-                    }
-                    catch (Exception)
+                    using (Image myImage = Image.FromStream(fs, false, false))
                     {
                         try
                         {
-                            RejectMediaWriteToGrid(AMFullName);
-                            return srcHash;
+                            PropertyItem propItem = myImage.GetPropertyItem(36867);
+                            string dateTaken = r.Replace(Encoding.UTF8.GetString(propItem.Value), "-", 2);
+                            FileDateTime = DateTime.Parse(dateTaken);
+                            year = FileDateTime.Year.ToString("0000");
+                            month = FileDateTime.Month.ToString("00");
+                            CheckCreateFolderStructureImage(year, month);
                         }
-                        catch (Exception ex)
+                        catch (Exception)
                         {
-                            var srchash = new byte[1];
-                            ErrorWriteToGrid(ex);
-                            return srchash;
                             // throw;
                         }
-
-                        //throw;
                     }
                 }
             }
+            else if (VideoFileTypes(AMType))
+            {
+                video = true;
+                FileDateTime = fsd.LastWriteTime;
+                vyear = FileDateTime.Year.ToString("0000");
+                vmonth = FileDateTime.Month.ToString("00");
+                try
+                {
+                    CheckCreateFolderStructureVideo(vyear, vmonth);
+                }
+                catch (Exception)
+                {
+                    // throw;
+                }
+            }
+            else
+            {
+                var srchash = new byte[1];
+                return srchash;
+            }
+            
+            // Optimization: Use optimized hash computation with buffered streaming
+            OneFileLabel.Text = norootdir + " hashing...";
+            try
+            {
+                srcHash = PerformanceOptimizer.ComputeHashOptimized(srcImageFile);
+            }
+            catch (Exception)
+            {
+                try
+                {
+                    RejectMediaWriteToGrid(AMFullName);
+                    return srcHash;
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show(ex.Message);
+                    throw;
+                }
+            }
+            
+            SyncProgress.PerformStep();
+            
+            if (StoredHashes.Exists(x => x == Convert.ToBase64String(srcHash)) || hashes.Exists(x => x == Convert.ToBase64String(srcHash)))
+            {
+                fsd.MoveTo(RejectFolderTextbox.Text + "\\" + AMFullName);
+                RejectMediaWriteToGrid(AMFullName);
+                
+                // UX Enhancement: Track duplicate
+                _duplicatesFound++;
+                
+                var srchash = new byte[1];
+                return srchash;
+            }
+            
+            thisfilename = AddtoList(srcImageFile, true);
+            if (thisfilename.Length != 0)
+            {
+                thisfilename = " " + thisfilename;
+            }
+            
+            if (video)
+            {
+                finalFileName = SessionMediaCountFormat(FileDateTime, thisfilename, fsd);
+                finalFileName = MoveVideoUpdateStatusGrid(vyear, vmonth, FileDateTime, finalFileName, fsd);
+            }
+            else
+            {
+                finalFileName = SessionMediaCountFormat(FileDateTime, thisfilename, fsd);
+                finalFileName = MoveImageUpdateStatusGrid(year, month, FileDateTime, finalFileName, fsd);
+            }
+
+            // UX Enhancement: Track statistics
+            _totalFilesProcessed++;
+            _totalBytesProcessed += AMLength;
+            
+            hashes.Add(Convert.ToBase64String(srcHash));
+            UpdateProgressInfo();
+            // Optimized: UI updates are now batched in UpdateDataGridView()
+            return srcHash;
         }
 
         // Optimized: Helper method to batch UI updates
