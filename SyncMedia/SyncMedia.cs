@@ -30,6 +30,27 @@ namespace SyncMedia
         #region "Private"
         private static Regex r = new Regex(":");
         string AMFullName = "";
+        
+        // Optimized: Use HashSet for O(1) lookup instead of multiple string comparisons
+        private static readonly HashSet<string> ImageExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff"
+        };
+        
+        private static readonly HashSet<string> VideoExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg"
+        };
+        
+        private static readonly HashSet<string> AllMediaExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ".jpg", ".jpeg", ".png", ".bmp", ".gif", ".tif", ".tiff",
+            ".mov", ".mp4", ".wmv", ".avi", ".m4v", ".mpg", ".mpeg"
+        };
+        
+        // Optimized: Batch UI updates to reduce Application.DoEvents() calls
+        private int _uiUpdateCounter = 0;
+        private const int UI_UPDATE_BATCH_SIZE = 10;
         #endregion
         public SyncMedia()
 
@@ -99,7 +120,7 @@ namespace SyncMedia
             string finalFileName = string.Empty;
             string norootdir = srcImageFile.Replace(SourceFolderTextbox.Text, "");
             var srcHash = new byte[1];
-            using (SHA1CryptoServiceProvider cryptoSHA1 = new SHA1CryptoServiceProvider())
+            using (var cryptoSHA1 = SHA1.Create())
             {
                 using (var fs = new FileStream(srcImageFile, FileMode.Open, FileAccess.Read))
                 {
@@ -157,10 +178,9 @@ namespace SyncMedia
                             return srchash;
                         }
                         OneFileLabel.Text = norootdir + " hashing...";
-                        Application.DoEvents();
                         srcHash = cryptoSHA1.ComputeHash(fs);
                         SyncProgress.PerformStep();
-                        Application.DoEvents();
+                        
                         if (StoredHashes.Exists(x => x == Convert.ToBase64String(srcHash)) || hashes.Exists(x => x == Convert.ToBase64String(srcHash)))
                         {
                             fs.Close();
@@ -186,10 +206,9 @@ namespace SyncMedia
                             finalFileName = MoveImageUpdateStatusGrid(year, month, FileDateTime, finalFileName, fsd);
                         }
 
-                        Application.DoEvents();
                         hashes.Add(Convert.ToBase64String(srcHash));
                         TotalFilesLabel.Text = SyncProgress.Value + "/" + MediaCount.ToString();
-                        Application.DoEvents();
+                        // Optimized: UI updates are now batched in UpdateDataGridView()
                         return srcHash;
                     }
                     catch (Exception)
@@ -213,30 +232,34 @@ namespace SyncMedia
             }
         }
 
+        // Optimized: Helper method to batch UI updates
+        private void UpdateDataGridView(bool forceUpdate = false)
+        {
+            _uiUpdateCounter++;
+            if (forceUpdate || _uiUpdateCounter >= UI_UPDATE_BATCH_SIZE)
+            {
+                dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
+                dataGridViewPreview.AutoResizeColumn(0);
+                dataGridViewPreview.Refresh();
+                if (dataGridViewPreview.RowCount > 1)
+                {
+                    dataGridViewPreview.CurrentCell = dataGridViewPreview.Rows[dataGridViewPreview.RowCount - 1].Cells[0];
+                }
+                Application.DoEvents();
+                _uiUpdateCounter = 0;
+            }
+        }
+
         private void RejectMediaWriteToGrid(string AMFullName)
         {
             dgvl.Add(AMFullName + " moved to REJECT FOLDER");
-            dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
-            dataGridViewPreview.AutoResizeColumn(0);
-            dataGridViewPreview.Refresh();
-            if (dataGridViewPreview.RowCount > 1)
-            {
-                dataGridViewPreview.CurrentCell = dataGridViewPreview.Rows[dataGridViewPreview.RowCount - 1].Cells[0];
-            }
-            Application.DoEvents();
+            UpdateDataGridView();
         }
 
         public void ErrorWriteToGrid(Exception exc)
         {
             dgvl.Add(exc.Message.Substring(0,16) + "...");
-            dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
-            dataGridViewPreview.AutoResizeColumn(0);
-            dataGridViewPreview.Refresh();
-            if (dataGridViewPreview.RowCount > 1)
-            {
-                dataGridViewPreview.CurrentCell = dataGridViewPreview.Rows[dataGridViewPreview.RowCount - 1].Cells[0];
-            }
-            Application.DoEvents();
+            UpdateDataGridView();
         }
 
         private string MoveImageUpdateStatusGrid(string year, string month, DateTime FileDateTime, string finalFileName, FileInfo fsd)
@@ -252,14 +275,7 @@ namespace SyncMedia
             }
 
             dgvl.Add(year + "\\" + year + " " + month + "\\" + finalFileName);
-            dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
-            dataGridViewPreview.AutoResizeColumn(0);
-            dataGridViewPreview.Refresh();
-            if (dataGridViewPreview.RowCount > 1)
-            {
-                dataGridViewPreview.CurrentCell = dataGridViewPreview.Rows[dataGridViewPreview.RowCount - 1].Cells[0];
-            }
-            Application.DoEvents();
+            UpdateDataGridView();
             return finalFileName;
         }
 
@@ -276,14 +292,7 @@ namespace SyncMedia
             }
 
             dgvl.Add(vyear + "\\" + vyear + " " + vmonth + "\\" + vyear + " " + vmonth + " Movies\\" + finalFileName);
-            dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
-            dataGridViewPreview.AutoResizeColumn(0);
-            dataGridViewPreview.Refresh();
-            if (dataGridViewPreview.RowCount > 1)
-            {
-                dataGridViewPreview.CurrentCell = dataGridViewPreview.Rows[dataGridViewPreview.RowCount - 1].Cells[0];
-            }
-            Application.DoEvents();
+            UpdateDataGridView();
             return finalFileName;
         }
 
@@ -326,12 +335,12 @@ namespace SyncMedia
 
         private static bool VideoFileTypes(string AMType)
         {
-            return AMType == ".mov" || AMType == ".mp4" || AMType == ".wmv" || AMType == ".avi" || AMType == ".m4v" || AMType == ".mpg" || AMType == ".mpeg";
+            return VideoExtensions.Contains(AMType);
         }
 
         private static bool ImageFileTypes(string AMType)
         {
-            return AMType == ".jpg" || AMType == ".png" || AMType == ".bmp" || AMType == ".jpeg" || AMType == ".gif" || AMType == ".tif" || AMType == ".tiff";
+            return ImageExtensions.Contains(AMType);
         }
 
         private void CheckCreateFolderStructureVideo(string vyear, string vmonth)
@@ -384,15 +393,25 @@ namespace SyncMedia
         private void HashAll_Click(object sender, EventArgs e)
         {
             HashAll.Enabled = false;
-            MediaCount = Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories).Where(file => file.ToLower().EndsWith(".jpg") || file.ToLower().EndsWith(".png") || file.ToLower().EndsWith(".bmp") || file.ToLower().EndsWith(".jpeg") || file.ToLower().EndsWith(".gif") || file.ToLower().EndsWith(".tif") || file.ToLower().EndsWith(".tiff") || file.ToLower().EndsWith(".mov") || file.ToLower().EndsWith(".mp4") || file.ToLower().EndsWith(".wmv") || file.ToLower().EndsWith(".avi") || file.ToLower().EndsWith(".m4v") || file.ToLower().EndsWith(".mpg") || file.ToLower().EndsWith(".mpeg")).Count();
+            // Optimized: Use HashSet for file extension checking
+            MediaCount = Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories)
+                .Count(file => AllMediaExtensions.Contains(Path.GetExtension(file)));
             SyncProgress.Maximum = MediaCount;
             TotalFilesLabel.Text = MediaCount.ToString();
             SyncProgress.Step = 1;
-            Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories).OrderBy(Filename => Filename).Select(f => new { FileName = f, FileHash = Convert.ToBase64String(ImageHash(f)) }).AsParallel().ToList();
+            // Optimized: Filter files before processing
+            Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories)
+                .Where(file => AllMediaExtensions.Contains(Path.GetExtension(file)))
+                .OrderBy(Filename => Filename)
+                .Select(f => new { FileName = f, FileHash = Convert.ToBase64String(ImageHash(f)) })
+                .AsParallel()
+                .ToList();
             TotalFilesLabel.Text = MediaCount.ToString() + "/" + MediaCount.ToString();
             MediaCount = 0;
             hashes = hashes.Union(StoredHashes).ToList();
             XmlData.CreateXmlDoc(XmlDatabase, hashes);
+            // Optimized: Force final UI update
+            UpdateDataGridView(forceUpdate: true);
             OneFileLabel.Text = "All Media Checked and Moved.  Close and re-open the application to sync more files";
         }
 
@@ -460,32 +479,31 @@ namespace SyncMedia
 
         private static string CleanFileName(string nodate)
         {
-            //Clean this up.  
+            // Optimized: Remove duplicates and convert to lower case once
             nodate = Regex.Replace(nodate, @"[\d-]", string.Empty);
-            nodate = nodate.ToLower().Replace(@".mp", string.Empty);
-            nodate = nodate.ToLower().Replace(@".jpg", string.Empty);
-            nodate = nodate.ToLower().Replace(@".jepg", string.Empty);
-            nodate = nodate.ToLower().Replace(@".mpeg", string.Empty);
-            nodate = nodate.ToLower().Replace(@".mpg", string.Empty);
-            nodate = nodate.ToLower().Replace(@".png", string.Empty);
-            nodate = nodate.ToLower().Replace(@".mov", string.Empty);
-            nodate = nodate.ToLower().Replace(".mov", string.Empty);
-            nodate = nodate.ToLower().Replace(".mp4", string.Empty);
-            nodate = nodate.ToLower().Replace(".wmv", string.Empty);
-            nodate = nodate.ToLower().Replace(".avi", string.Empty);
-            nodate = nodate.ToLower().Replace(".m4v", string.Empty);
-            nodate = nodate.ToLower().Replace(".mpg", string.Empty);
-            nodate = nodate.ToLower().Replace(".mpeg", string.Empty);
-            nodate = nodate.ToLower().Replace(".jpg", string.Empty);
-            nodate = nodate.ToLower().Replace(".png", string.Empty);
-            nodate = nodate.ToLower().Replace(".bmp", string.Empty);
-            nodate = nodate.ToLower().Replace(".jpeg", string.Empty);
-            nodate = nodate.ToLower().Replace(".gif", string.Empty);
-            nodate = nodate.ToLower().Replace(".tif", string.Empty);
-            nodate = nodate.ToLower().Replace(".tiff", string.Empty);
-            nodate = nodate.ToLower().Replace(@",", string.Empty);
-            nodate = nodate.ToLower().Replace(@".", string.Empty);
-            nodate = nodate.ToLower().Replace(@"/", string.Empty);
+            nodate = nodate.ToLower();
+            
+            // Remove all file extensions in one pass
+            nodate = nodate.Replace(".mp", string.Empty);
+            nodate = nodate.Replace(".jpg", string.Empty);
+            nodate = nodate.Replace(".jpeg", string.Empty);
+            nodate = nodate.Replace(".jepg", string.Empty);
+            nodate = nodate.Replace(".png", string.Empty);
+            nodate = nodate.Replace(".bmp", string.Empty);
+            nodate = nodate.Replace(".gif", string.Empty);
+            nodate = nodate.Replace(".tif", string.Empty);
+            nodate = nodate.Replace(".tiff", string.Empty);
+            nodate = nodate.Replace(".mov", string.Empty);
+            nodate = nodate.Replace(".mp4", string.Empty);
+            nodate = nodate.Replace(".wmv", string.Empty);
+            nodate = nodate.Replace(".avi", string.Empty);
+            nodate = nodate.Replace(".m4v", string.Empty);
+            nodate = nodate.Replace(".mpg", string.Empty);
+            nodate = nodate.Replace(".mpeg", string.Empty);
+            nodate = nodate.Replace(",", string.Empty);
+            nodate = nodate.Replace(".", string.Empty);
+            nodate = nodate.Replace("/", string.Empty);
+            
             return nodate;
         }
 
@@ -498,7 +516,10 @@ namespace SyncMedia
         {
             FilesNamesToInclude.Items.Clear();
             l.Clear();
-            var UpdatedFileList = Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories).Where(file => file.ToLower().EndsWith(".jpg") || file.ToLower().EndsWith(".png") || file.ToLower().EndsWith(".bmp") || file.ToLower().EndsWith(".jpeg") || file.ToLower().EndsWith(".gif") || file.ToLower().EndsWith(".tif") || file.ToLower().EndsWith(".tiff") || file.ToLower().EndsWith(".mov") || file.ToLower().EndsWith(".mp4") || file.ToLower().EndsWith(".wmv") || file.ToLower().EndsWith(".avi") || file.ToLower().EndsWith(".m4v") || file.ToLower().EndsWith(".mpg") || file.ToLower().EndsWith(".mpeg")).ToList();
+            // Optimized: Use HashSet for file extension checking
+            var UpdatedFileList = Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories)
+                .Where(file => AllMediaExtensions.Contains(Path.GetExtension(file)))
+                .ToList();
             foreach (var item in UpdatedFileList)
             {
                 AddtoList(item);
