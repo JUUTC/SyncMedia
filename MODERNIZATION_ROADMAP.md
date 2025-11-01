@@ -164,8 +164,11 @@ SyncMedia.Pro (WinUI 3)
 ✅ Basic gamification  
 ✅ File preview (3s/10s limit)  
 ✅ Standard processing speed  
+✅ MD5 hash-based exact duplicate detection  
 ❌ Parallel processing  
 ❌ Advanced optimizations  
+❌ AI-powered similar image detection (imagededup)  
+❌ GPU acceleration  
 ❌ Batch operations  
 📺 Ad-supported  
 
@@ -174,9 +177,19 @@ SyncMedia.Pro (WinUI 3)
 ✅ Parallel processing  
 ✅ Advanced optimizations  
 ✅ Unlimited preview time  
+✅ **AI-powered perceptual duplicate detection**  
+✅ **GPU-accelerated image processing (10-100x faster)**  
+✅ **Find similar images (crops, edits, filters)**  
+✅ **Deep learning-based duplicate detection (CNN)**  
 ✅ Batch operations  
 ✅ Priority support  
 ❌ No ads  
+
+**Pro-Exclusive Feature**: Advanced duplicate detection using **idealo/imagededup**
+- Perceptual hashing (PHash, DHash, WHash)
+- CNN-based deep learning detection
+- GPU acceleration with CUDA
+- See `ADVANCED_DUPLICATE_DETECTION.md` for technical details  
 
 ### Technical Implementation
 
@@ -225,6 +238,59 @@ Extract to separate assembly:
 - GPU-accelerated image processing
 - Batch operation queuing
 
+#### 5. Advanced Duplicate Detection (Pro Only) - NEW
+**Feature**: GPU-Accelerated Perceptual Image Duplicate Detection
+
+Using **idealo/imagededup** library for advanced duplicate detection:
+- **Current (Free)**: MD5 hash-based exact duplicate detection (CPU)
+- **Pro Feature**: Perceptual hashing + CNN-based near-duplicate detection (GPU)
+
+**Technical Approach**:
+1. **Python Integration**:
+   - Bundle Python runtime with Pro version
+   - Use subprocess/IPC for Python interop
+   - Alternative: Create microservice endpoint
+
+2. **Detection Methods** (Pro):
+   - **PHash (Perceptual Hash)**: Fast CPU-based similar image detection
+   - **CNN (Deep Learning)**: GPU-accelerated, finds visually similar images even with edits
+   - **Difference Hash (dHash)**: Fast similar image detection
+   - **Wavelet Hash (wHash)**: Rotation/scale invariant detection
+
+3. **Implementation**:
+   ```csharp
+   public interface IDuplicateDetector
+   {
+       Task<List<DuplicateGroup>> FindDuplicatesAsync(List<string> filePaths);
+   }
+   
+   // Free version - exact matches only
+   public class MD5DuplicateDetector : IDuplicateDetector
+   {
+       // Current implementation
+   }
+   
+   // Pro version - perceptual + exact matches
+   public class AdvancedDuplicateDetector : IDuplicateDetector
+   {
+       private PythonInterop _pythonService;
+       // Calls imagededup via Python
+   }
+   ```
+
+4. **User Benefits** (Pro):
+   - Find similar photos (crops, edits, filters)
+   - Detect rotated/scaled duplicates
+   - Group similar images
+   - 10-100x faster with GPU acceleration
+   - Configurable similarity threshold
+
+5. **Technical Requirements**:
+   - Python 3.8+ runtime
+   - CUDA-capable GPU (optional, falls back to CPU)
+   - imagededup package + dependencies (TensorFlow/PyTorch)
+   - ~500MB additional download for Pro version
+
 ### Implementation Tasks
 - [ ] Create shared Core library
 - [ ] Implement feature flag system
@@ -233,6 +299,10 @@ Extract to separate assembly:
 - [ ] Integrate Microsoft Advertising SDK
 - [ ] Implement in-app purchase flow
 - [ ] Extract performance optimizations to Pro-only code
+- [ ] **Integrate imagededup for Pro duplicate detection**
+- [ ] **Create Python interop layer**
+- [ ] **Bundle Python runtime with Pro installer**
+- [ ] **Add GPU detection and fallback logic**
 - [ ] Test both versions thoroughly
 - [ ] Create separate Store listings
 - [ ] Update documentation for both versions
