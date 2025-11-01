@@ -95,7 +95,6 @@ namespace SyncMedia
         private List<string> _achievements = new List<string>();
         
         // Phase 2: File Preview Feature
-        private PictureBox _previewPictureBox;
         private CheckBox _enablePreviewCheckbox;
         private Panel _previewPanel;
         private FilePreviewHelper _previewHelper;
@@ -121,15 +120,6 @@ namespace SyncMedia
                 BackColor = Color.Black
             };
             
-            // Create preview PictureBox
-            _previewPictureBox = new PictureBox
-            {
-                Dock = DockStyle.Fill,
-                SizeMode = PictureBoxSizeMode.CenterImage,
-                BackColor = Color.Black
-            };
-            _previewPanel.Controls.Add(_previewPictureBox);
-            
             // Create enable preview checkbox
             _enablePreviewCheckbox = new CheckBox
             {
@@ -141,14 +131,14 @@ namespace SyncMedia
             _enablePreviewCheckbox.CheckedChanged += EnablePreviewCheckbox_CheckedChanged;
             
             // Add tooltip
-            toolTip1.SetToolTip(_enablePreviewCheckbox, "Show preview of files during sync:\nImages: 3 seconds\nVideos: 10 seconds");
+            toolTip1.SetToolTip(_enablePreviewCheckbox, "Show preview of files during sync:\nImages: 3 seconds\nVideos: 10 seconds (with playback)");
             
             // Add controls to form
             this.Controls.Add(_previewPanel);
             this.Controls.Add(_enablePreviewCheckbox);
             
-            // Initialize preview helper
-            _previewHelper = new FilePreviewHelper(_previewPictureBox);
+            // Initialize preview helper (it will create PictureBox and WebBrowser internally)
+            _previewHelper = new FilePreviewHelper(_previewPanel);
             
             // Load saved preference
             string previewEnabled = XmlData.ReadSetting("PreviewEnabled");

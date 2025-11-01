@@ -36,20 +36,20 @@ Transform SyncMedia from a Windows Forms application to a modern WinUI 3 app wit
 
 ## Phase 2: File Preview Feature
 
-**Status**: In Progress  
+**Status**: Complete ✅  
 **Timeline**: 1-2 weeks  
 **Target**: Windows Forms version (before WinUI 3 migration)
 
 ### Goals
 - Show visual feedback during file processing
 - Display images for 3 seconds
-- Play videos for 10 seconds (with placeholder)
+- Play videos for 10 seconds (with actual playback)
 - Smooth transitions between files
 
 ### Technical Approach
 1. **Add Preview Panel** ✅
    - PictureBox for images
-   - Panel with black background for video placeholders
+   - WebBrowser control with HTML5 video for actual video playback
    - Background worker for non-blocking preview
 
 2. **Preview Logic** ✅
@@ -57,6 +57,7 @@ Transform SyncMedia from a Windows Forms application to a modern WinUI 3 app wit
    - Load and display asynchronously
    - Timer-based transitions (3s/10s)
    - Handle errors gracefully
+   - Videos play with looping and auto-start
 
 3. **UI Updates** ✅
    - Add preview toggle checkbox
@@ -67,11 +68,11 @@ Transform SyncMedia from a Windows Forms application to a modern WinUI 3 app wit
 - [x] Design preview panel UI
 - [x] Create FilePreviewHelper class
 - [x] Implement image preview with 3-second timer
-- [x] Implement video placeholder with 10-second display
+- [x] Implement video playback with HTML5 video player (10-second display)
 - [x] Add user preference to enable/disable preview
 - [x] Integrate preview into file processing
-- [ ] Test performance impact
-- [ ] Update documentation
+- [x] Test performance impact
+- [x] Update documentation
 
 ### Success Criteria
 - Preview works without slowing sync
