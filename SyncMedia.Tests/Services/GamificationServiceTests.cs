@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Xunit;
-using FluentAssertions;
 using SyncMedia.Models;
 using SyncMedia.Services;
 
@@ -16,7 +15,7 @@ namespace SyncMedia.Tests.Services
             Action act = () => new GamificationService(null);
             
             // Assert
-            act.Should().Throw<ArgumentNullException>();
+            Assert.Throws<ArgumentNullException>(act);
         }
         
         [Fact]
@@ -40,8 +39,8 @@ namespace SyncMedia.Tests.Services
             // 5 duplicates * 5 points = 25
             // 10 MB * 1 point = 10
             // Total = 135
-            data.SessionPoints.Should().Be(135);
-            data.TotalPoints.Should().Be(135);
+            data.Assert.Equal(135, SessionPoints);
+            data.Assert.Equal(135, TotalPoints);
         }
         
         [Fact]
@@ -63,7 +62,7 @@ namespace SyncMedia.Tests.Services
             service.AwardPoints(stats);
             
             // Assert - Should include quick speed bonus (50 points)
-            data.SessionPoints.Should().BeGreaterThan(110); // 110 base + bonus
+            data.Assert.True(SessionPoints > 110); // 110 base + bonus
         }
         
         [Fact]
@@ -85,7 +84,7 @@ namespace SyncMedia.Tests.Services
             service.AwardPoints(stats);
             
             // Assert - Should include lightning speed bonus (500 points)
-            data.SessionPoints.Should().BeGreaterThan(600); // 600 base + 500 bonus
+            data.Assert.True(SessionPoints > 600); // 600 base + 500 bonus
         }
         
         [Fact]
@@ -100,8 +99,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("First Ten"));
-            data.Achievements.Should().Contain("FirstTen");
+            Assert.Contains(a => a.Contains("First Ten", achievements));
+            data.Assert.Contains("FirstTen", Achievements);
         }
         
         [Fact]
@@ -116,11 +115,11 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().HaveCountGreaterThan(0);
-            data.Achievements.Should().Contain("FirstTen");
-            data.Achievements.Should().Contain("QuarterCentury");
-            data.Achievements.Should().Contain("HalfCentury");
-            data.Achievements.Should().Contain("Century");
+            Assert.True(achievements.Count > 0);
+            data.Assert.Contains("FirstTen", Achievements);
+            data.Assert.Contains("QuarterCentury", Achievements);
+            data.Assert.Contains("HalfCentury", Achievements);
+            data.Assert.Contains("Century", Achievements);
         }
         
         [Fact]
@@ -138,8 +137,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Gigabyte"));
-            data.Achievements.Should().Contain("OneGB");
+            Assert.Contains(a => a.Contains("Gigabyte", achievements));
+            data.Assert.Contains("OneGB", Achievements);
         }
         
         [Fact]
@@ -154,8 +153,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Dupe Hunter"));
-            data.Achievements.Should().Contain("DupeHunter");
+            Assert.Contains(a => a.Contains("Dupe Hunter", achievements));
+            data.Assert.Contains("DupeHunter", Achievements);
         }
         
         [Fact]
@@ -174,8 +173,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Perfect Ten"));
-            data.Achievements.Should().Contain("FlawlessTen");
+            Assert.Contains(a => a.Contains("Perfect Ten", achievements));
+            data.Assert.Contains("FlawlessTen", Achievements);
         }
         
         [Fact]
@@ -194,8 +193,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().NotContain(a => a.Contains("Perfect"));
-            data.Achievements.Should().NotContain("FlawlessTen");
+            Assert.DoesNotContain(a => a.Contains("Perfect", achievements));
+            data.Assert.DoesNotContain("FlawlessTen", Achievements);
         }
         
         [Fact]
@@ -216,8 +215,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Speedster"));
-            data.Achievements.Should().Contain("SpeedsterV"); // At least this one
+            Assert.Contains(a => a.Contains("Speedster", achievements));
+            data.Assert.Contains("SpeedsterV", Achievements); // At least this one
         }
         
         [Fact]
@@ -235,7 +234,7 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Daily Century"));
+            Assert.Contains(a => a.Contains("Daily Century", achievements));
         }
         
         [Fact]
@@ -254,8 +253,8 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Balanced Pro"));
-            data.Achievements.Should().Contain("ThousandAndTen");
+            Assert.Contains(a => a.Contains("Balanced Pro", achievements));
+            data.Assert.Contains("ThousandAndTen", Achievements);
         }
         
         [Fact]
@@ -277,9 +276,9 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("TRIPLE THRONE"));
-            data.Achievements.Should().Contain("TripleThrone");
-            data.TotalPoints.Should().Be(pointsBefore + 10000); // 10K bonus
+            Assert.Contains(a => a.Contains("TRIPLE THRONE", achievements));
+            data.Assert.Contains("TripleThrone", Achievements);
+            data.Assert.Equal(pointsBefore + 10000, TotalPoints); // 10K bonus
         }
         
         [Fact]
@@ -297,8 +296,8 @@ namespace SyncMedia.Tests.Services
             var secondCheck = service.CheckAchievements(stats);
             
             // Assert
-            firstCheck.Should().HaveCountGreaterThan(0);
-            secondCheck.Should().BeEmpty();
+            Assert.True(firstCheck.Count > 0);
+            Assert.Empty(secondCheck);
         }
         
         [Fact]
@@ -313,10 +312,10 @@ namespace SyncMedia.Tests.Services
             var achievements = service.CheckAchievements(stats);
             
             // Assert
-            achievements.Should().Contain(a => a.Contains("Rookie"));
-            achievements.Should().Contain(a => a.Contains("Apprentice"));
-            achievements.Should().Contain(a => a.Contains("Skilled"));
-            data.Achievements.Should().Contain("Skilled");
+            Assert.Contains(a => a.Contains("Rookie", achievements));
+            Assert.Contains(a => a.Contains("Apprentice", achievements));
+            Assert.Contains(a => a.Contains("Skilled", achievements));
+            data.Assert.Contains("Skilled", Achievements);
         }
     }
 }

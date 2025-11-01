@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Xunit;
-using FluentAssertions;
 using SyncMedia.Models;
 
 namespace SyncMedia.Tests.Models
@@ -15,12 +14,13 @@ namespace SyncMedia.Tests.Models
             var data = new GamificationData();
             
             // Assert
-            data.TotalPoints.Should().Be(0);
-            data.SessionPoints.Should().Be(0);
-            data.TotalFilesLifetime.Should().Be(0);
-            data.TotalDuplicatesLifetime.Should().Be(0);
-            data.TotalBytesLifetime.Should().Be(0);
-            data.Achievements.Should().NotBeNull().And.BeEmpty();
+            Assert.Equal(0, data.TotalPoints);
+            Assert.Equal(0, data.SessionPoints);
+            Assert.Equal(0, data.TotalFilesLifetime);
+            Assert.Equal(0, data.TotalDuplicatesLifetime);
+            Assert.Equal(0, data.TotalBytesLifetime);
+            Assert.NotNull(data.Achievements);
+            Assert.Empty(data.Achievements);
         }
         
         [Fact]
@@ -33,7 +33,7 @@ namespace SyncMedia.Tests.Models
             data.ResetSessionPoints();
             
             // Assert
-            data.SessionPoints.Should().Be(0);
+            Assert.Equal(0, data.SessionPoints);
         }
         
         [Fact]
@@ -47,8 +47,8 @@ namespace SyncMedia.Tests.Models
             data.AddSessionPoints(50);
             
             // Assert
-            data.SessionPoints.Should().Be(150);
-            data.TotalPoints.Should().Be(150);
+            Assert.Equal(150, data.SessionPoints);
+            Assert.Equal(150, data.TotalPoints);
         }
         
         [Fact]
@@ -73,9 +73,9 @@ namespace SyncMedia.Tests.Models
             data.UpdateLifetimeStats(stats);
             
             // Assert
-            data.TotalFilesLifetime.Should().Be(150);
-            data.TotalDuplicatesLifetime.Should().Be(15);
-            data.TotalBytesLifetime.Should().Be(1500000);
+            Assert.Equal(150, data.TotalFilesLifetime);
+            Assert.Equal(15, data.TotalDuplicatesLifetime);
+            Assert.Equal(1500000, data.TotalBytesLifetime);
         }
         
         [Fact]
@@ -89,7 +89,7 @@ namespace SyncMedia.Tests.Models
             var result = data.HasAchievement("TestAchievement");
             
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
         
         [Fact]
@@ -102,7 +102,7 @@ namespace SyncMedia.Tests.Models
             var result = data.HasAchievement("NonExisting");
             
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
         
         [Fact]
@@ -115,7 +115,7 @@ namespace SyncMedia.Tests.Models
             data.AddAchievement("NewAchievement");
             
             // Assert
-            data.Achievements.Should().Contain("NewAchievement");
+            Assert.Contains("NewAchievement", data.Achievements);
         }
         
         [Fact]
@@ -129,7 +129,7 @@ namespace SyncMedia.Tests.Models
             data.AddAchievement("Achievement1");
             
             // Assert
-            data.Achievements.Count(a => a == "Achievement1").Should().Be(1);
+            Assert.Equal(1, data.Achievements.Count(a => a == "Achievement1"));
         }
     }
 }

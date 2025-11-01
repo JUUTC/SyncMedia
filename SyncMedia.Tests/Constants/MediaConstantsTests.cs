@@ -1,6 +1,5 @@
 using System.Linq;
 using Xunit;
-using FluentAssertions;
 using SyncMedia.Constants;
 
 namespace SyncMedia.Tests.Constants
@@ -17,7 +16,7 @@ namespace SyncMedia.Tests.Constants
         public void ImageExtensions_ShouldContainCommonFormats(string extension)
         {
             // Act & Assert
-            MediaConstants.ImageExtensions.Should().Contain(extension);
+            Assert.Contains(extension, MediaConstants.ImageExtensions);
         }
         
         [Theory]
@@ -29,7 +28,7 @@ namespace SyncMedia.Tests.Constants
         public void VideoExtensions_ShouldContainCommonFormats(string extension)
         {
             // Act & Assert
-            MediaConstants.VideoExtensions.Should().Contain(extension);
+            Assert.Contains(extension, MediaConstants.VideoExtensions);
         }
         
         [Fact]
@@ -41,44 +40,44 @@ namespace SyncMedia.Tests.Constants
             var videoCount = MediaConstants.VideoExtensions.Count;
             
             // Assert
-            allCount.Should().Be(imageCount + videoCount);
+            Assert.Equal(imageCount + videoCount, allCount);
         }
         
         [Fact]
         public void ImageExtensions_ShouldBeCaseInsensitive()
         {
             // Act & Assert
-            MediaConstants.ImageExtensions.Should().Contain(".JPG");
-            MediaConstants.ImageExtensions.Should().Contain(".Jpg");
-            MediaConstants.ImageExtensions.Should().Contain(".jpg");
+            Assert.Contains(".JPG", MediaConstants.ImageExtensions);
+            Assert.Contains(".Jpg", MediaConstants.ImageExtensions);
+            Assert.Contains(".jpg", MediaConstants.ImageExtensions);
         }
         
         [Fact]
         public void VideoExtensions_ShouldBeCaseInsensitive()
         {
             // Act & Assert
-            MediaConstants.VideoExtensions.Should().Contain(".MP4");
-            MediaConstants.VideoExtensions.Should().Contain(".Mp4");
-            MediaConstants.VideoExtensions.Should().Contain(".mp4");
+            Assert.Contains(".MP4", MediaConstants.VideoExtensions);
+            Assert.Contains(".Mp4", MediaConstants.VideoExtensions);
+            Assert.Contains(".mp4", MediaConstants.VideoExtensions);
         }
         
         [Fact]
         public void Constants_ShouldHaveExpectedValues()
         {
             // Assert
-            MediaConstants.UI_UPDATE_BATCH_SIZE.Should().Be(10);
-            MediaConstants.POINTS_PER_FILE.Should().Be(10);
-            MediaConstants.POINTS_PER_DUPLICATE.Should().Be(5);
-            MediaConstants.POINTS_PER_MB.Should().Be(1);
+            Assert.Equal(10, MediaConstants.UI_UPDATE_BATCH_SIZE);
+            Assert.Equal(10, MediaConstants.POINTS_PER_FILE);
+            Assert.Equal(5, MediaConstants.POINTS_PER_DUPLICATE);
+            Assert.Equal(1, MediaConstants.POINTS_PER_MB);
         }
         
         [Fact]
         public void SpeedBonuses_ShouldBeProperlyTiered()
         {
             // Assert
-            MediaConstants.SPEED_QUICK_BONUS.Should().BeLessThan(MediaConstants.SPEED_DEMON_BONUS);
-            MediaConstants.SPEED_DEMON_BONUS.Should().BeLessThan(MediaConstants.SPEED_SUPER_BONUS);
-            MediaConstants.SPEED_SUPER_BONUS.Should().BeLessThan(MediaConstants.SPEED_LIGHTNING_BONUS);
+            Assert.True(MediaConstants.SPEED_QUICK_BONUS < MediaConstants.SPEED_DEMON_BONUS);
+            Assert.True(MediaConstants.SPEED_DEMON_BONUS < MediaConstants.SPEED_SUPER_BONUS);
+            Assert.True(MediaConstants.SPEED_SUPER_BONUS < MediaConstants.SPEED_LIGHTNING_BONUS);
         }
     }
 }

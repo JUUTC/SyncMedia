@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using FluentAssertions;
 using SyncMedia.Helpers;
 
 namespace SyncMedia.Tests.Helpers
@@ -20,7 +19,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.IsImageFile(extension);
             
             // Assert
-            result.Should().Be(expected);
+            Assert.Equal(expected, result);
         }
         
         [Theory]
@@ -36,7 +35,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.IsVideoFile(extension);
             
             // Assert
-            result.Should().Be(expected);
+            Assert.Equal(expected, result);
         }
         
         [Theory]
@@ -50,7 +49,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.IsMediaFile(extension);
             
             // Assert
-            result.Should().Be(expected);
+            Assert.Equal(expected, result);
         }
         
         [Fact]
@@ -63,9 +62,9 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.CleanFileName(filename);
             
             // Assert
-            result.Should().NotContain("2024");
-            result.Should().NotContain("01");
-            result.Should().NotContain("15");
+            Assert.DoesNotContain("2024", result);
+            Assert.DoesNotContain("01", result);
+            Assert.DoesNotContain("15", result);
         }
         
         [Fact]
@@ -78,9 +77,9 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.CleanFileName(filename);
             
             // Assert
-            result.Should().NotContain("M");
-            result.Should().NotContain("P");
-            result.Should().NotContain("J");
+            Assert.DoesNotContain("M", result);
+            Assert.DoesNotContain("P", result);
+            Assert.DoesNotContain("J", result);
         }
         
         [Fact]
@@ -93,7 +92,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.CleanFileName(filename);
             
             // Assert
-            result.Should().NotContain(".jpg");
+            Assert.DoesNotContain(".jpg", result);
         }
         
         [Fact]
@@ -106,7 +105,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.RemoveFolderPath(filename);
             
             // Assert
-            result.Should().NotContain("2024/01/15");
+            Assert.DoesNotContain("2024/01/15", result);
         }
         
         [Fact]
@@ -119,7 +118,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.FormatFileDateTime(date);
             
             // Assert
-            result.Should().Be("2024-03-07");
+            Assert.Equal("2024-03-07", result);
         }
         
         [Fact]
@@ -129,7 +128,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.ValidateFolderPath(null);
             
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
         
         [Fact]
@@ -139,7 +138,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.ValidateFolderPath(string.Empty);
             
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
         
         [Fact]
@@ -149,7 +148,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.ValidateFolderPath("   ");
             
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
         
         [Fact]
@@ -162,7 +161,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.ValidateFolderPath(path);
             
             // Assert
-            result.Should().BeFalse();
+            Assert.False(result);
         }
         
         [Fact]
@@ -175,7 +174,7 @@ namespace SyncMedia.Tests.Helpers
             var result = FileHelper.ValidateFolderPath(path);
             
             // Assert
-            result.Should().BeTrue();
+            Assert.True(result);
         }
     }
 }

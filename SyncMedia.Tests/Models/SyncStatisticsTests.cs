@@ -1,6 +1,5 @@
 using System;
 using Xunit;
-using FluentAssertions;
 using SyncMedia.Models;
 
 namespace SyncMedia.Tests.Models
@@ -14,10 +13,10 @@ namespace SyncMedia.Tests.Models
             var stats = new SyncStatistics();
             
             // Assert
-            stats.TotalFilesProcessed.Should().Be(0);
-            stats.DuplicatesFound.Should().Be(0);
-            stats.ErrorsEncountered.Should().Be(0);
-            stats.TotalBytesProcessed.Should().Be(0);
+            Assert.Equal(0, stats.TotalFilesProcessed);
+            Assert.Equal(0, stats.DuplicatesFound);
+            Assert.Equal(0, stats.ErrorsEncountered);
+            Assert.Equal(0, stats.TotalBytesProcessed);
         }
         
         [Fact]
@@ -33,7 +32,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.TotalMBProcessed;
             
             // Assert
-            result.Should().BeApproximately(100.0, 0.01);
+            Assert.InRange(result, 99.99, 100.01);
         }
         
         [Fact]
@@ -52,7 +51,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.ProcessingSpeedMBPerSecond;
             
             // Assert - Should be very small or zero since elapsed time is negligible
-            result.Should().BeGreaterThanOrEqualTo(0);
+            Assert.True(result >= 0);
         }
         
         [Fact]
@@ -71,7 +70,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.ProcessingSpeedMBPerSecond;
             
             // Assert
-            result.Should().BeApproximately(10.0, 0.5);
+            Assert.InRange(result, 9.5, 10.5);
         }
         
         [Fact]
@@ -90,7 +89,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.FilesPerMinute;
             
             // Assert - Should be very large or zero depending on precision
-            result.Should().BeGreaterThanOrEqualTo(0);
+            Assert.True(result >= 0);
         }
         
         [Fact]
@@ -109,7 +108,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.FilesPerMinute;
             
             // Assert
-            result.Should().BeApproximately(20.0, 0.5);
+            Assert.InRange(result, 19.5, 20.5);
         }
         
         [Fact]
@@ -127,7 +126,7 @@ namespace SyncMedia.Tests.Models
             var result = stats.ElapsedTime;
             
             // Assert
-            result.TotalSeconds.Should().BeApproximately(60, 1);
+            Assert.InRange(result.TotalSeconds, 59, 61);
         }
         
         [Fact]
@@ -146,10 +145,10 @@ namespace SyncMedia.Tests.Models
             stats.Reset();
             
             // Assert
-            stats.TotalFilesProcessed.Should().Be(0);
-            stats.DuplicatesFound.Should().Be(0);
-            stats.ErrorsEncountered.Should().Be(0);
-            stats.TotalBytesProcessed.Should().Be(0);
+            Assert.Equal(0, stats.TotalFilesProcessed);
+            Assert.Equal(0, stats.DuplicatesFound);
+            Assert.Equal(0, stats.ErrorsEncountered);
+            Assert.Equal(0, stats.TotalBytesProcessed);
         }
     }
 }

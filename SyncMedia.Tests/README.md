@@ -1,14 +1,11 @@
 # SyncMedia Test Project
 
 ## Overview
-Comprehensive unit test suite for the SyncMedia application using xUnit, FluentAssertions, and Coverlet for code coverage.
+Comprehensive unit test suite for the SyncMedia application using xUnit, Coverlet for code coverage.
 
 ## Test Framework
 - **xUnit** - Modern testing framework for .NET
-- **FluentAssertions** - Expressive assertion library
 - **Coverlet** - Code coverage tool
-- **Moq** - Mocking framework (for future use)
-
 ## Test Structure
 
 ```
@@ -146,17 +143,6 @@ Examples:
 - `IsImageFile_ShouldReturnCorrectValue`
 
 ## Assertions Style
-Using FluentAssertions for readable, expressive tests:
-
-```csharp
-// Instead of:
-Assert.Equal(expected, actual);
-
-// We use:
-actual.Should().Be(expected);
-result.Should().BeGreaterThan(100);
-achievements.Should().Contain(a => a.Contains("Century"));
-```
 
 ## Future Enhancements
 
@@ -186,7 +172,6 @@ When adding new features:
 1. Write tests first (TDD approach)
 2. Ensure 80%+ coverage for new code
 3. Follow existing naming conventions
-4. Use FluentAssertions style
 5. Test edge cases and error conditions
 
 ## Test Results Summary
@@ -213,6 +198,5 @@ Duration:    ~2 seconds
 
 ## Resources
 - [xUnit Documentation](https://xunit.net/)
-- [FluentAssertions Documentation](https://fluentassertions.com/)
 - [Coverlet Documentation](https://github.com/coverlet-coverage/coverlet)
 - [.NET Testing Best Practices](https://learn.microsoft.com/en-us/dotnet/core/testing/)
