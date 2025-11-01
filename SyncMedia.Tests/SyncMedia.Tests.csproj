@@ -21,6 +21,7 @@
     <Compile Include="..\SyncMedia\Models\GamificationData.cs" Link="SharedCode\Models\GamificationData.cs" />
     <Compile Include="..\SyncMedia\Services\GamificationService.cs" Link="SharedCode\Services\GamificationService.cs" />
     <Compile Include="..\SyncMedia\Helpers\FileHelper.cs" Link="SharedCode\Helpers\FileHelper.cs" />
+    <Compile Include="..\SyncMedia\Helpers\PerformanceOptimizer.cs" Link="SharedCode\Helpers\PerformanceOptimizer.cs" />
   </ItemGroup>
 
 </Project>
