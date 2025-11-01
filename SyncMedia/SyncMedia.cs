@@ -93,13 +93,88 @@ namespace SyncMedia
         private int _totalDuplicatesLifetime = 0;
         private long _totalBytesLifetime = 0;
         private List<string> _achievements = new List<string>();
+        
+        // Phase 2: File Preview Feature
+        private PictureBox _previewPictureBox;
+        private CheckBox _enablePreviewCheckbox;
+        private Panel _previewPanel;
+        private FilePreviewHelper _previewHelper;
         #endregion
         
         public SyncMedia()
 
         {
             InitializeComponent();
+            InitializePreviewControls();
             LoadGamificationData();
+        }
+        
+        // Phase 2: Initialize preview UI controls
+        private void InitializePreviewControls()
+        {
+            // Create preview panel
+            _previewPanel = new Panel
+            {
+                Location = new Point(12, 157),
+                Size = new Size(170, 190),
+                BorderStyle = BorderStyle.FixedSingle,
+                BackColor = Color.Black
+            };
+            
+            // Create preview PictureBox
+            _previewPictureBox = new PictureBox
+            {
+                Dock = DockStyle.Fill,
+                SizeMode = PictureBoxSizeMode.CenterImage,
+                BackColor = Color.Black
+            };
+            _previewPanel.Controls.Add(_previewPictureBox);
+            
+            // Create enable preview checkbox
+            _enablePreviewCheckbox = new CheckBox
+            {
+                Location = new Point(12, 352),
+                Size = new Size(170, 20),
+                Text = "Enable File Preview",
+                Checked = false
+            };
+            _enablePreviewCheckbox.CheckedChanged += EnablePreviewCheckbox_CheckedChanged;
+            
+            // Add tooltip
+            toolTip1.SetToolTip(_enablePreviewCheckbox, "Show preview of files during sync:\nImages: 3 seconds\nVideos: 10 seconds");
+            
+            // Add controls to form
+            this.Controls.Add(_previewPanel);
+            this.Controls.Add(_enablePreviewCheckbox);
+            
+            // Initialize preview helper
+            _previewHelper = new FilePreviewHelper(_previewPictureBox);
+            
+            // Load saved preference
+            string previewEnabled = XmlData.ReadSetting("PreviewEnabled");
+            if (!string.IsNullOrEmpty(previewEnabled))
+            {
+                _enablePreviewCheckbox.Checked = bool.Parse(previewEnabled);
+            }
+            
+            // Add form closing event to cleanup preview helper
+            this.FormClosing += SyncMedia_FormClosing;
+        }
+        
+        private void SyncMedia_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            _previewHelper?.Dispose();
+        }
+        
+        private void EnablePreviewCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            _previewHelper.IsPreviewEnabled = _enablePreviewCheckbox.Checked;
+            XmlData.AddUpdateAppSettings("PreviewEnabled", _enablePreviewCheckbox.Checked.ToString());
+            
+            if (!_enablePreviewCheckbox.Checked)
+            {
+                _previewHelper.ClearPreview();
+            }
         }
 
        
@@ -503,6 +578,10 @@ namespace SyncMedia
                 var srchash = new byte[1];
                 return srchash;
             }
+            
+            // Phase 2: Show file preview if enabled
+            bool isVideo = VideoFileTypes(AMType);
+            _previewHelper?.ShowPreview(srcImageFile, isVideo);
             
             // Process based on file type
             if (ImageFileTypes(AMType))
