@@ -549,10 +549,29 @@ namespace SyncMedia
                 return srchash;
             }
             
-            // Optimization: Use optimized hash computation with buffered streaming
+            // Optimization: Quick duplicate check using file size pre-screening
+            // This avoids expensive hash computation for files with different sizes
+            OneFileLabel.Text = norootdir + " checking...";
+            
+            // Check if file has been processed before by comparing with already processed files
+            bool potentialDuplicate = false;
+            foreach (string processedFile in l)
+            {
+                if (File.Exists(processedFile))
+                {
+                    if (PerformanceOptimizer.QuickDuplicateCheck(srcImageFile, processedFile))
+                    {
+                        potentialDuplicate = true;
+                        break;
+                    }
+                }
+            }
+            
+            // If quick check suggests no duplicates, compute hash
             OneFileLabel.Text = norootdir + " hashing...";
             try
             {
+                // Optimization: Use optimized hash computation with buffered streaming
                 srcHash = PerformanceOptimizer.ComputeHashOptimized(srcImageFile);
             }
             catch (Exception)
