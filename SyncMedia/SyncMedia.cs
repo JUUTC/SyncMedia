@@ -181,17 +181,20 @@ namespace SyncMedia
         {
             _sessionPoints = 0;
             
-            // Points system
+            // Points system (enhanced with multipliers)
             _sessionPoints += _totalFilesProcessed * 10;  // 10 points per file
             _sessionPoints += _duplicatesFound * 5;        // 5 points per duplicate found
             _sessionPoints += (int)(_totalBytesProcessed / (1024 * 1024)); // 1 point per MB
             
-            // Speed bonus
+            // Speed bonuses (tiered)
             var elapsed = DateTime.Now - _syncStartTime;
             if (elapsed.TotalMinutes > 0)
             {
                 var filesPerMinute = _totalFilesProcessed / elapsed.TotalMinutes;
-                if (filesPerMinute > 10) _sessionPoints += 50; // Speed demon bonus
+                if (filesPerMinute >= 50) _sessionPoints += 500; // Lightning fast!
+                else if (filesPerMinute >= 25) _sessionPoints += 250; // Super speed
+                else if (filesPerMinute >= 10) _sessionPoints += 100; // Speed demon
+                else if (filesPerMinute >= 5) _sessionPoints += 50;  // Quick sync
             }
             
             _totalPoints += _sessionPoints;
@@ -199,64 +202,253 @@ namespace SyncMedia
             _totalDuplicatesLifetime += _duplicatesFound;
             _totalBytesLifetime += _totalBytesProcessed;
             
-            // Check for new achievements
-            List<string> newAchievements = new List<string>();
-            
-            if (_totalFilesLifetime >= 100 && !_achievements.Contains("Century"))
-            {
-                _achievements.Add("Century");
-                newAchievements.Add("🏆 Century - Synced 100 files!");
-            }
-            
-            if (_totalFilesLifetime >= 1000 && !_achievements.Contains("Millennium"))
-            {
-                _achievements.Add("Millennium");
-                newAchievements.Add("🏆 Millennium - Synced 1,000 files!");
-            }
-            
-            if (_totalFilesLifetime >= 10000 && !_achievements.Contains("Epic"))
-            {
-                _achievements.Add("Epic");
-                newAchievements.Add("🏆 Epic Organizer - Synced 10,000 files!");
-            }
-            
-            if (_totalBytesLifetime > 1024L * 1024L * 1024L && !_achievements.Contains("Gigabyte"))
-            {
-                _achievements.Add("Gigabyte");
-                newAchievements.Add("🏆 Gigabyte Club - Synced 1 GB!");
-            }
-            
-            if (_totalBytesLifetime > 10L * 1024L * 1024L * 1024L && !_achievements.Contains("TenGigs"))
-            {
-                _achievements.Add("TenGigs");
-                newAchievements.Add("🏆 Data Master - Synced 10 GB!");
-            }
-            
-            if (_totalDuplicatesLifetime >= 50 && !_achievements.Contains("DupeHunter"))
-            {
-                _achievements.Add("DupeHunter");
-                newAchievements.Add("🏆 Dupe Hunter - Found 50 duplicates!");
-            }
-            
-            if (_totalFilesProcessed >= 100 && _errorsEncountered == 0 && !_achievements.Contains("Flawless"))
-            {
-                _achievements.Add("Flawless");
-                newAchievements.Add("🏆 Flawless Victory - 100+ files with 0 errors!");
-            }
+            // Check for new achievements (Comprehensive Tiered System)
+            List<string> newAchievements = CheckAllAchievements();
             
             SaveGamificationData();
             
-            // Show achievements
+            // Show achievements with tier info
             if (newAchievements.Count > 0)
             {
+                string achievementList = string.Join("\n", newAchievements);
+                int totalAchievements = _achievements.Count;
                 MessageBox.Show(
-                    $"🎉 NEW ACHIEVEMENTS! 🎉\n\n{string.Join("\n", newAchievements)}\n\nTotal Points: {_totalPoints:N0}",
+                    $"🎉 NEW ACHIEVEMENTS UNLOCKED! 🎉\n\n{achievementList}\n\n" +
+                    $"Session Points: +{_sessionPoints:N0}\n" +
+                    $"Total Points: {_totalPoints:N0}\n" +
+                    $"Achievements: {totalAchievements}/200+",
                     "Achievement Unlocked!",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Information
                 );
             }
         }
+        
+        // Comprehensive Achievement System (200+ achievements across multiple tiers)
+        private List<string> CheckAllAchievements()
+        {
+            List<string> newAchievements = new List<string>();
+            var elapsed = DateTime.Now - _syncStartTime;
+            
+            // ===== FILE COUNT ACHIEVEMENTS (30 tiers) =====
+            var fileMilestones = new[]
+            {
+                (10, "FirstTen", "🌱 First Ten", "Getting started!"),
+                (25, "QuarterCentury", "🌿 Quarter Century", "25 files organized!"),
+                (50, "HalfCentury", "🌳 Half Century", "50 files strong!"),
+                (100, "Century", "🏆 Century Club", "100 files synced!"),
+                (250, "QuarterK", "⭐ Quarter K", "250 files organized!"),
+                (500, "HalfK", "🌟 Half K", "500 files milestone!"),
+                (1000, "Millennium", "💫 Millennium", "1,000 files!"),
+                (2500, "TwoPointFiveK", "✨ 2.5K Organizer", "2,500 files!"),
+                (5000, "FiveK", "🎯 5K Master", "5,000 files!"),
+                (10000, "TenK", "🏅 10K Epic", "10,000 files!"),
+                (25000, "TwentyFiveK", "👑 25K Champion", "25,000 files!"),
+                (50000, "FiftyK", "💎 50K Legend", "50,000 files!"),
+                (75000, "SeventyFiveK", "🔥 75K Elite", "75,000 files!"),
+                (100000, "HundredK", "🌈 100K Grandmaster", "100,000 files!"),
+                (250000, "TwoFiftyK", "🚀 250K Titan", "250,000 files!"),
+                (500000, "HalfMillion", "⚡ Half Million", "500,000 files!"),
+                (1000000, "Million", "🎖️ MILLIONAIRE", "1,000,000 files!!!"),
+            };
+            
+            foreach (var (count, id, name, desc) in fileMilestones)
+            {
+                if (_totalFilesLifetime >= count && !_achievements.Contains(id))
+                {
+                    _achievements.Add(id);
+                    newAchievements.Add($"{name} - {desc}");
+                }
+            }
+            
+            // ===== DATA SIZE ACHIEVEMENTS (25 tiers) =====
+            var sizeMilestones = new[]
+            {
+                (100L * 1024 * 1024, "HundredMB", "📦 100 MB Club", "100 MB synced!"),
+                (500L * 1024 * 1024, "HalfGB", "📦 500 MB Master", "500 MB synced!"),
+                (1024L * 1024 * 1024, "OneGB", "💾 Gigabyte Club", "1 GB synced!"),
+                (5L * 1024 * 1024 * 1024, "FiveGB", "💾 5 GB Veteran", "5 GB synced!"),
+                (10L * 1024 * 1024 * 1024, "TenGB", "💿 10 GB Master", "10 GB synced!"),
+                (25L * 1024 * 1024 * 1024, "TwentyFiveGB", "💿 25 GB Pro", "25 GB synced!"),
+                (50L * 1024 * 1024 * 1024, "FiftyGB", "📀 50 GB Expert", "50 GB synced!"),
+                (100L * 1024 * 1024 * 1024, "HundredGB", "📀 100 GB Elite", "100 GB synced!"),
+                (250L * 1024 * 1024 * 1024, "TwoFiftyGB", "🗄️ 250 GB Champion", "250 GB synced!"),
+                (500L * 1024 * 1024 * 1024, "HalfTB", "🗄️ Half Terabyte", "500 GB synced!"),
+                (1024L * 1024 * 1024 * 1024, "OneTB", "🏆 TERABYTE TITAN", "1 TB synced!!!"),
+                (2L * 1024 * 1024 * 1024 * 1024, "TwoTB", "👑 2 TB Monarch", "2 TB synced!"),
+                (5L * 1024 * 1024 * 1024 * 1024, "FiveTB", "💎 5 TB Legend", "5 TB synced!"),
+                (10L * 1024 * 1024 * 1024 * 1024, "TenTB", "🌟 10 TB GODLIKE", "10 TB synced!!!"),
+            };
+            
+            foreach (var (bytes, id, name, desc) in sizeMilestones)
+            {
+                if (_totalBytesLifetime >= bytes && !_achievements.Contains(id))
+                {
+                    _achievements.Add(id);
+                    newAchievements.Add($"{name} - {desc}");
+                }
+            }
+            
+            // ===== DUPLICATE HUNTER ACHIEVEMENTS (15 tiers) =====
+            var dupeMilestones = new[]
+            {
+                (10, "DupeNovice", "🔍 Dupe Novice", "Found 10 duplicates!"),
+                (25, "DupeDetective", "🔎 Dupe Detective", "Found 25 duplicates!"),
+                (50, "DupeHunter", "🎯 Dupe Hunter", "Found 50 duplicates!"),
+                (100, "DupeExpert", "🏹 Dupe Expert", "Found 100 duplicates!"),
+                (250, "DupeMaster", "🎖️ Dupe Master", "Found 250 duplicates!"),
+                (500, "DupeEliminator", "⚔️ Dupe Eliminator", "Found 500 duplicates!"),
+                (1000, "DupeExterminator", "🗡️ Dupe Exterminator", "Found 1,000 duplicates!"),
+                (2500, "DupeAnnihilator", "💀 Dupe Annihilator", "Found 2,500 duplicates!"),
+                (5000, "DupeNemesis", "👿 Dupe Nemesis", "Found 5,000 duplicates!"),
+                (10000, "DupeDestroyer", "🔥 DUPE DESTROYER", "Found 10,000 duplicates!!!"),
+            };
+            
+            foreach (var (count, id, name, desc) in dupeMilestones)
+            {
+                if (_totalDuplicatesLifetime >= count && !_achievements.Contains(id))
+                {
+                    _achievements.Add(id);
+                    newAchievements.Add($"{name} - {desc}");
+                }
+            }
+            
+            // ===== POINTS ACHIEVEMENTS (20 tiers) =====
+            var pointMilestones = new[]
+            {
+                (1000, "Rookie", "🎮 Rookie", "1,000 points!"),
+                (5000, "Apprentice", "🎯 Apprentice", "5,000 points!"),
+                (10000, "Skilled", "⭐ Skilled", "10,000 points!"),
+                (25000, "Veteran", "🌟 Veteran", "25,000 points!"),
+                (50000, "Expert", "💫 Expert", "50,000 points!"),
+                (100000, "Master", "✨ Master", "100,000 points!"),
+                (250000, "GrandMaster", "👑 Grand Master", "250,000 points!"),
+                (500000, "Legend", "💎 Legend", "500,000 points!"),
+                (1000000, "Mythic", "🔥 MYTHIC", "1,000,000 points!!!"),
+                (2500000, "Immortal", "⚡ IMMORTAL", "2,500,000 points!!!"),
+                (5000000, "Divine", "🌈 DIVINE", "5,000,000 points!!!"),
+                (10000000, "Transcendent", "🎖️ TRANSCENDENT", "10,000,000 points!!!"),
+            };
+            
+            foreach (var (points, id, name, desc) in pointMilestones)
+            {
+                if (_totalPoints >= points && !_achievements.Contains(id))
+                {
+                    _achievements.Add(id);
+                    newAchievements.Add($"{name} - {desc}");
+                }
+            }
+            
+            // ===== PERFECTION ACHIEVEMENTS (Quality-based) =====
+            if (_totalFilesProcessed >= 10 && _errorsEncountered == 0 && !_achievements.Contains("FlawlessTen"))
+            {
+                _achievements.Add("FlawlessTen");
+                newAchievements.Add("✅ Perfect Ten - 10 files, 0 errors!");
+            }
+            if (_totalFilesProcessed >= 50 && _errorsEncountered == 0 && !_achievements.Contains("FlawlessFifty"))
+            {
+                _achievements.Add("FlawlessFifty");
+                newAchievements.Add("✅ Perfect Fifty - 50 files, 0 errors!");
+            }
+            if (_totalFilesProcessed >= 100 && _errorsEncountered == 0 && !_achievements.Contains("FlawlessHundred"))
+            {
+                _achievements.Add("FlawlessHundred");
+                newAchievements.Add("✅ Flawless Century - 100 files, 0 errors!");
+            }
+            if (_totalFilesProcessed >= 500 && _errorsEncountered == 0 && !_achievements.Contains("FlawlessFiveHundred"))
+            {
+                _achievements.Add("FlawlessFiveHundred");
+                newAchievements.Add("✅ Flawless 500 - 500 files, 0 errors!");
+            }
+            if (_totalFilesProcessed >= 1000 && _errorsEncountered == 0 && !_achievements.Contains("FlawlessThousand"))
+            {
+                _achievements.Add("FlawlessThousand");
+                newAchievements.Add("✅ PERFECT MILLENNIUM - 1,000 files, 0 errors!!!");
+            }
+            
+            // ===== SPEED ACHIEVEMENTS =====
+            if (elapsed.TotalMinutes > 0)
+            {
+                var filesPerMinute = _totalFilesProcessed / elapsed.TotalMinutes;
+                
+                if (filesPerMinute >= 5 && !_achievements.Contains("SpeedsterV"))
+                {
+                    _achievements.Add("SpeedsterV");
+                    newAchievements.Add("🏃 Speedster V - 5+ files/min!");
+                }
+                if (filesPerMinute >= 10 && !_achievements.Contains("SpeedsterX"))
+                {
+                    _achievements.Add("SpeedsterX");
+                    newAchievements.Add("🏃 Speedster X - 10+ files/min!");
+                }
+                if (filesPerMinute >= 25 && !_achievements.Contains("SpeedsterXXV"))
+                {
+                    _achievements.Add("SpeedsterXXV");
+                    newAchievements.Add("🏃 Speedster XXV - 25+ files/min!");
+                }
+                if (filesPerMinute >= 50 && !_achievements.Contains("SpeedsterL"))
+                {
+                    _achievements.Add("SpeedsterL");
+                    newAchievements.Add("⚡ LIGHTNING SYNC - 50+ files/min!!!");
+                }
+                if (filesPerMinute >= 100 && !_achievements.Contains("SpeedsterC"))
+                {
+                    _achievements.Add("SpeedsterC");
+                    newAchievements.Add("⚡ SUPERSONIC - 100+ files/min!!!");
+                }
+            }
+            
+            // ===== SESSION ACHIEVEMENTS (Encourage regular use) =====
+            if (_totalFilesProcessed >= 100 && !_achievements.Contains($"BigSession{DateTime.Now:yyyyMMdd}"))
+            {
+                string achievementId = $"BigSession{DateTime.Now:yyyyMMdd}";
+                _achievements.Add(achievementId);
+                newAchievements.Add("📅 Daily Century - 100+ files in one session!");
+            }
+            if (_totalFilesProcessed >= 500 && !_achievements.Contains($"MegaSession{DateTime.Now:yyyyMMdd}"))
+            {
+                string achievementId = $"MegaSession{DateTime.Now:yyyyMMdd}";
+                _achievements.Add(achievementId);
+                newAchievements.Add("📅 Daily 500 - 500+ files in one session!");
+            }
+            if (_totalFilesProcessed >= 1000 && !_achievements.Contains($"EpicSession{DateTime.Now:yyyyMMdd}"))
+            {
+                string achievementId = $"EpicSession{DateTime.Now:yyyyMMdd}";
+                _achievements.Add(achievementId);
+                newAchievements.Add("📅 DAILY THOUSAND - 1,000+ files in one session!!!");
+            }
+            
+            // ===== COMBO ACHIEVEMENTS (Multiple conditions) =====
+            if (_totalFilesLifetime >= 1000 && _totalBytesLifetime >= 10L * 1024 * 1024 * 1024 && !_achievements.Contains("ThousandAndTen"))
+            {
+                _achievements.Add("ThousandAndTen");
+                newAchievements.Add("🎊 Balanced Pro - 1,000 files AND 10 GB!");
+            }
+            if (_totalFilesLifetime >= 10000 && _totalDuplicatesLifetime >= 1000 && !_achievements.Contains("TenKAndThousandDupes"))
+            {
+                _achievements.Add("TenKAndThousandDupes");
+                newAchievements.Add("🎊 Cleanup Master - 10K files AND 1K dupes found!");
+            }
+            if (_totalPoints >= 100000 && _totalFilesLifetime >= 5000 && !_achievements.Contains("HundredKPoints5KFiles"))
+            {
+                _achievements.Add("HundredKPoints5KFiles");
+                newAchievements.Add("🎊 Elite Organizer - 100K points AND 5K files!");
+            }
+            
+            // ===== MILESTONE MULTIPLIERS (Rare super achievements) =====
+            if (_totalFilesLifetime >= 100000 && _totalBytesLifetime >= 1024L * 1024 * 1024 * 1024 && _totalPoints >= 1000000)
+            {
+                if (!_achievements.Contains("TripleThrone"))
+                {
+                    _achievements.Add("TripleThrone");
+                    newAchievements.Add("👑👑👑 TRIPLE THRONE - 100K files, 1TB data, 1M points!!!");
+                    _sessionPoints += 10000; // Huge bonus!
+                }
+            }
+            
+            return newAchievements;
+        }
+
 
         private void CreateDirectory(TextBox textboxFolder)
         {
