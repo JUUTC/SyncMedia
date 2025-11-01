@@ -126,6 +126,18 @@ namespace SyncMedia
 
         private byte[] ImageHash(string srcImageFile)
         {
+            // UX Enhancement: Check for pause/cancel
+            while (_isPaused && !_isCancelled)
+            {
+                System.Threading.Thread.Sleep(100);
+                Application.DoEvents();
+            }
+            
+            if (_isCancelled)
+            {
+                return new byte[1];
+            }
+            
             string year = string.Empty;
             string month = string.Empty;
             string vyear = string.Empty;
@@ -477,8 +489,11 @@ namespace SyncMedia
             _totalBytesProcessed = 0;
             _syncStartTime = DateTime.Now;
             _isCancelled = false;
+            _isPaused = false;
             
             HashAll.Enabled = false;
+            PauseButton.Enabled = true;
+            CancelButton.Enabled = true;
             
             // UX Enhancement: Apply filters based on checkboxes
             HashSet<string> filteredExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -491,6 +506,13 @@ namespace SyncMedia
             {
                 foreach (var ext in VideoExtensions)
                     filteredExtensions.Add(ext);
+            }
+            
+            if (filteredExtensions.Count == 0)
+            {
+                MessageBox.Show("Please select at least one file type filter (Images or Videos).", "No Filters", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                HashAll.Enabled = true;
+                return;
             }
             
             // Optimized: Use HashSet for file extension checking with filters
@@ -518,6 +540,11 @@ namespace SyncMedia
             
             var elapsed = DateTime.Now - _syncStartTime;
             OneFileLabel.Text = $"Completed! Processed: {_totalFilesProcessed} files ({_totalBytesProcessed / (1024.0 * 1024.0):F2} MB) in {elapsed:hh\\:mm\\:ss} | Duplicates: {_duplicatesFound} | Errors: {_errorsEncountered}";
+            
+            // Re-enable controls
+            HashAll.Enabled = true;
+            PauseButton.Enabled = false;
+            CancelButton.Enabled = false;
         }
 
        
@@ -709,6 +736,66 @@ namespace SyncMedia
             {
                 InsertUpdateFolderSetting(RejectFolderTextbox, "RejectFolder");
             }
+        }
+        
+        // UX Enhancement: Filter checkbox handlers
+        private void FilterImagesCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            _filterImages = FilterImagesCheckbox.Checked;
+        }
+        
+        private void FilterVideosCheckbox_CheckedChanged(object sender, EventArgs e)
+        {
+            _filterVideos = FilterVideosCheckbox.Checked;
+        }
+        
+        // UX Enhancement: Pause button handler
+        private void PauseButton_Click(object sender, EventArgs e)
+        {
+            _isPaused = !_isPaused;
+            PauseButton.Text = _isPaused ? "Resume" : "Pause";
+            
+            if (_isPaused)
+            {
+                OneFileLabel.Text = "Sync paused. Click Resume to continue.";
+            }
+        }
+        
+        // UX Enhancement: Cancel button handler
+        private void CancelButton_Click(object sender, EventArgs e)
+        {
+            if (MessageBox.Show("Are you sure you want to cancel the sync operation?", 
+                "Cancel Sync", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                _isCancelled = true;
+                OneFileLabel.Text = "Sync cancelled by user.";
+                HashAll.Enabled = true;
+                PauseButton.Enabled = false;
+                CancelButton.Enabled = false;
+            }
+        }
+        
+        // UX Enhancement: Search textbox handler
+        private void SearchTextbox_TextChanged(object sender, EventArgs e)
+        {
+            string searchText = SearchTextbox.Text.ToLower();
+            
+            if (string.IsNullOrWhiteSpace(searchText))
+            {
+                // Show all items
+                dataGridViewPreview.DataSource = dgvl.Select(x => new { Value = x }).ToList();
+            }
+            else
+            {
+                // Filter items based on search
+                var filtered = dgvl.Where(x => x.ToLower().Contains(searchText))
+                                  .Select(x => new { Value = x })
+                                  .ToList();
+                dataGridViewPreview.DataSource = filtered;
+            }
+            
+            dataGridViewPreview.AutoResizeColumn(0);
+            dataGridViewPreview.Refresh();
         }
     }
 
