@@ -1,6 +1,19 @@
 # SyncMedia
+
+[![Microsoft Store Ready](https://img.shields.io/badge/Microsoft%20Store-Ready-brightgreen)](WINDOWS_STORE_MIGRATION.md)
+
 Copy pictures and video from source folder to destination folder tree and prevents dupes by hashing each file and saving
 a xml list of hashes.
+
+## Installation
+
+### Microsoft Store (Recommended)
+This application is packaged and ready for Microsoft Store distribution. See [Windows Store Migration Guide](WINDOWS_STORE_MIGRATION.md) for publishing instructions.
+
+### Manual Installation
+Download and run the installer from the [Releases](../../releases) page.
+
+## Usage
 
 Once the application starts you will need to "set" three folders (This will be saved).
 The first is the folder you downloaded your files from your camera or phone to. 
@@ -33,3 +46,48 @@ Each file is hashed to get a unique signature so the system will not place dupli
 
 The application will only sort the following file types:
 .jpg, .png, .bmp, .jpeg, .gif, .tif, .tiff, .mov, .mp4, .wmv, .avi, .m4v, .mpg and .mpeg
+
+## Settings Storage
+
+Your folder preferences and gamification data are stored in:
+```
+%LOCALAPPDATA%\SyncMedia\settings.xml
+```
+
+This location ensures your settings are preserved across app updates and work properly with Windows Store packaging.
+
+## Building from Source
+
+### Requirements
+- .NET 9.0 SDK
+- Windows 10 SDK (10.0.17763.0 or higher) for packaging
+- Visual Studio 2022 (optional, for packaging project)
+
+### Build Instructions
+
+```bash
+# Clone the repository
+git clone https://github.com/JUUTC/SyncMedia.git
+cd SyncMedia
+
+# Restore dependencies
+dotnet restore
+
+# Build the application
+dotnet build -c Release
+
+# Run the application
+dotnet run --project SyncMedia\SyncMedia.csproj
+```
+
+### Creating Microsoft Store Package
+
+See [Windows Store Migration Guide](WINDOWS_STORE_MIGRATION.md) for detailed instructions on creating and publishing the MSIX package.
+
+## Architecture
+
+The application follows a clean architecture with separation of concerns. See [ARCHITECTURE.md](SyncMedia/ARCHITECTURE.md) for detailed documentation.
+
+## License
+
+See [LICENSE](LICENSE) file for details.

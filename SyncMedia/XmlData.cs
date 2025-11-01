@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using System.Configuration;
 using System.IO;
 
 
@@ -10,17 +9,74 @@ namespace SyncMedia
 {
     public class XmlData
     {
+        private static readonly string SettingsDirectory = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "SyncMedia"
+        );
+        
+        private static readonly string SettingsFilePath = Path.Combine(SettingsDirectory, "settings.xml");
+
+        // Ensure settings directory exists
+        static XmlData()
+        {
+            try
+            {
+                if (!Directory.Exists(SettingsDirectory))
+                {
+                    Directory.CreateDirectory(SettingsDirectory);
+                }
+            }
+            catch
+            {
+                // If we can't create the directory, settings will fail gracefully
+            }
+        }
+
+        // Load all settings from XML file
+        private static XDocument LoadSettingsDocument()
+        {
+            try
+            {
+                if (File.Exists(SettingsFilePath))
+                {
+                    return XDocument.Load(SettingsFilePath);
+                }
+            }
+            catch
+            {
+                // If load fails, return new document
+            }
+            
+            // Return new settings document
+            return new XDocument(new XElement("settings"));
+        }
+
+        // Save settings document to file
+        private static void SaveSettingsDocument(XDocument doc)
+        {
+            try
+            {
+                doc.Save(SettingsFilePath);
+            }
+            catch
+            {
+                // Silently fail if save doesn't work
+            }
+        }
+
         public static string ReadSetting(string key)
         {
             try
             {
-                var appSettings = ConfigurationManager.AppSettings;
-                string result = appSettings[key] ?? "";
-                return result;
+                var doc = LoadSettingsDocument();
+                var element = doc.Root?.Elements("setting")
+                    .FirstOrDefault(e => e.Attribute("key")?.Value == key);
+                
+                return element?.Attribute("value")?.Value ?? "";
             }
-            catch (ConfigurationErrorsException)
+            catch
             {
-                return "Error";
+                return "";
             }
         }
 
@@ -28,24 +84,38 @@ namespace SyncMedia
         {
             try
             {
-                var configFile = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                var settings = configFile.AppSettings.Settings;
-                if (settings[key] == null)
+                var doc = LoadSettingsDocument();
+                var root = doc.Root;
+                
+                if (root == null)
                 {
-                    settings.Add(key, value);
+                    root = new XElement("settings");
+                    doc.Add(root);
+                }
+
+                var element = root.Elements("setting")
+                    .FirstOrDefault(e => e.Attribute("key")?.Value == key);
+                
+                if (element == null)
+                {
+                    // Add new setting
+                    root.Add(new XElement("setting",
+                        new XAttribute("key", key),
+                        new XAttribute("value", value ?? "")));
                 }
                 else
                 {
-                    settings[key].Value = value;
+                    // Update existing setting
+                    element.SetAttributeValue("value", value ?? "");
                 }
-                configFile.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection(configFile.AppSettings.SectionInformation.Name);
+                
+                SaveSettingsDocument(doc);
+                return "Success";
             }
-            catch (ConfigurationErrorsException)
+            catch
             {
                 return "Error";
             }
-            return "Success";
         }
 
         public static string CreateXmlDoc(string filen, List<string> hashlist)
