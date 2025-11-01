@@ -51,6 +51,19 @@ namespace SyncMedia
         // Optimized: Batch UI updates to reduce Application.DoEvents() calls
         private int _uiUpdateCounter = 0;
         private const int UI_UPDATE_BATCH_SIZE = 10;
+        
+        // UX Enhancement: Statistics tracking
+        private int _totalFilesProcessed = 0;
+        private int _duplicatesFound = 0;
+        private int _errorsEncountered = 0;
+        private long _totalBytesProcessed = 0;
+        private DateTime _syncStartTime;
+        private bool _isPaused = false;
+        private bool _isCancelled = false;
+        
+        // UX Enhancement: Filter options
+        private bool _filterImages = true;
+        private bool _filterVideos = true;
         #endregion
         public SyncMedia()
 
@@ -68,6 +81,7 @@ namespace SyncMedia
             if (SourceFolderTextbox.Text != string.Empty)
             {
                 CreateDirectory(SourceFolderTextbox);
+                ValidateFolder(SourceFolderTextbox.Text, SourceFolderTextbox);
             }
 
             DestinationFolderTextbox.Text = XmlData.ReadSetting("DestinationFolder");
@@ -75,6 +89,7 @@ namespace SyncMedia
             {
                 XmlDatabase = @DestinationFolderTextbox.Text + "MediaSync_SaveFile_" + Device + @".xml";
                 CreateDirectory(DestinationFolderTextbox);
+                ValidateFolder(DestinationFolderTextbox.Text, DestinationFolderTextbox);
                 if (File.Exists(@DestinationFolderTextbox.Text + "MediaSync_SaveFile_" + Device + @".xml"))
                 {
                     StoredHashes = XmlData.GetHashesList(XmlDatabase).ToList();
@@ -90,6 +105,7 @@ namespace SyncMedia
             if (RejectFolderTextbox.Text != string.Empty)
             {
                 CreateDirectory(RejectFolderTextbox);
+                ValidateFolder(RejectFolderTextbox.Text, RejectFolderTextbox);
             }
         }
 
@@ -206,8 +222,12 @@ namespace SyncMedia
                             finalFileName = MoveImageUpdateStatusGrid(year, month, FileDateTime, finalFileName, fsd);
                         }
 
+                        // UX Enhancement: Track statistics
+                        _totalFilesProcessed++;
+                        _totalBytesProcessed += AMLength;
+                        
                         hashes.Add(Convert.ToBase64String(srcHash));
-                        TotalFilesLabel.Text = SyncProgress.Value + "/" + MediaCount.ToString();
+                        UpdateProgressInfo();
                         // Optimized: UI updates are now batched in UpdateDataGridView()
                         return srcHash;
                     }
@@ -249,16 +269,55 @@ namespace SyncMedia
                 _uiUpdateCounter = 0;
             }
         }
+        
+        // UX Enhancement: Update progress with statistics and ETA
+        private void UpdateProgressInfo()
+        {
+            if (_syncStartTime == DateTime.MinValue) return;
+            
+            var elapsed = DateTime.Now - _syncStartTime;
+            var filesPerSecond = elapsed.TotalSeconds > 0 ? _totalFilesProcessed / elapsed.TotalSeconds : 0;
+            var remaining = MediaCount - SyncProgress.Value;
+            var eta = filesPerSecond > 0 ? TimeSpan.FromSeconds(remaining / filesPerSecond) : TimeSpan.Zero;
+            
+            var sizeInMB = _totalBytesProcessed / (1024.0 * 1024.0);
+            var speed = elapsed.TotalSeconds > 0 ? sizeInMB / elapsed.TotalSeconds : 0;
+            
+            TotalFilesLabel.Text = $"{SyncProgress.Value}/{MediaCount} | {sizeInMB:F2} MB | {speed:F2} MB/s | ETA: {eta:hh\\:mm\\:ss} | Duplicates: {_duplicatesFound} | Errors: {_errorsEncountered}";
+        }
+        
+        // UX Enhancement: Validate folder path
+        private bool ValidateFolder(string path, TextBox textBox)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                textBox.BackColor = Color.LightYellow;
+                return false;
+            }
+            
+            if (!Directory.Exists(path))
+            {
+                textBox.BackColor = Color.LightCoral;
+                return false;
+            }
+            
+            textBox.BackColor = Color.LightGreen;
+            return true;
+        }
 
         private void RejectMediaWriteToGrid(string AMFullName)
         {
-            dgvl.Add(AMFullName + " moved to REJECT FOLDER");
+            _duplicatesFound++;
+            dgvl.Add($"[DUPLICATE] {AMFullName}");
             UpdateDataGridView();
         }
 
         public void ErrorWriteToGrid(Exception exc)
         {
-            dgvl.Add(exc.Message.Substring(0,16) + "...");
+            _errorsEncountered++;
+            // UX Enhancement: Show full error message instead of truncating
+            string errorMsg = exc.Message.Length > 100 ? exc.Message.Substring(0, 97) + "..." : exc.Message;
+            dgvl.Add($"[ERROR] {errorMsg}");
             UpdateDataGridView();
         }
 
@@ -392,27 +451,73 @@ namespace SyncMedia
 
         private void HashAll_Click(object sender, EventArgs e)
         {
+            // UX Enhancement: Validate folders before starting
+            if (!ValidateFolder(SourceFolderTextbox.Text, SourceFolderTextbox))
+            {
+                MessageBox.Show("Please select a valid source folder.", "Invalid Source", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            if (!ValidateFolder(DestinationFolderTextbox.Text, DestinationFolderTextbox))
+            {
+                MessageBox.Show("Please select a valid destination folder.", "Invalid Destination", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            if (!ValidateFolder(RejectFolderTextbox.Text, RejectFolderTextbox))
+            {
+                MessageBox.Show("Please select a valid reject folder.", "Invalid Reject Folder", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            // UX Enhancement: Reset statistics
+            _totalFilesProcessed = 0;
+            _duplicatesFound = 0;
+            _errorsEncountered = 0;
+            _totalBytesProcessed = 0;
+            _syncStartTime = DateTime.Now;
+            _isCancelled = false;
+            
             HashAll.Enabled = false;
-            // Optimized: Use HashSet for file extension checking
+            
+            // UX Enhancement: Apply filters based on checkboxes
+            HashSet<string> filteredExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            if (_filterImages)
+            {
+                foreach (var ext in ImageExtensions)
+                    filteredExtensions.Add(ext);
+            }
+            if (_filterVideos)
+            {
+                foreach (var ext in VideoExtensions)
+                    filteredExtensions.Add(ext);
+            }
+            
+            // Optimized: Use HashSet for file extension checking with filters
             MediaCount = Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories)
-                .Count(file => AllMediaExtensions.Contains(Path.GetExtension(file)));
+                .Count(file => filteredExtensions.Contains(Path.GetExtension(file)));
             SyncProgress.Maximum = MediaCount;
             TotalFilesLabel.Text = MediaCount.ToString();
             SyncProgress.Step = 1;
+            
             // Optimized: Filter files before processing
             Directory.EnumerateFiles(SourceFolderTextbox.Text, "*.*", SearchOption.AllDirectories)
-                .Where(file => AllMediaExtensions.Contains(Path.GetExtension(file)))
+                .Where(file => filteredExtensions.Contains(Path.GetExtension(file)))
                 .OrderBy(Filename => Filename)
                 .Select(f => new { FileName = f, FileHash = Convert.ToBase64String(ImageHash(f)) })
                 .AsParallel()
                 .ToList();
-            TotalFilesLabel.Text = MediaCount.ToString() + "/" + MediaCount.ToString();
+                
+            // UX Enhancement: Show final statistics
+            UpdateProgressInfo();
             MediaCount = 0;
             hashes = hashes.Union(StoredHashes).ToList();
             XmlData.CreateXmlDoc(XmlDatabase, hashes);
             // Optimized: Force final UI update
             UpdateDataGridView(forceUpdate: true);
-            OneFileLabel.Text = "All Media Checked and Moved.  Close and re-open the application to sync more files";
+            
+            var elapsed = DateTime.Now - _syncStartTime;
+            OneFileLabel.Text = $"Completed! Processed: {_totalFilesProcessed} files ({_totalBytesProcessed / (1024.0 * 1024.0):F2} MB) in {elapsed:hh\\:mm\\:ss} | Duplicates: {_duplicatesFound} | Errors: {_errorsEncountered}";
         }
 
        
@@ -547,19 +652,15 @@ namespace SyncMedia
                     return;
             }
             
-                XmlData.AddUpdateAppSettings(FolderType, FolderTextbox.Text);
-            //if (string.Join("", Data.CheckForDevice(Device).Take(1)) == string.Empty)
-            //{
-            //   Data.InsertDevice(Device, FolderType, FolderTextbox.Text);
-            //}
-            //else
-            //{
-            //    Data.UpdateDevice(Device, FolderType, FolderTextbox.Text);
-            //}
+            XmlData.AddUpdateAppSettings(FolderType, FolderTextbox.Text);
+            
             if (!Directory.Exists(FolderTextbox.Text))
             {
                 Directory.CreateDirectory(FolderTextbox.Text);
             }
+            
+            // UX Enhancement: Validate folder after selection
+            ValidateFolder(FolderTextbox.Text, FolderTextbox);
         }
 
         private void SetFolderSource_Click(object sender, EventArgs e)
