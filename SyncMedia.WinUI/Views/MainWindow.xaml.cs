@@ -41,6 +41,8 @@ namespace SyncMedia.WinUI.Views
             {
                 "home" => typeof(HomePage),
                 "folders" => typeof(FolderConfigurationPage),
+                "fileTypes" => typeof(FileTypesPage),
+                "namingList" => typeof(NamingListPage),
                 "sync" => typeof(SyncPage),
                 "files" => typeof(FilesPage),
                 "stats" => typeof(StatisticsPage),
@@ -54,39 +56,7 @@ namespace SyncMedia.WinUI.Views
         }
     }
 
-    // Placeholder pages - to be implemented
-    public sealed partial class HomePage : Page
-    {
-        public HomePage()
-        {
-            var root = new Grid();
-            var stack = new StackPanel
-            {
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center,
-                Spacing = 16
-            };
-
-            var title = new TextBlock
-            {
-                Text = "Welcome to SyncMedia",
-                Style = Application.Current.Resources["TitleTextBlockStyle"] as Style
-            };
-
-            var subtitle = new TextBlock
-            {
-                Text = "Modern media synchronization with AI-powered duplicate detection",
-                Style = Application.Current.Resources["SubtitleTextBlockStyle"] as Style,
-                Opacity = 0.7
-            };
-
-            stack.Children.Add(title);
-            stack.Children.Add(subtitle);
-            root.Children.Add(stack);
-            this.Content = root;
-        }
-    }
-
+    // Placeholder pages - to be implemented in Week 3-4
     public sealed partial class SyncPage : Page
     {
         public SyncPage()

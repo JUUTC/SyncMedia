@@ -28,12 +28,18 @@ namespace SyncMedia.WinUI
 
             // Register ViewModels
             services.AddTransient<MainViewModel>();
+            services.AddTransient<HomeViewModel>();
             services.AddTransient<FolderConfigurationViewModel>();
+            services.AddTransient<FileTypesViewModel>();
+            services.AddTransient<NamingListViewModel>();
             services.AddTransient<SettingsViewModel>();
 
             // Register Views
             services.AddTransient<MainWindow>();
+            services.AddTransient<HomePage>();
             services.AddTransient<FolderConfigurationPage>();
+            services.AddTransient<FileTypesPage>();
+            services.AddTransient<NamingListPage>();
             services.AddTransient<SettingsPage>();
 
             s_serviceProvider = services.BuildServiceProvider();

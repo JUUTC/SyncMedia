@@ -25,6 +25,17 @@
                         <FontIcon Glyph="&#xE8B7;"/>
                     </NavigationViewItem.Icon>
                 </NavigationViewItem>
+                <NavigationViewItem Content="File Types" Tag="fileTypes">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8F9;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItem Content="Naming List" Tag="namingList">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8F3;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItemSeparator/>
                 <NavigationViewItem Content="Sync" Icon="Sync" Tag="sync"/>
                 <NavigationViewItem Content="Files" Tag="files">
                     <NavigationViewItem.Icon>

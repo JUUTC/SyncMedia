@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.NamingListPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16" MaxWidth="800">
+            <TextBlock 
+                Text="Naming List" 
+                Style="{StaticResource TitleTextBlockStyle}"
+                Margin="0,0,0,8"/>
+            
+            <TextBlock 
+                Text="Exclude files matching these name patterns from sync operations."
+                Style="{StaticResource BodyTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Margin="0,0,0,16"/>
+
+            <!-- Add Pattern Card -->
+            <Border 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock 
+                        Text="Add Exclusion Pattern"
+                        Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                    <Grid ColumnSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox 
+                            Grid.Column="0"
+                            PlaceholderText="Enter file name pattern (e.g., temp*, *.tmp)"
+                            Text="{x:Bind ViewModel.NewPatternText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                        <Button 
+                            Grid.Column="1"
+                            Content="Add"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Command="{x:Bind ViewModel.AddPatternCommand}"
+                            IsEnabled="{x:Bind ViewModel.CanAddPattern, Mode=OneWay}">
+                            <Button.KeyboardAccelerators>
+                                <KeyboardAccelerator Key="Enter"/>
+                            </Button.KeyboardAccelerators>
+                        </Button>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <!-- Patterns List Card -->
+            <Border 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16">
+                <StackPanel Spacing="12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock 
+                            Grid.Column="0"
+                            Text="Exclusion Patterns"
+                            Style="{StaticResource SubtitleTextBlockStyle}"
+                            VerticalAlignment="Center"/>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                            <Button 
+                                Content="Remove Selected"
+                                Command="{x:Bind ViewModel.RemoveSelectedCommand}"
+                                IsEnabled="{x:Bind ViewModel.HasSelection, Mode=OneWay}">
+                                <Button.Icon>
+                                    <FontIcon Glyph="&#xE74D;"/>
+                                </Button.Icon>
+                            </Button>
+
+                            <Button 
+                                Content="Clear All"
+                                Command="{x:Bind ViewModel.ClearAllCommand}"
+                                IsEnabled="{x:Bind ViewModel.HasPatterns, Mode=OneWay}">
+                                <Button.Icon>
+                                    <FontIcon Glyph="&#xE894;"/>
+                                </Button.Icon>
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+
+                    <ListView 
+                        ItemsSource="{x:Bind ViewModel.NamingList, Mode=OneWay}"
+                        SelectedItem="{x:Bind ViewModel.SelectedPattern, Mode=TwoWay}"
+                        SelectionMode="Single"
+                        Height="300">
+                        <ListView.ItemTemplate>
+                            <DataTemplate x:DataType="x:String">
+                                <Grid Padding="8,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <FontIcon Glyph="&#xE8F3;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}"/>
+                                        <TextBlock Text="{x:Bind}" VerticalAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                        <ListView.EmptyStateContent>
+                            <StackPanel Spacing="8" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                <FontIcon Glyph="&#xE8F3;" FontSize="48" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                                <TextBlock 
+                                    Text="No exclusion patterns added yet"
+                                    Style="{StaticResource BodyTextBlockStyle}"
+                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                                <TextBlock 
+                                    Text="Add patterns above to exclude files from sync"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+                            </StackPanel>
+                        </ListView.EmptyStateContent>
+                    </ListView>
+                </StackPanel>
+            </Border>
+
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.ShowMessage, Mode=OneWay}"
+                Message="{x:Bind ViewModel.Message, Mode=OneWay}"
+                Severity="{x:Bind ViewModel.MessageSeverity, Mode=OneWay}"
+                IsClosable="True"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
