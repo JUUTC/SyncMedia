@@ -9,6 +9,10 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using SyncMedia.Helpers;
+using SyncMedia.Core;
+using SyncMedia.Core.Helpers;
+using SyncMedia.Core.Models;
+using SyncMedia.Core.Services;
 
 
 
