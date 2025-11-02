@@ -1,6 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
-using SyncMedia.WinUI.Services;
 using SyncMedia.WinUI.ViewModels;
 using SyncMedia.WinUI.Views;
 using System;
@@ -9,8 +8,10 @@ namespace SyncMedia.WinUI
 {
     public partial class App : Application
     {
-        private Window m_window;
-        private IServiceProvider _serviceProvider;
+        private static Window s_window;
+        private static IServiceProvider s_serviceProvider;
+
+        public static Window MainWindow => s_window;
 
         public App()
         {
@@ -27,17 +28,26 @@ namespace SyncMedia.WinUI
 
             // Register ViewModels
             services.AddTransient<MainViewModel>();
+            services.AddTransient<FolderConfigurationViewModel>();
+            services.AddTransient<SettingsViewModel>();
 
             // Register Views
             services.AddTransient<MainWindow>();
+            services.AddTransient<FolderConfigurationPage>();
+            services.AddTransient<SettingsPage>();
 
-            _serviceProvider = services.BuildServiceProvider();
+            s_serviceProvider = services.BuildServiceProvider();
+        }
+
+        public static T GetService<T>() where T : class
+        {
+            return s_serviceProvider.GetRequiredService<T>();
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args)
         {
-            m_window = _serviceProvider.GetRequiredService<MainWindow>();
-            m_window.Activate();
+            s_window = GetService<MainWindow>();
+            s_window.Activate();
         }
     }
 }

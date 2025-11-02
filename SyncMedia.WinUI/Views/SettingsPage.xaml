@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16" MaxWidth="800">
+            <!-- Header -->
+            <TextBlock Text="Settings" Style="{StaticResource TitleTextBlockStyle}"/>
+
+            <!-- Pro Features Section -->
+            <StackPanel Spacing="12" Margin="0,24,0,0">
+                <TextBlock Text="Pro Features" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                
+                <StackPanel Spacing="8" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                    
+                    <!-- License Info -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        
+                        <TextBlock Grid.Column="0" VerticalAlignment="Center">
+                            <Run Text="License: "/><Run Text="{x:Bind ViewModel.LicenseType, Mode=OneWay}" FontWeight="SemiBold"/>
+                        </TextBlock>
+                        
+                        <Button Grid.Column="1" 
+                                Command="{x:Bind ViewModel.UpgradeCommand}"
+                                Content="Upgrade to Pro"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Visibility="{x:Bind ViewModel.ProVersion, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                    </Grid>
+
+                    <!-- Advanced Duplicate Detection -->
+                    <ToggleSwitch Header="Advanced Duplicate Detection" 
+                                  IsOn="{x:Bind ViewModel.AdvancedDuplicateDetectionEnabled, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.ProVersion, Mode=OneWay}">
+                        <ToggleSwitch.OnContent>
+                            <TextBlock Text="AI-powered duplicate detection enabled"/>
+                        </ToggleSwitch.OnContent>
+                        <ToggleSwitch.OffContent>
+                            <TextBlock Text="Using standard MD5 hash detection"/>
+                        </ToggleSwitch.OffContent>
+                    </ToggleSwitch>
+
+                    <!-- Similarity Threshold -->
+                    <StackPanel Spacing="4" IsEnabled="{x:Bind ViewModel.ProVersion, Mode=OneWay}">
+                        <Grid>
+                            <TextBlock Text="Similarity Threshold" VerticalAlignment="Center"/>
+                            <TextBlock HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <Run Text="{x:Bind ViewModel.SimilarityThreshold, Mode=OneWay}"/><Run Text="%"/>
+                            </TextBlock>
+                        </Grid>
+                        <Slider Minimum="50" Maximum="100" StepFrequency="5"
+                                Value="{x:Bind ViewModel.SimilarityThreshold, Mode=TwoWay}"/>
+                    </StackPanel>
+
+                    <!-- GPU Acceleration -->
+                    <ToggleSwitch Header="GPU Acceleration" 
+                                  IsOn="{x:Bind ViewModel.GpuAccelerationEnabled, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.ProVersion, Mode=OneWay}">
+                        <ToggleSwitch.OnContent>
+                            <TextBlock Text="Using CUDA for 10-100x speedup"/>
+                        </ToggleSwitch.OnContent>
+                        <ToggleSwitch.OffContent>
+                            <TextBlock Text="Using CPU processing"/>
+                        </ToggleSwitch.OffContent>
+                    </ToggleSwitch>
+
+                    <!-- Detection Method -->
+                    <ComboBox Header="Detection Method" 
+                              SelectedItem="{x:Bind ViewModel.SelectedDetectionMethod, Mode=TwoWay}"
+                              IsEnabled="{x:Bind ViewModel.ProVersion, Mode=OneWay}"
+                              HorizontalAlignment="Stretch">
+                        <x:String>PHash</x:String>
+                        <x:String>DHash</x:String>
+                        <x:String>WHash</x:String>
+                        <x:String>CNN (MobileNet)</x:String>
+                        <x:String>CNN (ResNet)</x:String>
+                        <x:String>CNN (EfficientNet)</x:String>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- General Settings -->
+            <StackPanel Spacing="12" Margin="0,24,0,0">
+                <TextBlock Text="General" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                
+                <StackPanel Spacing="8" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                    
+                    <!-- File Preview -->
+                    <ToggleSwitch Header="File Preview" 
+                                  IsOn="{x:Bind ViewModel.FilePreviewEnabled, Mode=TwoWay}">
+                        <ToggleSwitch.OnContent>
+                            <TextBlock Text="Show image/video preview during sync"/>
+                        </ToggleSwitch.OnContent>
+                        <ToggleSwitch.OffContent>
+                            <TextBlock Text="No preview"/>
+                        </ToggleSwitch.OffContent>
+                    </ToggleSwitch>
+
+                    <!-- Performance Optimizations -->
+                    <ToggleSwitch Header="Performance Optimizations" 
+                                  IsOn="{x:Bind ViewModel.PerformanceOptimizationsEnabled, Mode=TwoWay}"
+                                  IsEnabled="{x:Bind ViewModel.ProVersion, Mode=OneWay}">
+                        <ToggleSwitch.OnContent>
+                            <TextBlock Text="Parallel processing enabled"/>
+                        </ToggleSwitch.OnContent>
+                        <ToggleSwitch.OffContent>
+                            <TextBlock Text="Single-threaded processing"/>
+                        </ToggleSwitch.OffContent>
+                    </ToggleSwitch>
+
+                    <!-- Theme -->
+                    <ComboBox Header="Theme" 
+                              SelectedItem="{x:Bind ViewModel.SelectedTheme, Mode=TwoWay}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.Items>
+                            <ComboBoxItem Content="System Default" Tag="Default"/>
+                            <ComboBoxItem Content="Light" Tag="Light"/>
+                            <ComboBoxItem Content="Dark" Tag="Dark"/>
+                        </ComboBox.Items>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- About Section -->
+            <StackPanel Spacing="12" Margin="0,24,0,0">
+                <TextBlock Text="About" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                
+                <StackPanel Spacing="8" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
+                    
+                    <TextBlock>
+                        <Run Text="SyncMedia "/><Run Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}" FontWeight="SemiBold"/>
+                    </TextBlock>
+                    
+                    <TextBlock Text="Modern media synchronization with AI-powered duplicate detection" 
+                               TextWrapping="Wrap" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    
+                    <HyperlinkButton Content="View on GitHub" NavigateUri="https://github.com/JUUTC/SyncMedia"/>
+                </StackPanel>
+            </StackPanel>
+
+            <!-- Reset Button -->
+            <Button Command="{x:Bind ViewModel.ResetToDefaultsCommand}"
+                    Content="Reset to Defaults"
+                    Margin="0,16,0,0"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

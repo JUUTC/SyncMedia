@@ -13,26 +13,29 @@
                        PaneDisplayMode="Left"
                        IsBackButtonVisible="Collapsed"
                        IsSettingsVisible="True"
-                       Header="SyncMedia">
+                       Header="{x:Bind NavView.SelectedItem.Content, Mode=OneWay}"
+                       SelectionChanged="NavView_SelectionChanged"
+                       IsSettingsVisible="True"
+                       SettingsInvoked="NavView_SettingsInvoked">
             <NavigationView.MenuItems>
+                <NavigationViewItem Content="Home" Icon="Home" Tag="home"/>
+                <NavigationViewItemSeparator/>
+                <NavigationViewItem Content="Folders" Tag="folders">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8B7;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
                 <NavigationViewItem Content="Sync" Icon="Sync" Tag="sync"/>
-                <NavigationViewItem Content="Files" Icon="Folder" Tag="files"/>
-                <NavigationViewItem Content="Progress" Icon="ProgressRing" Tag="progress"/>
+                <NavigationViewItem Content="Files" Tag="files">
+                    <NavigationViewItem.Icon>
+                        <FontIcon Glyph="&#xE8A5;"/>
+                    </NavigationViewItem.Icon>
+                </NavigationViewItem>
+                <NavigationViewItemSeparator/>
                 <NavigationViewItem Content="Statistics" Icon="Chart" Tag="stats"/>
             </NavigationView.MenuItems>
 
-            <Frame x:Name="ContentFrame">
-                <Grid>
-                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="16">
-                        <TextBlock Text="Welcome to SyncMedia (WinUI 3)" 
-                                 Style="{StaticResource TitleTextBlockStyle}"/>
-                        <TextBlock Text="Phase 3 WinUI 3 Migration - In Progress" 
-                                 Style="{StaticResource SubtitleTextBlockStyle}"
-                                 Opacity="0.7"/>
-                        <ProgressRing IsActive="False" Width="48" Height="48"/>
-                    </StackPanel>
-                </Grid>
-            </Frame>
+            <Frame x:Name="ContentFrame"/>
         </NavigationView>
     </Grid>
 </Window>
