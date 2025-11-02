@@ -82,13 +82,35 @@ Transform SyncMedia from a Windows Forms application to a modern WinUI 3 app wit
 
 ## Phase 3: WinUI 3 Migration
 
-**Status**: Not Started  
+**Status**: In Progress 🚧  
 **Timeline**: 3-4 weeks  
-**Complexity**: High - Complete UI rewrite
+**Complexity**: High - Complete UI rewrite  
+**Documentation**: See `PHASE3_WINUI_MIGRATION.md` for detailed migration guide
 
 ### Goals
 - Modern, fluent design UI
 - Better touch support
+- Improved accessibility
+- Native Windows 11 integration
+- Foundation for Pro features (imagededup integration)
+
+### Migration Approach
+- **Strategy**: Gradual in-place migration with hybrid approach
+- **Pattern**: MVVM with CommunityToolkit.Mvvm
+- **Shared Code**: Extract business logic to SyncMedia.Core library
+- **Coexistence**: Keep Windows Forms version until WinUI 3 is feature-complete
+
+### Project Structure Changes
+```
+Before:
+SyncMedia/               # Monolithic Windows Forms app
+
+After:
+SyncMedia.Core/          # NEW: Shared business logic (Models, Services, Helpers)
+SyncMedia.WinForms/      # RENAMED: Legacy Windows Forms (maintenance mode)
+SyncMedia.WinUI/         # NEW: Modern WinUI 3 app (primary development)
+SyncMedia.Package/       # UPDATED: Packages WinUI 3 app
+```
 - Improved accessibility
 - Native Windows 11 integration
 
