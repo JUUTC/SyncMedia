@@ -22,6 +22,9 @@ namespace SyncMedia.Core.Helpers
                 data.TotalFilesLifetime = int.Parse(XmlData.ReadSetting("TotalFilesLifetime") ?? "0");
                 data.TotalDuplicatesLifetime = int.Parse(XmlData.ReadSetting("TotalDuplicatesLifetime") ?? "0");
                 data.TotalBytesLifetime = long.Parse(XmlData.ReadSetting("TotalBytesLifetime") ?? "0");
+                data.TotalSyncsCompleted = int.Parse(XmlData.ReadSetting("TotalSyncsCompleted") ?? "0");
+                data.FailedSyncsCount = int.Parse(XmlData.ReadSetting("FailedSyncsCount") ?? "0");
+                data.TotalSpaceSaved = long.Parse(XmlData.ReadSetting("TotalSpaceSaved") ?? "0");
                 
                 string achievementsStr = XmlData.ReadSetting("Achievements");
                 if (!string.IsNullOrEmpty(achievementsStr))
@@ -36,6 +39,9 @@ namespace SyncMedia.Core.Helpers
                 data.TotalFilesLifetime = 0;
                 data.TotalDuplicatesLifetime = 0;
                 data.TotalBytesLifetime = 0;
+                data.TotalSyncsCompleted = 0;
+                data.FailedSyncsCount = 0;
+                data.TotalSpaceSaved = 0;
                 data.Achievements.Clear();
             }
             
@@ -51,6 +57,9 @@ namespace SyncMedia.Core.Helpers
             XmlData.AddUpdateAppSettings("TotalFilesLifetime", data.TotalFilesLifetime.ToString());
             XmlData.AddUpdateAppSettings("TotalDuplicatesLifetime", data.TotalDuplicatesLifetime.ToString());
             XmlData.AddUpdateAppSettings("TotalBytesLifetime", data.TotalBytesLifetime.ToString());
+            XmlData.AddUpdateAppSettings("TotalSyncsCompleted", data.TotalSyncsCompleted.ToString());
+            XmlData.AddUpdateAppSettings("FailedSyncsCount", data.FailedSyncsCount.ToString());
+            XmlData.AddUpdateAppSettings("TotalSpaceSaved", data.TotalSpaceSaved.ToString());
             XmlData.AddUpdateAppSettings("Achievements", string.Join("|", data.Achievements));
         }
     }

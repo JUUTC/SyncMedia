@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using SyncMedia.Core.Constants;
 using SyncMedia.Core.Models;
+using SyncMedia.Core.Helpers;
 
 namespace SyncMedia.Core.Services
 {
@@ -10,11 +11,31 @@ namespace SyncMedia.Core.Services
     /// </summary>
     public class GamificationService
     {
+        private static readonly Lazy<GamificationService> _instance = 
+            new Lazy<GamificationService>(() => new GamificationService());
+        
+        public static GamificationService Instance => _instance.Value;
+        
         private readonly GamificationData _data;
+        
+        private GamificationService()
+        {
+            _data = GamificationPersistence.LoadData();
+        }
         
         public GamificationService(GamificationData data)
         {
             _data = data ?? throw new ArgumentNullException(nameof(data));
+        }
+        
+        public GamificationData GetGamificationData()
+        {
+            return _data;
+        }
+        
+        public void SaveData()
+        {
+            GamificationPersistence.SaveData(_data);
         }
         
         /// <summary>

@@ -116,6 +116,7 @@ namespace SyncMedia.Core.Services
                     {
                         ProgressPercentage = progress,
                         CurrentFile = Path.GetFileName(filePath),
+                        CurrentFilePath = filePath,
                         FilesProcessed = i + 1,
                         TotalFiles = files.Count,
                         ElapsedTime = DateTime.Now - _syncStartTime
@@ -308,6 +309,7 @@ namespace SyncMedia.Core.Services
     {
         public double ProgressPercentage { get; set; }
         public string CurrentFile { get; set; }
+        public string CurrentFilePath { get; set; }
         public int FilesProcessed { get; set; }
         public int TotalFiles { get; set; }
         public TimeSpan ElapsedTime { get; set; }

@@ -43,6 +43,12 @@ namespace SyncMedia.WinUI.ViewModels
         [ObservableProperty]
         private double processingSpeed = 0; // files per second
 
+        [ObservableProperty]
+        private bool isPreviewEnabled = true;
+
+        [ObservableProperty]
+        private string currentFilePath = "";
+
         public SyncViewModel(FilesViewModel filesViewModel)
         {
             _filesViewModel = filesViewModel;
@@ -136,6 +142,20 @@ namespace SyncMedia.WinUI.ViewModels
             return !IsSyncing;
         }
 
+        [RelayCommand(CanExecute = nameof(CanPauseSync))]
+        private void PauseSync()
+        {
+            // Pause functionality - for now, maps to stop
+            // Future enhancement: implement true pause/resume support
+            _cancellationTokenSource?.Cancel();
+            StatusMessage = "Pausing sync...";
+        }
+
+        private bool CanPauseSync()
+        {
+            return IsSyncing;
+        }
+
         [RelayCommand(CanExecute = nameof(CanStopSync))]
         private void StopSync()
         {
@@ -157,6 +177,7 @@ namespace SyncMedia.WinUI.ViewModels
                 FilesProcessed = e.FilesProcessed;
                 TotalFiles = e.TotalFiles;
                 CurrentFile = e.CurrentFile;
+                CurrentFilePath = e.CurrentFilePath;
                 ElapsedTime = e.ElapsedTime.ToString(@"hh\:mm\:ss");
 
                 // Calculate processing speed
@@ -192,7 +213,53 @@ namespace SyncMedia.WinUI.ViewModels
                 StatusMessage = e.WasCancelled
                     ? $"Sync cancelled. Processed: {stats.ProcessedFiles}, Success: {stats.SuccessfulFiles}, Skipped: {stats.SkippedFiles}, Errors: {stats.ErrorFiles}"
                     : $"Sync complete! Processed: {stats.ProcessedFiles}, Success: {stats.SuccessfulFiles}, Skipped: {stats.SkippedFiles}, Errors: {stats.ErrorFiles}";
+                
+                // Track achievements and gamification
+                if (!e.WasCancelled && stats.ProcessedFiles > 0)
+                {
+                    var gamification = GamificationService.Instance;
+                    var gamificationData = gamification.GetGamificationData();
+                    
+                    // Update sync statistics
+                    gamificationData.TotalSyncsCompleted++;
+                    if (stats.ErrorFiles > 0)
+                    {
+                        gamificationData.FailedSyncsCount++;
+                    }
+                    
+                    // Calculate space saved from duplicates
+                    // Estimate: duplicates would have taken the average file size
+                    if (stats.SuccessfulFiles > 0)
+                    {
+                        long avgFileSize = stats.TotalBytesProcessed / stats.SuccessfulFiles;
+                        long spaceSaved = avgFileSize * stats.DuplicatesFound;
+                        gamificationData.TotalSpaceSaved += spaceSaved;
+                    }
+                    
+                    // Award points and check for achievements
+                    gamification.AwardPoints(stats);
+                    var newAchievements = gamification.CheckAchievements(stats);
+                    
+                    // Save gamification data
+                    gamification.SaveData();
+                    
+                    // Show achievement notifications
+                    if (newAchievements.Count > 0)
+                    {
+                        foreach (var achievement in newAchievements)
+                        {
+                            ShowAchievementNotification(achievement);
+                        }
+                    }
+                }
             });
+        }
+        
+        private void ShowAchievementNotification(string achievement)
+        {
+            // TODO: Show a modern notification/toast for the achievement
+            // For now, just update status message
+            StatusMessage = $"🏆 Achievement Unlocked: {achievement}";
         }
     }
 }

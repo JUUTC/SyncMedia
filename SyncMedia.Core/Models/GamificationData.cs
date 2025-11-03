@@ -14,6 +14,13 @@ namespace SyncMedia.Core.Models
         public long TotalBytesLifetime { get; set; }
         public List<string> Achievements { get; set; }
         
+        // Additional statistics for UI display
+        public int TotalFilesSynced => TotalFilesLifetime;
+        public int TotalSyncsCompleted { get; set; }
+        public int FailedSyncsCount { get; set; }
+        public long TotalSpaceSaved { get; set; }
+        public int AchievementsUnlocked => Achievements.Count;
+        
         public GamificationData()
         {
             Achievements = new List<string>();

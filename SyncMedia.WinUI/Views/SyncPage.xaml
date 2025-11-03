@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:controls="using:SyncMedia.WinUI.Controls"
     mc:Ignorable="d">
 
     <ScrollViewer VerticalScrollBarVisibility="Auto">
@@ -118,20 +119,22 @@
                 </Button>
             </StackPanel>
 
-            <!-- Preview Placeholder -->
+            <!-- File Preview Control -->
             <Border Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                     BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
                     BorderThickness="1"
                     CornerRadius="8"
                     Padding="20"
-                    Height="200">
-                <Grid>
-                    <TextBlock Text="File Preview Area" 
-                               HorizontalAlignment="Center" 
-                               VerticalAlignment="Center"
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                    <!-- TODO: Add MediaPlayerElement for video preview -->
-                </Grid>
+                    Height="300">
+                <StackPanel Spacing="12">
+                    <Grid>
+                        <TextBlock Text="File Preview" Style="{StaticResource SubtitleTextBlockStyle}" />
+                        <CheckBox Content="Enable Preview" 
+                                  IsChecked="{x:Bind ViewModel.IsPreviewEnabled, Mode=TwoWay}"
+                                  HorizontalAlignment="Right" />
+                    </Grid>
+                    <controls:FilePreviewControl x:Name="FilePreview" Height="240" />
+                </StackPanel>
             </Border>
         </StackPanel>
     </ScrollViewer>

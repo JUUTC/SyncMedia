@@ -7,12 +7,22 @@ namespace SyncMedia.Core.Models
     /// </summary>
     public class SyncStatistics
     {
+        public int TotalFiles { get; set; }
+        public int ProcessedFiles { get; set; }
+        public int SuccessfulFiles { get; set; }
+        public int SkippedFiles { get; set; }
+        public int ErrorFiles { get; set; }
         public int TotalFilesProcessed { get; set; }
         public int DuplicatesFound { get; set; }
         public int ErrorsEncountered { get; set; }
         public long TotalBytesProcessed { get; set; }
         public DateTime SyncStartTime { get; set; }
         public DateTime SyncEndTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public TimeSpan Duration { get; set; }
+        public string Status { get; set; } = "";
+        public string ErrorMessage { get; set; } = "";
+        
         public TimeSpan ElapsedTime => SyncEndTime - SyncStartTime;
         
         public double TotalMBProcessed => TotalBytesProcessed / (1024.0 * 1024.0);

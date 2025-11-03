@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="SyncMedia.WinUI.Controls.FilePreviewControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <Grid>
+        <!-- Preview Container -->
+        <Border Background="{ThemeResource LayerFillColorDefaultBrush}"
+                CornerRadius="8"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+            <Grid>
+                <!-- Image Preview -->
+                <Image x:Name="ImagePreview"
+                       Visibility="Collapsed"
+                       Stretch="Uniform"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center" />
+
+                <!-- Video Preview -->
+                <MediaPlayerElement x:Name="VideoPreview"
+                                   Visibility="Collapsed"
+                                   AreTransportControlsEnabled="False"
+                                   AutoPlay="True"
+                                   Stretch="Uniform" />
+
+                <!-- Placeholder Text -->
+                <TextBlock x:Name="PlaceholderText"
+                          Text="File preview will appear here"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Center"
+                          Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                          Style="{StaticResource BodyTextBlockStyle}" />
+
+                <!-- File Type Indicator -->
+                <StackPanel x:Name="FileTypeIndicator"
+                           Visibility="Collapsed"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Spacing="8">
+                    <FontIcon x:Name="FileTypeIcon"
+                             FontSize="48"
+                             Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                    <TextBlock x:Name="FileTypeText"
+                              HorizontalAlignment="Center"
+                              Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
