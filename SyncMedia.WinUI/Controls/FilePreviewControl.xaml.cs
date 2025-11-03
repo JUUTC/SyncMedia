@@ -15,6 +15,11 @@ namespace SyncMedia.WinUI.Controls
         private DispatcherTimer _videoTimer;
         private bool _isPreviewEnabled = true;
 
+        // File type icon glyphs (Segoe MDL2 Assets)
+        private const string MusicNoteGlyph = "\uEC4F";
+        private const string DocumentGlyph = "\uE8A5";
+        private const string SpreadsheetGlyph = "\uE9F9";
+
         // Media extension sets
         private static readonly string[] ImageExtensions = new[]
         {
@@ -159,11 +164,11 @@ namespace SyncMedia.WinUI.Controls
             // Set icon based on file type
             string glyph = extension.ToLowerInvariant() switch
             {
-                ".mp3" or ".wav" or ".flac" or ".aac" => "\uEC4F", // MusicNote
-                ".pdf" => "\uE8A5", // PDF
-                ".doc" or ".docx" => "\uE8A5", // Document
-                ".xls" or ".xlsx" => "\uE9F9", // SpreadsheetDocument
-                _ => "\uE8A5" // Generic document
+                ".mp3" or ".wav" or ".flac" or ".aac" => MusicNoteGlyph,
+                ".pdf" => DocumentGlyph,
+                ".doc" or ".docx" => DocumentGlyph,
+                ".xls" or ".xlsx" => SpreadsheetGlyph,
+                _ => DocumentGlyph
             };
 
             FileTypeIcon.Glyph = glyph;

@@ -8,6 +8,8 @@ namespace SyncMedia.WinUI.ViewModels;
 
 public partial class AchievementsViewModel : ObservableObject
 {
+    private const long BytesPerGigabyte = 1024L * 1024 * 1024;
+
     [ObservableProperty]
     private ObservableCollection<AchievementData> achievements = new();
 
@@ -88,7 +90,7 @@ public partial class AchievementsViewModel : ObservableObject
                 Description = "Process over 10GB of files",
                 IconGlyph = "\uE8B7", // Save
                 IsUnlocked = unlockedAchievements.Contains("DataMaster"),
-                Progress = (int)(gamificationData.TotalBytesLifetime / (1024L * 1024 * 1024)),
+                Progress = (int)(gamificationData.TotalBytesLifetime / BytesPerGigabyte),
                 Target = 10,
                 UnlockCriteria = "Process 10GB of data"
             },

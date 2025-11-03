@@ -50,10 +50,10 @@ namespace SyncMedia.WinUI.ViewModels
         [ObservableProperty]
         private string currentFilePath = "";
 
-        public SyncViewModel(FilesViewModel filesViewModel)
+        public SyncViewModel(FilesViewModel filesViewModel, SyncService syncService = null)
         {
             _filesViewModel = filesViewModel;
-            _syncService = new SyncService();
+            _syncService = syncService ?? new SyncService();
             
             // Subscribe to sync service events
             _syncService.ProgressChanged += OnProgressChanged;

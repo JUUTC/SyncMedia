@@ -83,11 +83,11 @@ namespace SyncMedia.WinUI.Services
     /// </summary>
     public static class DispatcherQueueExtensions
     {
-        public static async Task EnqueueAsync(this Microsoft.UI.Dispatching.DispatcherQueue dispatcher, Func<Task> action)
+        public static Task EnqueueAsync(this Microsoft.UI.Dispatching.DispatcherQueue dispatcher, Func<Task> action)
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            dispatcher.TryEnqueue(async () =>
+            dispatcher.TryEnqueue(Microsoft.UI.Dispatching.DispatcherQueuePriority.Normal, async () =>
             {
                 try
                 {
@@ -100,7 +100,7 @@ namespace SyncMedia.WinUI.Services
                 }
             });
 
-            await tcs.Task;
+            return tcs.Task;
         }
     }
 }
