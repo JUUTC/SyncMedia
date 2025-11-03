@@ -1,0 +1,148 @@
+# Third-Party Software Licenses
+
+SyncMedia includes the following third-party open-source software components. Each component is used under its respective license.
+
+---
+
+## Python
+
+**Copyright**: © 2001-2024 Python Software Foundation. All rights reserved.
+
+**License**: PSF License Agreement
+
+Python is licensed under the PSF License Agreement, which is GPL-compatible and allows commercial use.
+
+Full license text: https://docs.python.org/3/license.html
+
+---
+
+## imagededup
+
+**Copyright**: © 2019 idealo.de
+
+**License**: Apache License 2.0
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Full license text: https://github.com/idealo/imagededup/blob/master/LICENSE
+
+---
+
+## PyTorch
+
+**Copyright**: © 2016-2024 Facebook, Inc. and its affiliates. All rights reserved.
+
+**License**: BSD-style License
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the names of Facebook, Deepmind Technologies, NYU, NEC Laboratories
+   America and IDIAP Research Institute nor the names of its contributors may
+   be used to endorse or promote products derived from this software without
+   specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+Full license text: https://github.com/pytorch/pytorch/blob/master/LICENSE
+
+---
+
+## Pillow (PIL Fork)
+
+**Copyright**: © 1997-2011 by Secret Labs AB
+**Copyright**: © 1995-2011 by Fredrik Lundh
+**Copyright**: © 2010-2024 by Jeffrey A. Clark (Alex) and contributors
+
+**License**: Historical Permission Notice and Disclaimer (HPND)
+
+The Python Imaging Library (PIL) is
+    Copyright © 1997-2011 by Secret Labs AB
+    Copyright © 1995-2011 by Fredrik Lundh
+
+Pillow is the friendly PIL fork. It is
+    Copyright © 2010-2024 by Jeffrey A. Clark (Alex) and contributors
+
+Like PIL, Pillow is licensed under the open source HPND License.
+
+Full license text: https://github.com/python-pillow/Pillow/blob/main/LICENSE
+
+---
+
+## NumPy
+
+**Copyright**: © 2005-2024 NumPy Developers. All rights reserved.
+
+**License**: BSD 3-Clause License
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice,
+   this list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the NumPy Developers nor the names of any contributors
+   may be used to endorse or promote products derived from this software
+   without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+POSSIBILITY OF SUCH DAMAGE.
+
+Full license text: https://github.com/numpy/numpy/blob/main/LICENSE.txt
+
+---
+
+## Additional Dependencies
+
+SyncMedia may include additional dependencies installed via pip. For a complete
+list of all dependencies and their licenses, please refer to the Python
+site-packages directory in the installation folder.
+
+---
+
+**Note**: This file provides a summary of the main third-party licenses. For
+complete and authoritative license information, please refer to the official
+license files in each project's repository (links provided above).
+
+**Date**: November 2024  
+**SyncMedia Version**: 1.0
