@@ -46,18 +46,45 @@ namespace SyncMedia.Core.Services
         /// <summary>
         /// Try to get bundled Python from MSIX package
         /// </summary>
-        private string TryGetBundledPython()
+        private string? TryGetBundledPython()
         {
             try
             {
                 // Method 1: Try Windows.ApplicationModel.Package (MSIX package)
                 // This will only work when running as packaged app
-                var packagePath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
-                var bundledPython = Path.Combine(packagePath, "Python", "python.exe");
-                
-                if (File.Exists(bundledPython))
+                // Use reflection to avoid compile-time dependency on Windows SDK
+                var packageType = Type.GetType("Windows.ApplicationModel.Package, Windows.Foundation.UniversalApiContract");
+                if (packageType != null)
                 {
-                    return bundledPython;
+                    var currentProperty = packageType.GetProperty("Current");
+                    if (currentProperty != null)
+                    {
+                        var package = currentProperty.GetValue(null);
+                        if (package != null)
+                        {
+                            var installedLocationProperty = package.GetType().GetProperty("InstalledLocation");
+                            if (installedLocationProperty != null)
+                            {
+                                var installedLocation = installedLocationProperty.GetValue(package);
+                                if (installedLocation != null)
+                                {
+                                    var pathProperty = installedLocation.GetType().GetProperty("Path");
+                                    if (pathProperty != null)
+                                    {
+                                        var packagePath = pathProperty.GetValue(installedLocation) as string;
+                                        if (packagePath != null)
+                                        {
+                                            var bundledPython = Path.Combine(packagePath, "Python", "python.exe");
+                                            if (File.Exists(bundledPython))
+                                            {
+                                                return bundledPython;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
             catch
