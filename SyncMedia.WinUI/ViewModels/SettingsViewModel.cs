@@ -1,12 +1,17 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Controls;
 using SyncMedia.Core;
+using SyncMedia.Core.Services;
+using System;
 
 namespace SyncMedia.WinUI.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private readonly LicenseManager _licenseManager;
+
     [ObservableProperty]
     private bool proVersion = false;
 
@@ -37,8 +42,21 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string licenseType = "Free";
 
+    [ObservableProperty]
+    private string licenseKey = "";
+
+    [ObservableProperty]
+    private int trialDaysRemaining = 0;
+
+    [ObservableProperty]
+    private bool isInTrial = false;
+
+    [ObservableProperty]
+    private string activationDate = "";
+
     public SettingsViewModel()
     {
+        _licenseManager = new LicenseManager();
         LoadSettings();
     }
 
@@ -50,8 +68,14 @@ public partial class SettingsViewModel : ObservableObject
         FilePreviewEnabled = bool.Parse(data.ReadValue("FilePreviewEnabled") ?? "true");
         PerformanceOptimizationsEnabled = bool.Parse(data.ReadValue("PerformanceOptimizationsEnabled") ?? "false");
         
-        // Pro features (Phase 4)
-        ProVersion = bool.Parse(data.ReadValue("ProVersion") ?? "false");
+        // Load license information
+        var license = _licenseManager.CurrentLicense;
+        ProVersion = license.IsPro;
+        IsInTrial = license.IsInTrial;
+        TrialDaysRemaining = license.TrialDaysRemaining;
+        ActivationDate = license.ActivationDate?.ToString("d") ?? "";
+        
+        // Pro features
         AdvancedDuplicateDetectionEnabled = bool.Parse(data.ReadValue("AdvancedDuplicateDetectionEnabled") ?? "false");
         SimilarityThreshold = int.Parse(data.ReadValue("SimilarityThreshold") ?? "70");
         GpuAccelerationEnabled = bool.Parse(data.ReadValue("GpuAccelerationEnabled") ?? "false");
@@ -66,8 +90,19 @@ public partial class SettingsViewModel : ObservableObject
             _ => ElementTheme.Default
         };
 
-        // Update license type
-        LicenseType = ProVersion ? "Pro" : "Free";
+        // Update license type display
+        if (ProVersion)
+        {
+            LicenseType = "Pro";
+        }
+        else if (IsInTrial)
+        {
+            LicenseType = $"Free (Trial: {TrialDaysRemaining} days left)";
+        }
+        else
+        {
+            LicenseType = "Free";
+        }
     }
 
     partial void OnFilePreviewEnabledChanged(bool value)
@@ -140,13 +175,90 @@ public partial class SettingsViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void Upgrade()
+    private async void Upgrade()
     {
-        // TODO: Implement in-app purchase flow (Phase 4)
-        // For now, just toggle for testing
-        ProVersion = true;
-        LicenseType = "Pro";
-        SaveSetting("ProVersion", "true");
+        // Show license key input dialog
+        var inputDialog = new ContentDialog
+        {
+            Title = "Activate Pro License",
+            Content = CreateLicenseKeyInput(),
+            PrimaryButtonText = "Activate",
+            CloseButtonText = "Cancel",
+            DefaultButton = ContentDialogButton.Primary,
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+
+        var result = await inputDialog.ShowAsync();
+        
+        if (result == ContentDialogResult.Primary)
+        {
+            var textBox = (inputDialog.Content as StackPanel)?.Children[1] as TextBox;
+            var enteredKey = textBox?.Text;
+            
+            if (_licenseManager.ActivateLicense(enteredKey))
+            {
+                ProVersion = true;
+                LicenseType = "Pro";
+                ActivationDate = DateTime.Now.ToString("d");
+                
+                // Refresh feature flags
+                FeatureFlagService.Instance.RefreshFeatureFlags();
+                
+                // Show success message
+                await ShowMessageAsync("Success", "Pro license activated successfully!\n\nAll Pro features are now unlocked.");
+            }
+            else
+            {
+                // Show error message
+                await ShowMessageAsync("Invalid License Key", "The license key you entered is invalid. Please check and try again.\n\nFormat: XXXX-XXXX-XXXX-XXXX");
+            }
+        }
+    }
+
+    private StackPanel CreateLicenseKeyInput()
+    {
+        var panel = new StackPanel { Spacing = 12 };
+        
+        var description = new TextBlock
+        {
+            Text = "Enter your Pro license key (format: XXXX-XXXX-XXXX-XXXX):",
+            TextWrapping = TextWrapping.Wrap
+        };
+        
+        var textBox = new TextBox
+        {
+            PlaceholderText = "XXXX-XXXX-XXXX-XXXX",
+            MaxLength = 19
+        };
+        
+        panel.Children.Add(description);
+        panel.Children.Add(textBox);
+        
+        return panel;
+    }
+
+    private async System.Threading.Tasks.Task ShowMessageAsync(string title, string message)
+    {
+        var dialog = new ContentDialog
+        {
+            Title = title,
+            Content = message,
+            CloseButtonText = "OK",
+            XamlRoot = App.MainWindow.Content.XamlRoot
+        };
+        
+        await dialog.ShowAsync();
+    }
+
+    [RelayCommand]
+    private void GenerateTestKey()
+    {
+        // For development/testing only
+        var testKey = LicenseManager.GenerateLicenseKey();
+        LicenseKey = testKey;
+        
+        // Show the generated key in a dialog
+        _ = ShowMessageAsync("Test License Key", $"Generated test key:\n\n{testKey}\n\nYou can use this to test the Pro upgrade.");
     }
 
     [RelayCommand]
