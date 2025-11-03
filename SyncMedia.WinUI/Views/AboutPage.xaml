@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.AboutPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16" MaxWidth="800">
+            <!-- Header -->
+            <TextBlock Text="About SyncMedia" Style="{StaticResource TitleTextBlockStyle}"/>
+            
+            <!-- Version Info -->
+            <StackPanel Spacing="4">
+                <TextBlock Text="{x:Bind ViewModel.AppVersion, Mode=OneWay}" FontSize="16"/>
+                <TextBlock Text="Modern photo and video organizer with AI-powered duplicate detection" 
+                           TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+            
+            <!-- Features -->
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <TextBlock Text="Features" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="✓ Smart file organization" TextWrapping="Wrap"/>
+                <TextBlock Text="✓ Real-time file preview" TextWrapping="Wrap"/>
+                <TextBlock Text="✓ Achievement system with gamification" TextWrapping="Wrap"/>
+                <TextBlock Text="✓ AI-powered duplicate detection (Pro)" TextWrapping="Wrap"/>
+                <TextBlock Text="✓ GPU acceleration support (Pro)" TextWrapping="Wrap"/>
+            </StackPanel>
+            
+            <!-- Privacy -->
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <TextBlock Text="Privacy" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="All processing happens locally on your device" TextWrapping="Wrap"/>
+                <TextBlock Text="No data is sent to the cloud" TextWrapping="Wrap"/>
+                <TextBlock Text="No account required" TextWrapping="Wrap"/>
+            </StackPanel>
+            
+            <!-- Third-Party Software -->
+            <StackPanel Spacing="12" Margin="0,24,0,0">
+                <TextBlock Text="Third-Party Software" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="SyncMedia includes the following open-source components:" 
+                           TextWrapping="Wrap"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                
+                <!-- Python -->
+                <StackPanel Spacing="4" Padding="12" 
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                            BorderThickness="1" CornerRadius="4">
+                    <TextBlock Text="Python" FontWeight="SemiBold"/>
+                    <TextBlock Text="Python Software Foundation" FontSize="12"/>
+                    <TextBlock Text="License: PSF License" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="High-level programming language runtime" 
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- imagededup -->
+                <StackPanel Spacing="4" Padding="12" 
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                            BorderThickness="1" CornerRadius="4">
+                    <TextBlock Text="imagededup" FontWeight="SemiBold"/>
+                    <TextBlock Text="idealo.de" FontSize="12"/>
+                    <TextBlock Text="License: Apache 2.0" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Finding duplicate images using perceptual hashing and deep learning" 
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- PyTorch -->
+                <StackPanel Spacing="4" Padding="12" 
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                            BorderThickness="1" CornerRadius="4">
+                    <TextBlock Text="PyTorch" FontWeight="SemiBold"/>
+                    <TextBlock Text="Facebook AI Research (FAIR)" FontSize="12"/>
+                    <TextBlock Text="License: BSD-style License" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Deep learning framework for neural networks" 
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- Pillow -->
+                <StackPanel Spacing="4" Padding="12" 
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                            BorderThickness="1" CornerRadius="4">
+                    <TextBlock Text="Pillow (PIL Fork)" FontWeight="SemiBold"/>
+                    <TextBlock Text="Alex Clark and contributors" FontSize="12"/>
+                    <TextBlock Text="License: HPND License" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Python Imaging Library for image processing" 
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+                
+                <!-- NumPy -->
+                <StackPanel Spacing="4" Padding="12" 
+                            Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                            BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" 
+                            BorderThickness="1" CornerRadius="4">
+                    <TextBlock Text="NumPy" FontWeight="SemiBold"/>
+                    <TextBlock Text="NumPy Developers" FontSize="12"/>
+                    <TextBlock Text="License: BSD License" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                    <TextBlock Text="Fundamental package for scientific computing" 
+                               FontSize="12" TextWrapping="Wrap"
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                </StackPanel>
+            </StackPanel>
+            
+            <!-- Links -->
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <HyperlinkButton Content="View Full License Texts" 
+                                 Command="{x:Bind ViewModel.ViewLicensesCommand}"/>
+                <HyperlinkButton Content="Report an Issue" 
+                                 NavigateUri="https://github.com/JUUTC/SyncMedia/issues"/>
+                <HyperlinkButton Content="Visit Project Website" 
+                                 NavigateUri="https://github.com/JUUTC/SyncMedia"/>
+            </StackPanel>
+            
+            <!-- Copyright -->
+            <TextBlock Text="© 2024 SyncMedia. All rights reserved." 
+                       FontSize="12"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       Margin="0,24,0,0"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

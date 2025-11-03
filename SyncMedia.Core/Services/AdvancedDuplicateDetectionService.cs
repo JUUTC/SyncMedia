@@ -28,9 +28,78 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
-        /// Find Python executable in common locations
+        /// Find Python executable - checks bundled Python first, then system Python
         /// </summary>
         private string FindPythonExecutable()
+        {
+            // Priority 1: Check for bundled Python (MSIX package deployment)
+            var bundledPython = TryGetBundledPython();
+            if (bundledPython != null)
+            {
+                return bundledPython;
+            }
+            
+            // Priority 2: Check system PATH for development/user-installed Python
+            return FindSystemPython();
+        }
+        
+        /// <summary>
+        /// Try to get bundled Python from MSIX package
+        /// </summary>
+        private string TryGetBundledPython()
+        {
+            try
+            {
+                // Method 1: Try Windows.ApplicationModel.Package (MSIX package)
+                // This will only work when running as packaged app
+                var packagePath = Windows.ApplicationModel.Package.Current.InstalledLocation.Path;
+                var bundledPython = Path.Combine(packagePath, "Python", "python.exe");
+                
+                if (File.Exists(bundledPython))
+                {
+                    return bundledPython;
+                }
+            }
+            catch
+            {
+                // Not running as MSIX package or Windows.ApplicationModel not available
+            }
+            
+            try
+            {
+                // Method 2: Check relative to assembly location
+                // For development or non-packaged deployment
+                var assemblyPath = Path.GetDirectoryName(typeof(AdvancedDuplicateDetectionService).Assembly.Location);
+                var bundledPython = Path.Combine(assemblyPath, "Python", "python.exe");
+                
+                if (File.Exists(bundledPython))
+                {
+                    return bundledPython;
+                }
+                
+                // Also check one level up (for different build configurations)
+                var parentPath = Directory.GetParent(assemblyPath)?.FullName;
+                if (parentPath != null)
+                {
+                    bundledPython = Path.Combine(parentPath, "Python", "python.exe");
+                    if (File.Exists(bundledPython))
+                    {
+                        return bundledPython;
+                    }
+                }
+            }
+            catch
+            {
+                // Path issues, continue to system Python
+            }
+            
+            return null; // No bundled Python found
+        }
+        
+        /// <summary>
+        /// Find Python in system PATH (for development or user-installed Python)
+        /// </summary>
+        private string FindSystemPython()
         {
             // Try common Python executable names
             var pythonNames = new[] { "python", "python3", "py" };
@@ -65,7 +134,7 @@ namespace SyncMedia.Core.Services
                 }
             }
             
-            // Default to "python"
+            // Default to "python" (will fail gracefully if not found)
             return "python";
         }
 
