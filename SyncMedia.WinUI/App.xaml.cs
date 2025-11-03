@@ -33,6 +33,8 @@ namespace SyncMedia.WinUI
             services.AddTransient<FileTypesViewModel>();
             services.AddTransient<NamingListViewModel>();
             services.AddTransient<SettingsViewModel>();
+            services.AddTransient<SyncViewModel>();
+            services.AddTransient<FilesViewModel>();
 
             // Register Views
             services.AddTransient<MainWindow>();
@@ -41,6 +43,8 @@ namespace SyncMedia.WinUI
             services.AddTransient<FileTypesPage>();
             services.AddTransient<NamingListPage>();
             services.AddTransient<SettingsPage>();
+            services.AddTransient<SyncPage>();
+            services.AddTransient<FilesPage>();
 
             s_serviceProvider = services.BuildServiceProvider();
         }

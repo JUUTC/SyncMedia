@@ -56,35 +56,7 @@ namespace SyncMedia.WinUI.Views
         }
     }
 
-    // Placeholder pages - to be implemented in Week 3-4
-    public sealed partial class SyncPage : Page
-    {
-        public SyncPage()
-        {
-            var text = new TextBlock
-            {
-                Text = "Sync Page - Coming in Week 3",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            this.Content = text;
-        }
-    }
-
-    public sealed partial class FilesPage : Page
-    {
-        public FilesPage()
-        {
-            var text = new TextBlock
-            {
-                Text = "Files Page - Coming in Week 3",
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment = VerticalAlignment.Center
-            };
-            this.Content = text;
-        }
-    }
-
+    // Placeholder page - to be implemented in Week 4
     public sealed partial class StatisticsPage : Page
     {
         public StatisticsPage()
