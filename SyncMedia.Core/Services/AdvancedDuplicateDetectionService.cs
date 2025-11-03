@@ -74,8 +74,39 @@ namespace SyncMedia.Core.Services
         /// </summary>
         public async Task<PythonEnvironmentStatus> CheckEnvironmentAsync()
         {
+            // Check if Python script exists
+            if (!File.Exists(_pythonScriptPath))
+            {
+                return new PythonEnvironmentStatus
+                {
+                    IsAvailable = false,
+                    UnavailabilityReason = PythonUnavailabilityReason.ScriptNotFound,
+                    Message = "Python integration script not found",
+                    ErrorDetails = $"Script path: {_pythonScriptPath}",
+                    SetupInstructions = "The Python script is missing. This may occur if the application was not installed correctly. Please reinstall the application.",
+                    ShouldFallbackToMD5 = true
+                };
+            }
+            
             try
             {
+                // Get Python version first
+                var pythonVersion = await GetPythonVersionAsync();
+                
+                if (pythonVersion == "Unknown" || pythonVersion.Contains("not found", StringComparison.OrdinalIgnoreCase))
+                {
+                    return new PythonEnvironmentStatus
+                    {
+                        IsAvailable = false,
+                        UnavailabilityReason = PythonUnavailabilityReason.PythonNotFound,
+                        Message = "Python not found on this system",
+                        ErrorDetails = $"Tried executables: python, python3, py",
+                        SetupInstructions = GetPythonInstallationInstructions(),
+                        ShouldFallbackToMD5 = true
+                    };
+                }
+                
+                // Try to run a test command to check packages
                 var testInput = new
                 {
                     images = new string[] { },
@@ -86,23 +117,94 @@ namespace SyncMedia.Core.Services
                 var inputJson = JsonSerializer.Serialize(testInput);
                 var result = await ExecutePythonScriptAsync(inputJson, CancellationToken.None);
                 
+                // Parse result to check for GPU support
+                bool hasGpu = result.Contains("gpu_used", StringComparison.OrdinalIgnoreCase);
+                
                 return new PythonEnvironmentStatus
                 {
                     IsAvailable = true,
-                    PythonVersion = await GetPythonVersionAsync(),
-                    HasGpuSupport = result.Contains("gpu_used", StringComparison.OrdinalIgnoreCase),
-                    Message = "Python environment is ready"
+                    PythonVersion = pythonVersion.Trim(),
+                    HasGpuSupport = hasGpu,
+                    UnavailabilityReason = PythonUnavailabilityReason.None,
+                    Message = "Python environment is ready",
+                    SetupInstructions = hasGpu ? "GPU acceleration available" : "GPU not available, will use CPU processing",
+                    ShouldFallbackToMD5 = false
                 };
             }
             catch (Exception ex)
             {
+                // Determine specific reason for failure
+                var reason = PythonUnavailabilityReason.UnknownError;
+                var message = "Python environment not available";
+                var instructions = "Unknown error occurred";
+                
+                if (ex.Message.Contains("imagededup", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Contains("torch", StringComparison.OrdinalIgnoreCase) ||
+                    ex.Message.Contains("ModuleNotFoundError", StringComparison.OrdinalIgnoreCase))
+                {
+                    reason = PythonUnavailabilityReason.PackagesMissing;
+                    message = "Required Python packages not installed";
+                    instructions = GetPackageInstallationInstructions();
+                }
+                else if (ex.Message.Contains("permission", StringComparison.OrdinalIgnoreCase) ||
+                         ex.Message.Contains("access denied", StringComparison.OrdinalIgnoreCase))
+                {
+                    reason = PythonUnavailabilityReason.PermissionDenied;
+                    message = "Permission denied when executing Python";
+                    instructions = "Try running the application as administrator or check Python installation permissions.";
+                }
+                
                 return new PythonEnvironmentStatus
                 {
                     IsAvailable = false,
-                    Message = $"Python environment not available: {ex.Message}",
-                    ErrorDetails = ex.ToString()
+                    PythonVersion = await GetPythonVersionAsync(),
+                    UnavailabilityReason = reason,
+                    Message = message,
+                    ErrorDetails = ex.ToString(),
+                    SetupInstructions = instructions,
+                    ShouldFallbackToMD5 = true
                 };
             }
+        }
+        
+        /// <summary>
+        /// Get Python installation instructions
+        /// </summary>
+        private string GetPythonInstallationInstructions()
+        {
+            return @"Python 3.8 or higher is required for AI-powered duplicate detection.
+
+Installation Steps:
+1. Download Python from: https://www.python.org/downloads/
+2. Run installer and check 'Add Python to PATH'
+3. Open Command Prompt and run: pip install -r requirements.txt
+4. Restart SyncMedia
+
+Alternative: Continue using standard MD5 duplicate detection (exact matches only).";
+        }
+        
+        /// <summary>
+        /// Get package installation instructions
+        /// </summary>
+        private string GetPackageInstallationInstructions()
+        {
+            return @"Required Python packages are not installed.
+
+Installation Steps:
+1. Open Command Prompt
+2. Navigate to: SyncMedia installation directory\Python\
+3. Run: pip install -r requirements.txt
+4. Wait for installation to complete
+5. Restart SyncMedia
+
+Required packages:
+- imagededup>=0.3.2
+- torch>=2.0.0
+- torchvision>=0.15.0
+- Pillow>=10.0.0
+- numpy>=1.24.0
+
+Alternative: Continue using standard MD5 duplicate detection.";
         }
 
         /// <summary>
@@ -272,6 +374,40 @@ namespace SyncMedia.Core.Services
         public bool HasGpuSupport { get; set; }
         public string Message { get; set; }
         public string ErrorDetails { get; set; }
+        
+        /// <summary>
+        /// Specific reason for unavailability
+        /// </summary>
+        public PythonUnavailabilityReason UnavailabilityReason { get; set; }
+        
+        /// <summary>
+        /// List of missing packages (if Python is found but packages are missing)
+        /// </summary>
+        public List<string> MissingPackages { get; set; }
+        
+        /// <summary>
+        /// User-friendly setup instructions
+        /// </summary>
+        public string SetupInstructions { get; set; }
+        
+        /// <summary>
+        /// Whether fallback to MD5 is recommended
+        /// </summary>
+        public bool ShouldFallbackToMD5 { get; set; }
+    }
+    
+    /// <summary>
+    /// Reason why Python environment is unavailable
+    /// </summary>
+    public enum PythonUnavailabilityReason
+    {
+        None,                    // Python is available
+        PythonNotFound,         // Python executable not found
+        PythonVersionTooOld,    // Python version < 3.8
+        PackagesMissing,        // Required packages not installed
+        ScriptNotFound,         // find_duplicates.py script missing
+        PermissionDenied,       // Cannot execute Python
+        UnknownError            // Other error
     }
 
     // Internal classes for JSON deserialization
