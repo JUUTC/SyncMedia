@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.AchievementsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewmodels="using:SyncMedia.WinUI.ViewModels"
+    mc:Ignorable="d">
+
+    <Page.DataContext>
+        <viewmodels:AchievementsViewModel />
+    </Page.DataContext>
+
+    <Grid Padding="24">
+        <ScrollViewer>
+            <StackPanel Spacing="16">
+                <!-- Header -->
+                <TextBlock 
+                    Text="Achievements" 
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Margin="0,0,0,16"/>
+
+                <!-- Achievements Grid -->
+                <ItemsRepeater ItemsSource="{x:Bind ViewModel.Achievements, Mode=OneWay}">
+                    <ItemsRepeater.Layout>
+                        <UniformGridLayout 
+                            MinItemWidth="300"
+                            MinItemHeight="150"
+                            ItemsStretch="Fill"
+                            MinRowSpacing="16"
+                            MinColumnSpacing="16"/>
+                    </ItemsRepeater.Layout>
+
+                    <ItemsRepeater.ItemTemplate>
+                        <DataTemplate>
+                            <Grid 
+                                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="20">
+                                
+                                <!-- Achievement content -->
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="Auto"/>
+                                    </Grid.RowDefinitions>
+
+                                    <!-- Icon and Name -->
+                                    <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="12" Margin="0,0,0,12">
+                                        <FontIcon 
+                                            Glyph="{Binding IconGlyph}"
+                                            FontSize="32"
+                                            Foreground="{Binding IsUnlocked, Converter={StaticResource AchievementColorConverter}}"/>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock 
+                                                Text="{Binding Name}" 
+                                                Style="{StaticResource SubtitleTextBlockStyle}"
+                                                Opacity="{Binding IsUnlocked, Converter={StaticResource AchievementOpacityConverter}}"/>
+                                            <TextBlock 
+                                                Text="{Binding UnlockedDate, Converter={StaticResource DateTimeConverter}}"
+                                                Style="{StaticResource CaptionTextBlockStyle}"
+                                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                Visibility="{Binding IsUnlocked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <!-- Description -->
+                                    <TextBlock 
+                                        Grid.Row="1"
+                                        Text="{Binding Description}"
+                                        TextWrapping="Wrap"
+                                        Opacity="{Binding IsUnlocked, Converter={StaticResource AchievementOpacityConverter}}"
+                                        Margin="0,0,0,12"/>
+
+                                    <!-- Progress -->
+                                    <StackPanel Grid.Row="2" Visibility="{Binding IsUnlocked, Converter={StaticResource InverseBoolToVisibilityConverter}}">
+                                        <ProgressBar 
+                                            Value="{Binding Progress}"
+                                            Maximum="{Binding Target}"
+                                            Margin="0,0,0,4"/>
+                                        <TextBlock 
+                                            Style="{StaticResource CaptionTextBlockStyle}"
+                                            Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                                            <Run Text="{Binding Progress}"/>
+                                            <Run Text="/"/>
+                                            <Run Text="{Binding Target}"/>
+                                        </TextBlock>
+                                    </StackPanel>
+
+                                    <!-- Tooltip for unlock criteria -->
+                                    <ToolTipService.ToolTip>
+                                        <ToolTip>
+                                            <StackPanel MaxWidth="300">
+                                                <TextBlock 
+                                                    Text="{Binding Name}" 
+                                                    FontWeight="SemiBold"
+                                                    Margin="0,0,0,8"/>
+                                                <TextBlock 
+                                                    Text="{Binding UnlockCriteria}"
+                                                    TextWrapping="Wrap"/>
+                                                <TextBlock 
+                                                    Text="{Binding UnlockedDate, Converter={StaticResource DateTimeConverter}}"
+                                                    Margin="0,8,0,0"
+                                                    FontStyle="Italic"
+                                                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                    Visibility="{Binding IsUnlocked, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                            </StackPanel>
+                                        </ToolTip>
+                                    </ToolTipService.ToolTip>
+                                </Grid>
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsRepeater.ItemTemplate>
+                </ItemsRepeater>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
