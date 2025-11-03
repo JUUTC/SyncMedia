@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.FolderConfigurationPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16" MaxWidth="800">
+            <!-- Header -->
+            <TextBlock Text="Folder Configuration" Style="{StaticResource TitleTextBlockStyle}"/>
+            <TextBlock Text="Select source and destination folders for media synchronization" 
+                       Style="{StaticResource BodyTextBlockStyle}"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+
+            <!-- Source Folder -->
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <TextBlock Text="Source Folder" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="The folder containing files to synchronize" 
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" 
+                             Text="{x:Bind ViewModel.SourceFolder, Mode=TwoWay}"
+                             PlaceholderText="Select a folder..."
+                             IsReadOnly="True"/>
+                    
+                    <Button Grid.Column="1" 
+                            Command="{x:Bind ViewModel.BrowseSourceCommand}"
+                            Content="Browse...">
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control" Key="O"/>
+                        </Button.KeyboardAccelerators>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- Destination Folder -->
+            <StackPanel Spacing="8" Margin="0,16,0,0">
+                <TextBlock Text="Destination Folder" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="The folder where synchronized files will be stored" 
+                           Style="{StaticResource CaptionTextBlockStyle}"
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                
+                <Grid ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox Grid.Column="0" 
+                             Text="{x:Bind ViewModel.DestinationFolder, Mode=TwoWay}"
+                             PlaceholderText="Select a folder..."
+                             IsReadOnly="True"/>
+                    
+                    <Button Grid.Column="1" 
+                            Command="{x:Bind ViewModel.BrowseDestinationCommand}"
+                            Content="Browse...">
+                        <Button.KeyboardAccelerators>
+                            <KeyboardAccelerator Modifiers="Control" Key="D"/>
+                        </Button.KeyboardAccelerators>
+                    </Button>
+                </Grid>
+            </StackPanel>
+
+            <!-- Validation Button -->
+            <Button Command="{x:Bind ViewModel.ValidateCommand}"
+                    Content="Validate Configuration"
+                    Style="{StaticResource AccentButtonStyle}"
+                    Margin="0,16,0,0"/>
+
+            <!-- Status Message -->
+            <InfoBar x:Name="StatusInfoBar"
+                     IsOpen="{x:Bind ViewModel.StatusMessage, Mode=OneWay, Converter={StaticResource StringToBoolConverter}}"
+                     Message="{x:Bind ViewModel.StatusMessage, Mode=OneWay}"
+                     Severity="Informational"
+                     IsClosable="True"/>
+
+        </StackPanel>
+    </ScrollViewer>
+</Page>

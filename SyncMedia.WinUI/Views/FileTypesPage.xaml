@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.FileTypesPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ScrollViewer>
+        <StackPanel Padding="24" Spacing="16" MaxWidth="800">
+            <TextBlock 
+                Text="File Types" 
+                Style="{StaticResource TitleTextBlockStyle}"
+                Margin="0,0,0,8"/>
+            
+            <TextBlock 
+                Text="Select which file types to include in sync operations."
+                Style="{StaticResource BodyTextBlockStyle}"
+                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                Margin="0,0,0,16"/>
+
+            <!-- Media Types Card -->
+            <Border 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock 
+                        Text="Media Types"
+                        Style="{StaticResource SubtitleTextBlockStyle}"/>
+
+                    <CheckBox 
+                        Content="Images"
+                        IsChecked="{x:Bind ViewModel.IncludeImages, Mode=TwoWay}">
+                        <CheckBox.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xEB9F;" FontSize="16"/>
+                                    <TextBlock Text="Images" VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Text="(JPEG, PNG, GIF, BMP, TIFF, WebP)"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </CheckBox.ContentTemplate>
+                    </CheckBox>
+
+                    <CheckBox 
+                        Content="Videos"
+                        IsChecked="{x:Bind ViewModel.IncludeVideos, Mode=TwoWay}">
+                        <CheckBox.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE714;" FontSize="16"/>
+                                    <TextBlock Text="Videos" VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Text="(MP4, AVI, MOV, WMV, MKV, FLV)"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </CheckBox.ContentTemplate>
+                    </CheckBox>
+
+                    <CheckBox 
+                        Content="Music"
+                        IsChecked="{x:Bind ViewModel.IncludeMusic, Mode=TwoWay}">
+                        <CheckBox.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE8D6;" FontSize="16"/>
+                                    <TextBlock Text="Music" VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Text="(MP3, WAV, FLAC, AAC, OGG, WMA)"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </CheckBox.ContentTemplate>
+                    </CheckBox>
+
+                    <CheckBox 
+                        Content="Documents"
+                        IsChecked="{x:Bind ViewModel.IncludeDocuments, Mode=TwoWay}">
+                        <CheckBox.ContentTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE8A5;" FontSize="16"/>
+                                    <TextBlock Text="Documents" VerticalAlignment="Center"/>
+                                    <TextBlock 
+                                        Text="(PDF, DOCX, XLSX, PPTX, TXT)"
+                                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                        FontSize="12"
+                                        VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </CheckBox.ContentTemplate>
+                    </CheckBox>
+                </StackPanel>
+            </Border>
+
+            <!-- Custom File Types Card -->
+            <Border 
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1"
+                CornerRadius="8"
+                Padding="16">
+                <StackPanel Spacing="12">
+                    <TextBlock 
+                        Text="Custom File Types"
+                        Style="{StaticResource SubtitleTextBlockStyle}"/>
+                    
+                    <TextBlock 
+                        Text="Add custom file extensions (comma-separated)"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        FontSize="12"/>
+
+                    <TextBox 
+                        PlaceholderText="e.g., .raw, .psd, .ai"
+                        Text="{x:Bind ViewModel.CustomFileTypes, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                        AcceptsReturn="False"/>
+                </StackPanel>
+            </Border>
+
+            <InfoBar
+                IsOpen="{x:Bind ViewModel.ShowMessage, Mode=OneWay}"
+                Message="{x:Bind ViewModel.Message, Mode=OneWay}"
+                Severity="Success"
+                IsClosable="True"/>
+        </StackPanel>
+    </ScrollViewer>
+</Page>
