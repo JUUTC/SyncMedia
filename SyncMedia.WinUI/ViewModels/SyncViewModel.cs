@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using SyncMedia.Core;
 using SyncMedia.Core.Services;
+using SyncMedia.WinUI.Services;
 using System;
 using System.Linq;
 using System.Threading;
@@ -255,11 +256,10 @@ namespace SyncMedia.WinUI.ViewModels
             });
         }
         
-        private void ShowAchievementNotification(string achievement)
+        private async void ShowAchievementNotification(string achievement)
         {
-            // TODO: Show a modern notification/toast for the achievement
-            // For now, just update status message
-            StatusMessage = $"🏆 Achievement Unlocked: {achievement}";
+            // Show achievement notification using NotificationService
+            await NotificationService.Instance.ShowAchievementAsync(achievement);
         }
     }
 }

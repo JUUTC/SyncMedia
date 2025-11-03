@@ -1,6 +1,8 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.ObjectModel;
 using SyncMedia.Core.Models;
+using SyncMedia.Core.Services;
+using System.Linq;
 
 namespace SyncMedia.WinUI.ViewModels;
 
@@ -16,98 +18,104 @@ public partial class AchievementsViewModel : ObservableObject
 
     private void LoadAchievements()
     {
-        // Sample achievements - in production, these would be loaded from storage
-        Achievements = new ObservableCollection<AchievementData>
+        // Load achievements from GamificationService
+        var gamificationData = GamificationService.Instance.GetGamificationData();
+        var unlockedAchievements = gamificationData.Achievements;
+        
+        // Define all possible achievements (these should match the ones in GamificationService)
+        var allAchievements = new[]
         {
             new AchievementData
             {
-                Id = "first_sync",
-                Name = "First Sync",
-                Description = "Complete your first file synchronization",
+                Id = "FirstTen",
+                Name = "First Ten",
+                Description = "Getting started! Sync your first 10 files",
                 IconGlyph = "\uE73E", // CheckMark
-                IsUnlocked = true,
+                IsUnlocked = unlockedAchievements.Contains("FirstTen"),
                 UnlockedDate = System.DateTime.Now.AddDays(-7),
-                Progress = 1,
-                Target = 1,
-                UnlockCriteria = "Complete 1 sync operation"
+                Progress = gamificationData.TotalFilesLifetime >= 10 ? 10 : gamificationData.TotalFilesLifetime,
+                Target = 10,
+                UnlockCriteria = "Sync 10 files total"
             },
             new AchievementData
             {
-                Id = "speed_demon",
-                Name = "Speed Demon",
-                Description = "Sync 100 files in under 1 minute",
-                IconGlyph = "\uE945", // Lightning
-                IsUnlocked = false,
-                Progress = 45,
-                Target = 100,
-                UnlockCriteria = "Sync 100 files in less than 60 seconds"
-            },
-            new AchievementData
-            {
-                Id = "storage_saver",
-                Name = "Storage Saver",
-                Description = "Free up 1GB of space with duplicate detection",
-                IconGlyph = "\uE8B7", // Save
-                IsUnlocked = false,
-                Progress = 512,
-                Target = 1024,
-                UnlockCriteria = "Save 1GB (1024MB) by removing duplicates (Pro only)"
-            },
-            new AchievementData
-            {
-                Id = "perfectionist",
-                Name = "Perfectionist",
-                Description = "Complete 50 syncs with zero errors",
+                Id = "Century",
+                Name = "Century Club",
+                Description = "Join the elite! Sync 100 files",
                 IconGlyph = "\uE734", // Favorite
-                IsUnlocked = false,
-                Progress = 12,
-                Target = 50,
-                UnlockCriteria = "Complete 50 sync operations without any errors"
+                IsUnlocked = unlockedAchievements.Contains("Century"),
+                Progress = gamificationData.TotalFilesLifetime >= 100 ? 100 : gamificationData.TotalFilesLifetime,
+                Target = 100,
+                UnlockCriteria = "Sync 100 files total"
             },
             new AchievementData
             {
-                Id = "streak_master",
-                Name = "Streak Master",
-                Description = "Use the app 7 days in a row",
-                IconGlyph = "\uE82D", // Calendar
-                IsUnlocked = false,
-                Progress = 3,
-                Target = 7,
-                UnlockCriteria = "Use SyncMedia for 7 consecutive days"
+                Id = "Millennium",
+                Name = "Millennium",
+                Description = "Master of organization! Sync 1,000 files",
+                IconGlyph = "\uE7C3", // Award
+                IsUnlocked = unlockedAchievements.Contains("Millennium"),
+                Progress = gamificationData.TotalFilesLifetime >= 1000 ? 1000 : gamificationData.TotalFilesLifetime,
+                Target = 1000,
+                UnlockCriteria = "Sync 1,000 files total"
             },
             new AchievementData
             {
-                Id = "night_owl",
-                Name = "Night Owl",
-                Description = "Use the app after 10 PM",
-                IconGlyph = "\uE708", // NightLight
-                IsUnlocked = false,
-                Progress = 0,
+                Id = "DuplicateHunter",
+                Name = "Duplicate Hunter",
+                Description = "Find and eliminate 100 duplicate files",
+                IconGlyph = "\uE8FB", // Search
+                IsUnlocked = unlockedAchievements.Contains("DuplicateHunter"),
+                Progress = gamificationData.TotalDuplicatesLifetime >= 100 ? 100 : gamificationData.TotalDuplicatesLifetime,
+                Target = 100,
+                UnlockCriteria = "Find 100 duplicate files"
+            },
+            new AchievementData
+            {
+                Id = "SpeedDemon",
+                Name = "Speed Demon",
+                Description = "Process files at lightning speed!",
+                IconGlyph = "\uE945", // Lightning
+                IsUnlocked = unlockedAchievements.Contains("SpeedDemon"),
+                Progress = 0, // Speed-based, can't show progress easily
                 Target = 1,
-                UnlockCriteria = "Run a sync operation after 10:00 PM"
+                UnlockCriteria = "Process 50+ files per minute"
             },
             new AchievementData
             {
-                Id = "early_bird",
-                Name = "Early Bird",
-                Description = "Use the app before 6 AM",
-                IconGlyph = "\uE706", // Sunny
-                IsUnlocked = false,
-                Progress = 0,
-                Target = 1,
-                UnlockCriteria = "Run a sync operation before 6:00 AM"
+                Id = "DataMaster",
+                Name = "Data Master",
+                Description = "Process over 10GB of files",
+                IconGlyph = "\uE8B7", // Save
+                IsUnlocked = unlockedAchievements.Contains("DataMaster"),
+                Progress = (int)(gamificationData.TotalBytesLifetime / (1024L * 1024 * 1024)),
+                Target = 10,
+                UnlockCriteria = "Process 10GB of data"
             },
             new AchievementData
             {
-                Id = "power_user",
-                Name = "Power User",
-                Description = "Sync 10,000 files total",
-                IconGlyph = "\uE7C3", // GripperBarHorizontal (represents power/strength)
-                IsUnlocked = false,
-                Progress = 1247,
+                Id = "PointsMaster",
+                Name = "Points Master",
+                Description = "Earn 10,000 points through your efforts",
+                IconGlyph = "\uE753", // Star
+                IsUnlocked = unlockedAchievements.Contains("PointsMaster"),
+                Progress = gamificationData.TotalPoints >= 10000 ? 10000 : gamificationData.TotalPoints,
                 Target = 10000,
-                UnlockCriteria = "Process 10,000 files across all sync operations"
+                UnlockCriteria = "Earn 10,000 total points"
+            },
+            new AchievementData
+            {
+                Id = "Perfectionist",
+                Name = "Perfectionist",
+                Description = "Complete 10 syncs with zero errors",
+                IconGlyph = "\uE734", // Favorite
+                IsUnlocked = unlockedAchievements.Contains("Perfectionist"),
+                Progress = 0, // Would need to track this separately
+                Target = 10,
+                UnlockCriteria = "Complete 10 error-free syncs"
             }
         };
+        
+        Achievements = new ObservableCollection<AchievementData>(allAchievements);
     }
 }
