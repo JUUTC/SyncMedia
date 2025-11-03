@@ -1,0 +1,17 @@
+# SyncMedia Advanced Duplicate Detection Dependencies
+# Install with: pip install -r requirements.txt
+
+# Core duplicate detection library
+imagededup>=0.3.2
+
+# Deep learning framework (for CNN-based detection)
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Image processing
+Pillow>=10.0.0
+numpy>=1.24.0
+
+# Optional: GPU acceleration (CUDA)
+# Uncomment if you have NVIDIA GPU with CUDA support
+# torch==2.0.0+cu118 -f https://download.pytorch.org/whl/torch_stable.html
