@@ -24,4 +24,8 @@
     <Compile Include="..\SyncMedia\Helpers\PerformanceOptimizer.cs" Link="SharedCode\Helpers\PerformanceOptimizer.cs" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\SyncMedia.Core\SyncMedia.Core.csproj" />
+  </ItemGroup>
+
 </Project>
