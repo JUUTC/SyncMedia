@@ -56,14 +56,25 @@ SyncMedia is available in two versions:
 - ✅ MD5 hash-based duplicate detection
 - ✅ Basic gamification and achievements
 - ✅ File preview (3s for images, 10s for videos)
-- ✅ 14-day trial of Pro features
-- 📺 Ad-supported (banner ads)
+- ✅ **100 free files per 30-day period**
+- ✅ **Earn bonus files by watching video ads (+20 files per video)**
+- ✅ **Speed boost from ad engagement (60 minutes no throttling)**
+- 📺 Ad-supported (banner + video ads)
 - 🌐 **Requires internet connection** (for ad delivery)
+- ⏱️ **Progressive throttling** (500ms-2000ms per file after initial batch)
 
-**Internet Requirement**: The free version requires an active internet connection to load and display advertisements. If you lose connectivity, the app will pause and prompt you to reconnect or upgrade to Pro. This ensures the ad-supported model that keeps SyncMedia free.
+**File Limits & Bonuses:**
+- Base: 100 files every 30 days
+- Watch complete video ad: +20 files + 60min speed boost
+- Click through banner ad: +10 files
+- Skip video after 15s: +5 files
+
+**Internet Requirement**: The free version requires an active internet connection to load and display advertisements. If you lose connectivity, the app will pause and prompt you to reconnect or upgrade to Pro.
 
 ### Pro Version
 - ✅ All free features
+- ✅ **Unlimited files** (no file count limits)
+- ✅ **No throttling** (maximum speed processing)
 - ✅ AI-powered perceptual duplicate detection
 - ✅ GPU-accelerated processing (10-100x faster)
 - ✅ Find similar images (crops, edits, filters)
@@ -73,7 +84,7 @@ SyncMedia is available in two versions:
 - ❌ No ads
 - ✅ **Works completely offline**
 
-**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app. Pro users enjoy full offline functionality without any internet requirement.
+**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app. Pro users enjoy full offline functionality without any internet requirement or file limits.
 
 For more details, see [MODERNIZATION_ROADMAP.md](MODERNIZATION_ROADMAP.md), [ADVERTISING_INTEGRATION.md](ADVERTISING_INTEGRATION.md), and [CONNECTIVITY_REQUIREMENTS.md](CONNECTIVITY_REQUIREMENTS.md).
 
