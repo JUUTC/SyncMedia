@@ -47,6 +47,32 @@ Each file is hashed to get a unique signature so the system will not place dupli
 The application will only sort the following file types:
 .jpg, .png, .bmp, .jpeg, .gif, .tif, .tiff, .mov, .mp4, .wmv, .avi, .m4v, .mpg and .mpeg
 
+## Free vs Pro Versions
+
+SyncMedia is available in two versions:
+
+### Free Version
+- ✅ Core sync functionality
+- ✅ MD5 hash-based duplicate detection
+- ✅ Basic gamification and achievements
+- ✅ File preview (3s for images, 10s for videos)
+- ✅ 14-day trial of Pro features
+- 📺 Ad-supported (banner ads)
+
+### Pro Version
+- ✅ All free features
+- ✅ AI-powered perceptual duplicate detection
+- ✅ GPU-accelerated processing (10-100x faster)
+- ✅ Find similar images (crops, edits, filters)
+- ✅ Deep learning-based duplicate detection (CNN)
+- ✅ Parallel file processing
+- ✅ Advanced performance optimizations
+- ❌ No ads
+
+**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app.
+
+For more details, see [MODERNIZATION_ROADMAP.md](MODERNIZATION_ROADMAP.md) and [ADVERTISING_INTEGRATION.md](ADVERTISING_INTEGRATION.md).
+
 ## Settings Storage
 
 Your folder preferences and gamification data are stored in:
