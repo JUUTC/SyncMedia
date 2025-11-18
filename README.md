@@ -58,6 +58,9 @@ SyncMedia is available in two versions:
 - ✅ File preview (3s for images, 10s for videos)
 - ✅ 14-day trial of Pro features
 - 📺 Ad-supported (banner ads)
+- 🌐 **Requires internet connection** (for ad delivery)
+
+**Internet Requirement**: The free version requires an active internet connection to load and display advertisements. If you lose connectivity, the app will pause and prompt you to reconnect or upgrade to Pro. This ensures the ad-supported model that keeps SyncMedia free.
 
 ### Pro Version
 - ✅ All free features
@@ -68,10 +71,11 @@ SyncMedia is available in two versions:
 - ✅ Parallel file processing
 - ✅ Advanced performance optimizations
 - ❌ No ads
+- ✅ **Works completely offline**
 
-**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app.
+**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app. Pro users enjoy full offline functionality without any internet requirement.
 
-For more details, see [MODERNIZATION_ROADMAP.md](MODERNIZATION_ROADMAP.md) and [ADVERTISING_INTEGRATION.md](ADVERTISING_INTEGRATION.md).
+For more details, see [MODERNIZATION_ROADMAP.md](MODERNIZATION_ROADMAP.md), [ADVERTISING_INTEGRATION.md](ADVERTISING_INTEGRATION.md), and [CONNECTIVITY_REQUIREMENTS.md](CONNECTIVITY_REQUIREMENTS.md).
 
 ## Settings Storage
 
