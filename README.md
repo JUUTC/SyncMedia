@@ -1,134 +1,104 @@
 # SyncMedia
 
-[![Microsoft Store Ready](https://img.shields.io/badge/Microsoft%20Store-Ready-brightgreen)](WINDOWS_STORE_MIGRATION.md)
+[![Microsoft Store Ready](https://img.shields.io/badge/Microsoft%20Store-Ready-brightgreen)](https://github.com/JUUTC/SyncMedia)
 
-Copy pictures and video from source folder to destination folder tree and prevents dupes by hashing each file and saving
-a xml list of hashes.
+**Intelligent media file synchronization with duplicate detection, AI-powered organization, and flexible monetization.**
 
-## Installation
+---
 
-### Microsoft Store (Recommended)
-This application is packaged and ready for Microsoft Store distribution. See [Windows Store Migration Guide](WINDOWS_STORE_MIGRATION.md) for publishing instructions.
+## 🚀 Quick Start
 
-### Manual Installation
-Download and run the installer from the [Releases](../../releases) page.
+SyncMedia copies pictures and videos from a source folder to an organized destination folder tree while preventing duplicates through intelligent hashing.
 
-## Usage
+**Installation:**
+- **Microsoft Store** (Recommended): Search "SyncMedia" → One-click install
+- **Manual**: Download from [Releases](../../releases)
 
-Once the application starts you will need to "set" three folders (This will be saved).
-The first is the folder you downloaded your files from your camera or phone to. 
-This folder needs to be outside of the Destination folder or it will make a mess.
+**Basic Setup:**
+1. Set **Source** folder (where camera/phone downloads are)
+2. Set **Destination** folder (where organized files go)
+3. Set **Rejects** folder (where duplicates are moved)
+4. Click "Sync Media" → Done!
 
-For example you shouldn't set the source and destination folder like c:\pictures\ and c:\pictures\sorted.
-The source folder and all sub folders will be imported.
+---
 
-A good example would be c:\pictures\ and c:\users\johndoe\my pictures\
-
-The destination folder should be set to an empty folder the first time you use the application.
-
-The reject duplicate folder should also be a new empty folder outside of the source folder.
-
-A good example would be to create a folder in your destination folder. c:\users\johndoe\my pictures\rejects\
-
-If you are syncing multiple devices when you import them give them unique names.
-For example when Jane imports her iPhone she labels them "Jane iPhone - date-time".
-The "Update Naming List" will search the source folder for possible naming conventions.
-Check the box next to the names you want to retained on the files after they are imported.
-If none are selected all the files will be named in the following way:
-
-For pictures: Date Taken - sequence number from this import (a number from 001 to the total count of files you are importing) 
-For movies: Date Modified - sequence number from this import (a number from 001 to the total count of files you are importing)
-
-Once all of your folders are set and any names checked you can press "Sync Media" and the gray area will 
-populate with the file names and a status message for each.
-
-Each file is hashed to get a unique signature so the system will not place duplicate files into the folder structure.
-
-The application will only sort the following file types:
-.jpg, .png, .bmp, .jpeg, .gif, .tif, .tiff, .mov, .mp4, .wmv, .avi, .m4v, .mpg and .mpeg
-
-## Free vs Pro Versions
-
-SyncMedia is available in two versions:
+## 📊 Free vs Pro
 
 ### Free Version
+- ✅ **Unlimited files** (no hard caps!)
+- ✅ MD5 duplicate detection
 - ✅ Core sync functionality
-- ✅ MD5 hash-based duplicate detection
-- ✅ Basic gamification and achievements
-- ✅ File preview (3s for images, 10s for videos)
-- ✅ **100 free files per 30-day period**
-- ✅ **Earn bonus files by watching video ads (+20 files per video)**
-- ✅ **Speed boost from ad engagement (60 minutes no throttling)**
-- 📺 Ad-supported (banner + video ads)
-- 🌐 **Requires internet connection** (for ad delivery)
-- ⏱️ **Progressive throttling** (500ms-2000ms per file after initial batch)
-
-**File Limits & Bonuses:**
-- Base: 100 files every 30 days
-- Watch complete video ad: +20 files + 60min speed boost
-- Click through banner ad: +10 files
-- Skip video after 15s: +5 files
-
-**Internet Requirement**: The free version requires an active internet connection to load and display advertisements. If you lose connectivity, the app will pause and prompt you to reconnect or upgrade to Pro.
+- ⏱️ **Progressive throttling** (0-10s delays)
+- 📺 Banner + video ads
+- 🌐 Internet required
+- 🎯 **Watch ad to reset counter** → instant processing!
 
 ### Pro Version
-- ✅ All free features
-- ✅ **Unlimited files** (no file count limits)
-- ✅ **No throttling** (maximum speed processing)
-- ✅ AI-powered perceptual duplicate detection
-- ✅ GPU-accelerated processing (10-100x faster)
-- ✅ Find similar images (crops, edits, filters)
-- ✅ Deep learning-based duplicate detection (CNN)
-- ✅ Parallel file processing
-- ✅ Advanced performance optimizations
+- ✅ **Zero throttling** (always instant)
+- ✅ AI-powered duplicate detection
+- ✅ GPU acceleration (10-100x faster)
+- ✅ Offline mode
 - ❌ No ads
-- ✅ **Works completely offline**
 
-**Upgrade**: You can upgrade to Pro at any time from the Settings page in the app. Pro users enjoy full offline functionality without any internet requirement or file limits.
-
-For more details, see [MODERNIZATION_ROADMAP.md](MODERNIZATION_ROADMAP.md), [ADVERTISING_INTEGRATION.md](ADVERTISING_INTEGRATION.md), and [CONNECTIVITY_REQUIREMENTS.md](CONNECTIVITY_REQUIREMENTS.md).
-
-## Settings Storage
-
-Your folder preferences and gamification data are stored in:
+**Progressive Throttling:**
 ```
-%LOCALAPPDATA%\SyncMedia\settings.xml
+0-50 files:   0-500ms    ⚡ Fast
+100 files:    1000ms     🟡 Moderate  
+200 files:    2000ms     🟠 Slow
+500+ files:   5-10s      🔴 Very slow
+
+Watch ad → Reset to 0ms ⚡
 ```
 
-This location ensures your settings are preserved across app updates and work properly with Windows Store packaging.
+---
 
-## Building from Source
+## 📖 Complete Documentation
+
+**For full documentation, see [COMPREHENSIVE_README.md](COMPREHENSIVE_README.md)**
+
+Includes:
+- Detailed architecture
+- Advertising integration
+- Testing guide
+- Build instructions
+- License protection
+- Microsoft Store deployment
+- FAQ
+
+
+## 🛠️ Development
 
 ### Requirements
 - .NET 9.0 SDK
-- Windows 10 SDK (10.0.17763.0 or higher) for packaging
-- Visual Studio 2022 (optional, for packaging project)
+- Windows 10 SDK (10.0.17763.0+)
 
-### Build Instructions
-
+### Build
 ```bash
-# Clone the repository
 git clone https://github.com/JUUTC/SyncMedia.git
 cd SyncMedia
-
-# Restore dependencies
 dotnet restore
-
-# Build the application
 dotnet build -c Release
-
-# Run the application
-dotnet run --project SyncMedia\SyncMedia.csproj
+dotnet run --project SyncMedia.WinUI/SyncMedia.WinUI.csproj
 ```
 
-### Creating Microsoft Store Package
+### Testing
+```bash
+dotnet test  # Run 42 unit tests
+```
 
-See [Windows Store Migration Guide](WINDOWS_STORE_MIGRATION.md) for detailed instructions on creating and publishing the MSIX package.
+**Test Coverage:**
+- ✅ 11 LicenseInfo tests
+- ✅ 14 LicenseManager tests
+- ✅ 17 FeatureFlagService tests
+- ✅ Progressive throttling formula
+- ✅ Counter reset mechanism
+- ✅ Hardware binding validation
 
-## Architecture
+---
 
-The application follows a clean architecture with separation of concerns. See [ARCHITECTURE.md](SyncMedia/ARCHITECTURE.md) for detailed documentation.
+## 📄 License
 
-## License
+See [LICENSE](LICENSE) file.
 
-See [LICENSE](LICENSE) file for details.
+**Settings Storage:** `%LOCALAPPDATA%\SyncMedia\settings.xml`  
+**License Storage:** `%LOCALAPPDATA%\SyncMedia\license.json`
