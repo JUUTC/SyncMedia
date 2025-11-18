@@ -13,7 +13,6 @@ namespace SyncMedia.Core.Services
     public class LicenseManager
     {
         private const string LICENSE_FILE = "license.xml";
-        private const int TRIAL_DAYS = 14;
         private readonly string _licenseFilePath;
         private LicenseInfo _currentLicense;
 
@@ -33,7 +32,7 @@ namespace SyncMedia.Core.Services
         public LicenseInfo CurrentLicense => _currentLicense;
 
         /// <summary>
-        /// Load license from file or initialize trial
+        /// Load license from file or initialize new free tier license
         /// </summary>
         private void LoadLicense()
         {
@@ -50,8 +49,14 @@ namespace SyncMedia.Core.Services
                         LicenseKey = root.Element("LicenseKey")?.Value,
                         ActivationDate = ParseDate(root.Element("ActivationDate")?.Value),
                         ExpirationDate = ParseDate(root.Element("ExpirationDate")?.Value),
-                        TrialExpirationDate = ParseDate(root.Element("TrialExpirationDate")?.Value)
+                        FilesProcessedCount = int.Parse(root.Element("FilesProcessedCount")?.Value ?? "0"),
+                        PeriodStartDate = ParseDate(root.Element("PeriodStartDate")?.Value),
+                        BonusFilesFromAds = int.Parse(root.Element("BonusFilesFromAds")?.Value ?? "0"),
+                        SpeedBoostExpirationDate = ParseDate(root.Element("SpeedBoostExpirationDate")?.Value)
                     };
+
+                    // Check if period needs to be reset
+                    _currentLicense.CheckAndResetPeriod();
                 }
                 catch
                 {
@@ -66,14 +71,16 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
-        /// Initialize a new license with trial period
+        /// Initialize a new free tier license
         /// </summary>
         private void InitializeNewLicense()
         {
             _currentLicense = new LicenseInfo
             {
                 IsPro = false,
-                TrialExpirationDate = DateTime.Now.AddDays(TRIAL_DAYS)
+                FilesProcessedCount = 0,
+                PeriodStartDate = DateTime.Now,
+                BonusFilesFromAds = 0
             };
             SaveLicense();
         }
@@ -89,10 +96,52 @@ namespace SyncMedia.Core.Services
                     new XElement("LicenseKey", _currentLicense.LicenseKey ?? ""),
                     new XElement("ActivationDate", _currentLicense.ActivationDate?.ToString("o") ?? ""),
                     new XElement("ExpirationDate", _currentLicense.ExpirationDate?.ToString("o") ?? ""),
-                    new XElement("TrialExpirationDate", _currentLicense.TrialExpirationDate?.ToString("o") ?? "")
+                    new XElement("FilesProcessedCount", _currentLicense.FilesProcessedCount),
+                    new XElement("PeriodStartDate", _currentLicense.PeriodStartDate?.ToString("o") ?? ""),
+                    new XElement("BonusFilesFromAds", _currentLicense.BonusFilesFromAds),
+                    new XElement("SpeedBoostExpirationDate", _currentLicense.SpeedBoostExpirationDate?.ToString("o") ?? "")
                 )
             );
             doc.Save(_licenseFilePath);
+        }
+
+        /// <summary>
+        /// Increment the files processed counter
+        /// </summary>
+        /// <param name="count">Number of files processed</param>
+        public void IncrementFilesProcessed(int count = 1)
+        {
+            _currentLicense.CheckAndResetPeriod();
+            _currentLicense.FilesProcessedCount += count;
+            SaveLicense();
+        }
+
+        /// <summary>
+        /// Add bonus files from watching a video ad
+        /// </summary>
+        public void AddBonusFilesFromVideoAd()
+        {
+            _currentLicense.BonusFilesFromAds += LicenseInfo.BONUS_FILES_PER_VIDEO_AD;
+            SaveLicense();
+        }
+
+        /// <summary>
+        /// Add bonus files from ad click-through
+        /// </summary>
+        public void AddBonusFilesFromClick()
+        {
+            _currentLicense.BonusFilesFromAds += LicenseInfo.BONUS_FILES_PER_CLICK;
+            SaveLicense();
+        }
+
+        /// <summary>
+        /// Activate speed boost from watching video ad
+        /// </summary>
+        /// <param name="durationMinutes">Duration of speed boost in minutes</param>
+        public void ActivateSpeedBoost(int durationMinutes = 60)
+        {
+            _currentLicense.SpeedBoostExpirationDate = DateTime.Now.AddMinutes(durationMinutes);
+            SaveLicense();
         }
 
         /// <summary>

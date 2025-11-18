@@ -33,12 +33,22 @@ namespace SyncMedia.Core.Interfaces
         event EventHandler<AdErrorEventArgs> AdFailed;
 
         /// <summary>
+        /// Event raised when video ad completes successfully
+        /// </summary>
+        event EventHandler<VideoAdCompletedEventArgs> VideoAdCompleted;
+
+        /// <summary>
+        /// Event raised when user clicks on an ad
+        /// </summary>
+        event EventHandler AdClicked;
+
+        /// <summary>
         /// Initialize the advertising service
         /// </summary>
         void Initialize();
 
         /// <summary>
-        /// Show advertisements
+        /// Show banner advertisements
         /// </summary>
         void ShowAds();
 
@@ -52,6 +62,17 @@ namespace SyncMedia.Core.Interfaces
         /// </summary>
         /// <param name="shouldShowAds">Whether ads should be shown</param>
         void UpdateAdVisibility(bool shouldShowAds);
+
+        /// <summary>
+        /// Show an interstitial video ad
+        /// </summary>
+        /// <returns>True if video ad was shown successfully</returns>
+        bool ShowInterstitialVideoAd();
+
+        /// <summary>
+        /// Check if a video ad is ready to be shown
+        /// </summary>
+        bool IsVideoAdReady { get; }
     }
 
     /// <summary>
@@ -70,5 +91,21 @@ namespace SyncMedia.Core.Interfaces
     {
         public string ErrorMessage { get; set; }
         public int ErrorCode { get; set; }
+    }
+
+    /// <summary>
+    /// Event args for video ad completion
+    /// </summary>
+    public class VideoAdCompletedEventArgs : EventArgs
+    {
+        /// <summary>
+        /// Gets whether the video was watched completely
+        /// </summary>
+        public bool WatchedCompletely { get; set; }
+
+        /// <summary>
+        /// Gets the percentage of video watched (0-100)
+        /// </summary>
+        public int PercentageWatched { get; set; }
     }
 }

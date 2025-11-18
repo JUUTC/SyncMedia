@@ -28,30 +28,73 @@ namespace SyncMedia.Core.Models
         public DateTime? ExpirationDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the trial expiration date (14 days from first launch)
+        /// Gets or sets the number of files processed in current period (free tier)
         /// </summary>
-        public DateTime? TrialExpirationDate { get; set; }
+        public int FilesProcessedCount { get; set; }
 
         /// <summary>
-        /// Gets whether the user is currently in a trial period
+        /// Gets or sets the start date of current processing period
         /// </summary>
-        public bool IsInTrial => TrialExpirationDate.HasValue && DateTime.Now < TrialExpirationDate.Value;
+        public DateTime? PeriodStartDate { get; set; }
 
         /// <summary>
-        /// Gets whether the trial has expired
+        /// Gets or sets bonus files earned through ad interactions
         /// </summary>
-        public bool IsTrialExpired => TrialExpirationDate.HasValue && DateTime.Now >= TrialExpirationDate.Value;
+        public int BonusFilesFromAds { get; set; }
 
         /// <summary>
-        /// Gets the number of days remaining in the trial
+        /// Gets or sets the expiration date for ad-earned speed boost
         /// </summary>
-        public int TrialDaysRemaining
+        public DateTime? SpeedBoostExpirationDate { get; set; }
+
+        /// <summary>
+        /// Gets the maximum free files allowed per period (30 days)
+        /// </summary>
+        public const int FREE_FILES_PER_PERIOD = 100;
+
+        /// <summary>
+        /// Gets the number of bonus files earned per video ad watched
+        /// </summary>
+        public const int BONUS_FILES_PER_VIDEO_AD = 20;
+
+        /// <summary>
+        /// Gets the number of bonus files earned per ad click-through
+        /// </summary>
+        public const int BONUS_FILES_PER_CLICK = 10;
+
+        /// <summary>
+        /// Gets whether the user has reached the free file limit
+        /// </summary>
+        public bool HasReachedFreeLimit
         {
             get
             {
-                if (!TrialExpirationDate.HasValue) return 0;
-                var remaining = (TrialExpirationDate.Value - DateTime.Now).Days;
-                return Math.Max(0, remaining);
+                if (IsPro) return false;
+                return FilesProcessedCount >= (FREE_FILES_PER_PERIOD + BonusFilesFromAds);
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of files remaining in free tier
+        /// </summary>
+        public int RemainingFreeFiles
+        {
+            get
+            {
+                if (IsPro) return int.MaxValue;
+                var total = FREE_FILES_PER_PERIOD + BonusFilesFromAds;
+                return Math.Max(0, total - FilesProcessedCount);
+            }
+        }
+
+        /// <summary>
+        /// Gets whether the user has an active speed boost from watching ads
+        /// </summary>
+        public bool HasActiveSpeedBoost
+        {
+            get
+            {
+                return SpeedBoostExpirationDate.HasValue && DateTime.Now < SpeedBoostExpirationDate.Value;
             }
         }
 
@@ -70,6 +113,19 @@ namespace SyncMedia.Core.Models
                     return true;
                 }
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Resets the processing period if 30 days have passed
+        /// </summary>
+        public void CheckAndResetPeriod()
+        {
+            if (!PeriodStartDate.HasValue || (DateTime.Now - PeriodStartDate.Value).TotalDays >= 30)
+            {
+                FilesProcessedCount = 0;
+                BonusFilesFromAds = 0;
+                PeriodStartDate = DateTime.Now;
             }
         }
     }
