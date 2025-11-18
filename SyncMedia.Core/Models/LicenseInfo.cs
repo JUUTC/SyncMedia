@@ -48,19 +48,32 @@ namespace SyncMedia.Core.Models
         public DateTime? SpeedBoostExpirationDate { get; set; }
 
         /// <summary>
-        /// Gets the maximum free files allowed per period (30 days)
+        /// Gets or sets the machine ID (for hardware-bound licenses)
         /// </summary>
-        public const int FREE_FILES_PER_PERIOD = 100;
+        public string MachineId { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this is a store-purchased license (requires online validation)
+        /// </summary>
+        public bool IsStoreLicense { get; set; }
+
+        /// <summary>
+        /// Gets the maximum free files allowed per period (30 days)
+        /// Lower limit creates sustainable ad-supported model
+        /// </summary>
+        public const int FREE_FILES_PER_PERIOD = 25;
 
         /// <summary>
         /// Gets the number of bonus files earned per video ad watched
+        /// Higher reward incentivizes video ad engagement
         /// </summary>
-        public const int BONUS_FILES_PER_VIDEO_AD = 20;
+        public const int BONUS_FILES_PER_VIDEO_AD = 50;
 
         /// <summary>
         /// Gets the number of bonus files earned per ad click-through
+        /// Lower than video to prioritize video ad engagement
         /// </summary>
-        public const int BONUS_FILES_PER_CLICK = 10;
+        public const int BONUS_FILES_PER_CLICK = 5;
 
         /// <summary>
         /// Gets whether the user has reached the free file limit

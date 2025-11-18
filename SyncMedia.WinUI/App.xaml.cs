@@ -37,6 +37,7 @@ namespace SyncMedia.WinUI
             // Register UI services
             services.AddSingleton<IConnectivityService, ConnectivityService>();
             services.AddSingleton<IAdvertisingService, MicrosoftAdvertisingService>();
+            services.AddSingleton<IDisplayRequestService, DisplayRequestService>();
 
             // Register ViewModels
             services.AddTransient<MainViewModel>();

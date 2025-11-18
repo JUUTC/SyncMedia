@@ -42,7 +42,7 @@ namespace SyncMedia.Tests.Core.Models
             var license = new LicenseInfo
             {
                 IsPro = false,
-                FilesProcessedCount = 100,
+                FilesProcessedCount = 25, // Updated to new limit
                 BonusFilesFromAds = 0
             };
 
@@ -57,7 +57,7 @@ namespace SyncMedia.Tests.Core.Models
             var license = new LicenseInfo
             {
                 IsPro = false,
-                FilesProcessedCount = 101,
+                FilesProcessedCount = 26, // Updated to new limit
                 BonusFilesFromAds = 0
             };
 
@@ -72,12 +72,12 @@ namespace SyncMedia.Tests.Core.Models
             var license = new LicenseInfo
             {
                 IsPro = false,
-                FilesProcessedCount = 110,
-                BonusFilesFromAds = 20
+                FilesProcessedCount = 50,
+                BonusFilesFromAds = 50 // Updated bonus
             };
 
             // Act & Assert
-            // Limit is 100 + 20 = 120, processed is 110, so not reached
+            // Limit is 25 + 50 = 75, processed is 50, so not reached
             Assert.False(license.HasReachedFreeLimit);
         }
 
@@ -102,18 +102,18 @@ namespace SyncMedia.Tests.Core.Models
             var license = new LicenseInfo
             {
                 IsPro = false,
-                FilesProcessedCount = 30,
-                BonusFilesFromAds = 10
+                FilesProcessedCount = 10,
+                BonusFilesFromAds = 50 // Updated bonus
             };
 
             // Act
             var remaining = license.RemainingFreeFiles;
 
             // Assert
-            // Total available: 100 + 10 = 110
-            // Processed: 30
-            // Remaining: 80
-            Assert.Equal(80, remaining);
+            // Total available: 25 + 50 = 75
+            // Processed: 10
+            // Remaining: 65
+            Assert.Equal(65, remaining);
         }
 
         [Fact]
@@ -123,8 +123,8 @@ namespace SyncMedia.Tests.Core.Models
             var license = new LicenseInfo
             {
                 IsPro = false,
-                FilesProcessedCount = 120,
-                BonusFilesFromAds = 10
+                FilesProcessedCount = 80,
+                BonusFilesFromAds = 50 // Updated bonus
             };
 
             // Act
@@ -290,22 +290,22 @@ namespace SyncMedia.Tests.Core.Models
         }
 
         [Theory]
-        [InlineData(100)]
-        [InlineData(20)]
-        [InlineData(10)]
-        public void Constants_ShouldHaveExpectedValues(int expectedFreeFiles)
+        [InlineData(25)]
+        [InlineData(50)]
+        [InlineData(5)]
+        public void Constants_ShouldHaveExpectedValues(int expectedValue)
         {
             // Assert - verify the constants are set as expected
-            if (expectedFreeFiles == 100)
-                Assert.Equal(100, LicenseInfo.FREE_FILES_PER_PERIOD);
+            if (expectedValue == 25)
+                Assert.Equal(25, LicenseInfo.FREE_FILES_PER_PERIOD);
         }
 
         [Fact]
         public void BonusConstants_ShouldHaveExpectedValues()
         {
-            // Assert
-            Assert.Equal(20, LicenseInfo.BONUS_FILES_PER_VIDEO_AD);
-            Assert.Equal(10, LicenseInfo.BONUS_FILES_PER_CLICK);
+            // Assert - Updated values for fairer model
+            Assert.Equal(50, LicenseInfo.BONUS_FILES_PER_VIDEO_AD);
+            Assert.Equal(5, LicenseInfo.BONUS_FILES_PER_CLICK);
         }
     }
 }
