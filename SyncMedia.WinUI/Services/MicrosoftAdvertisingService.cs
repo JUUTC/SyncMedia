@@ -13,6 +13,9 @@ namespace SyncMedia.WinUI.Services
     {
         private AdControl _adControl;
         private bool _initialized;
+        private int _consecutiveAdFailures;
+        private DateTime _lastAdLoadAttempt;
+        private const int AD_BLOCK_THRESHOLD = 3; // Consider blocked after 3 failures
 
         // Microsoft Advertising test IDs (replace with real IDs for production)
         // Get your Application ID and Ad Unit ID from https://apps.microsoft.com
@@ -20,11 +23,18 @@ namespace SyncMedia.WinUI.Services
         private const string AD_UNIT_ID = "test"; // Test Ad Unit ID
         
         public bool AdsEnabled { get; private set; }
+        public bool AdsBlocked { get; private set; }
+
+        public event EventHandler<Core.Interfaces.AdBlockedEventArgs> AdBlockingDetected;
+        public event EventHandler AdLoaded;
+        public event EventHandler<Core.Interfaces.AdErrorEventArgs> AdFailed;
 
         public MicrosoftAdvertisingService()
         {
             _initialized = false;
             AdsEnabled = false;
+            AdsBlocked = false;
+            _consecutiveAdFailures = 0;
         }
 
         /// <summary>
@@ -68,6 +78,7 @@ namespace SyncMedia.WinUI.Services
                 AdsEnabled = true;
                 
                 // Refresh the ad to start showing
+                _lastAdLoadAttempt = DateTime.Now;
                 _adControl.Refresh();
             }
         }
@@ -97,12 +108,47 @@ namespace SyncMedia.WinUI.Services
         {
             // Ad successfully loaded and refreshed
             System.Diagnostics.Debug.WriteLine("Ad refreshed successfully");
+            
+            // Reset failure counter on success
+            _consecutiveAdFailures = 0;
+            AdsBlocked = false;
+            
+            // Raise success event
+            AdLoaded?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnAdErrorOccurred(object sender, AdErrorEventArgs e)
+        private void OnAdErrorOccurred(object sender, Microsoft.Advertising.WinRT.UI.AdErrorEventArgs e)
         {
             // Ad failed to load
             System.Diagnostics.Debug.WriteLine($"Ad error occurred: {e.ErrorMessage} (Code: {e.ErrorCode})");
+            
+            _consecutiveAdFailures++;
+            
+            // Check if we've exceeded the threshold for ad blocking detection
+            if (_consecutiveAdFailures >= AD_BLOCK_THRESHOLD)
+            {
+                AdsBlocked = true;
+                
+                // Determine if this is a network issue or likely ad-blocking
+                bool isNetworkIssue = e.ErrorCode == Microsoft.Advertising.WinRT.UI.ErrorCode.NetworkConnectionFailure ||
+                                     e.ErrorCode == Microsoft.Advertising.WinRT.UI.ErrorCode.ServerSideError;
+                
+                var args = new Core.Interfaces.AdBlockedEventArgs
+                {
+                    Reason = e.ErrorMessage,
+                    IsNetworkIssue = isNetworkIssue
+                };
+                
+                AdBlockingDetected?.Invoke(this, args);
+            }
+            
+            // Raise error event
+            var errorArgs = new Core.Interfaces.AdErrorEventArgs
+            {
+                ErrorMessage = e.ErrorMessage,
+                ErrorCode = (int)e.ErrorCode
+            };
+            AdFailed?.Invoke(this, errorArgs);
             
             // Hide the ad control if there's an error
             if (_adControl != null)

@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:advertising="using:Microsoft.Advertising.WinRT.UI"
+    xmlns:local="using:SyncMedia.WinUI.Views"
     mc:Ignorable="d"
     Title="SyncMedia - Modern Media Synchronization">
 
@@ -71,5 +72,14 @@
                                    Height="90"
                                    HorizontalAlignment="Center"/>
         </Border>
+
+        <!-- Connectivity Required Overlay (shown when internet is needed) -->
+        <Grid x:Name="ConnectivityOverlayContainer"
+              Grid.Row="0"
+              Grid.RowSpan="2"
+              Visibility="Collapsed"
+              Canvas.ZIndex="1000">
+            <local:ConnectivityRequiredOverlay x:Name="ConnectivityOverlay"/>
+        </Grid>
     </Grid>
 </Window>
