@@ -1,5 +1,8 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using SyncMedia.Core.Interfaces;
+using SyncMedia.Core.Services;
+using SyncMedia.WinUI.Services;
 using SyncMedia.WinUI.ViewModels;
 using System;
 
@@ -8,17 +11,47 @@ namespace SyncMedia.WinUI.Views
     public sealed partial class MainWindow : Window
     {
         public MainViewModel ViewModel { get; }
+        private readonly IAdvertisingService _advertisingService;
+        private readonly FeatureFlagService _featureFlagService;
 
-        public MainWindow(MainViewModel viewModel)
+        public MainWindow(MainViewModel viewModel, IAdvertisingService advertisingService, FeatureFlagService featureFlagService)
         {
             this.InitializeComponent();
             ViewModel = viewModel;
+            _advertisingService = advertisingService;
+            _featureFlagService = featureFlagService;
             
             // Set window size
             this.AppWindow.Resize(new Windows.Graphics.SizeInt32(1200, 800));
 
+            // Initialize advertising
+            InitializeAdvertising();
+
             // Navigate to home page by default
             ContentFrame.Navigate(typeof(HomePage));
+        }
+
+        private void InitializeAdvertising()
+        {
+            // Initialize the advertising service with the AdControl
+            if (_advertisingService is MicrosoftAdvertisingService msAdService)
+            {
+                msAdService.InitializeWithControl(AdControlBanner);
+            }
+
+            // Show or hide ads based on license status
+            UpdateAdVisibility();
+        }
+
+        private void UpdateAdVisibility()
+        {
+            bool shouldShowAds = _featureFlagService.ShouldShowAds;
+            
+            // Update ad visibility
+            _advertisingService.UpdateAdVisibility(shouldShowAds);
+            
+            // Also update the border visibility
+            AdBorder.Visibility = shouldShowAds ? Visibility.Visible : Visibility.Collapsed;
         }
 
         private void NavView_SelectionChanged(NavigationView sender, NavigationViewSelectionChangedEventArgs args)

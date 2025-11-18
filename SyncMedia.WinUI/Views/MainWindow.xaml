@@ -5,11 +5,19 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:advertising="using:Microsoft.Advertising.WinRT.UI"
     mc:Ignorable="d"
     Title="SyncMedia - Modern Media Synchronization">
 
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Main Navigation Content -->
         <NavigationView x:Name="NavView" 
+                       Grid.Row="0"
                        PaneDisplayMode="Left"
                        IsBackButtonVisible="Collapsed"
                        IsSettingsVisible="True"
@@ -48,5 +56,20 @@
 
             <Frame x:Name="ContentFrame"/>
         </NavigationView>
+        
+        <!-- Ad Container at bottom -->
+        <Border Grid.Row="1"
+                x:Name="AdBorder"
+                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="0,1,0,0"
+                HorizontalAlignment="Center"
+                Padding="8"
+                Visibility="Collapsed">
+            <advertising:AdControl x:Name="AdControlBanner"
+                                   Width="728"
+                                   Height="90"
+                                   HorizontalAlignment="Center"/>
+        </Border>
     </Grid>
 </Window>

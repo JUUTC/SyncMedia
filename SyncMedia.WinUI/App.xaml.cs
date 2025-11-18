@@ -1,5 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
+using SyncMedia.Core.Interfaces;
+using SyncMedia.Core.Services;
+using SyncMedia.WinUI.Services;
 using SyncMedia.WinUI.ViewModels;
 using SyncMedia.WinUI.Views;
 using System;
@@ -24,7 +27,15 @@ namespace SyncMedia.WinUI
             var services = new ServiceCollection();
 
             // Register Core services
-            // services.AddSingleton<ISyncService, SyncService>();
+            services.AddSingleton<LicenseManager>();
+            services.AddSingleton(provider => 
+            {
+                var licenseManager = provider.GetRequiredService<LicenseManager>();
+                return new FeatureFlagService(licenseManager.CurrentLicense);
+            });
+            
+            // Register UI services
+            services.AddSingleton<IAdvertisingService, MicrosoftAdvertisingService>();
 
             // Register ViewModels
             services.AddTransient<MainViewModel>();

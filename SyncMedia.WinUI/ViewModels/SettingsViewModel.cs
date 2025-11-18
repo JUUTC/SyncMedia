@@ -2,11 +2,18 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using SyncMedia.Core;
+using SyncMedia.Core.Interfaces;
+using SyncMedia.Core.Services;
+using System;
 
 namespace SyncMedia.WinUI.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private readonly IAdvertisingService _advertisingService;
+    private readonly LicenseManager _licenseManager;
+    private readonly FeatureFlagService _featureFlagService;
+
     [ObservableProperty]
     private bool proVersion = false;
 
@@ -37,8 +44,11 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string licenseType = "Free";
 
-    public SettingsViewModel()
+    public SettingsViewModel(IAdvertisingService advertisingService, LicenseManager licenseManager, FeatureFlagService featureFlagService)
     {
+        _advertisingService = advertisingService;
+        _licenseManager = licenseManager;
+        _featureFlagService = featureFlagService;
         LoadSettings();
     }
 
@@ -147,6 +157,17 @@ public partial class SettingsViewModel : ObservableObject
         ProVersion = true;
         LicenseType = "Pro";
         SaveSetting("ProVersion", "true");
+        
+        // Activate the license in LicenseManager
+        // In production, this would validate a real license key from the store
+        var testLicenseKey = LicenseManager.GenerateLicenseKey();
+        _licenseManager.ActivateLicense(testLicenseKey);
+        
+        // Refresh feature flags
+        _featureFlagService.RefreshFeatureFlags();
+        
+        // Update ad visibility - hide ads for Pro users
+        _advertisingService.UpdateAdVisibility(_featureFlagService.ShouldShowAds);
     }
 
     [RelayCommand]
