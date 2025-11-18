@@ -38,11 +38,6 @@ namespace SyncMedia.Core.Models
         public DateTime? PeriodStartDate { get; set; }
 
         /// <summary>
-        /// Gets or sets bonus files earned through ad interactions
-        /// </summary>
-        public int BonusFilesFromAds { get; set; }
-
-        /// <summary>
         /// Gets or sets the expiration date for ad-earned speed boost
         /// </summary>
         public DateTime? SpeedBoostExpirationDate { get; set; }
@@ -56,49 +51,6 @@ namespace SyncMedia.Core.Models
         /// Gets or sets whether this is a store-purchased license (requires online validation)
         /// </summary>
         public bool IsStoreLicense { get; set; }
-
-        /// <summary>
-        /// Gets the maximum free files allowed per period (30 days)
-        /// Lower limit creates sustainable ad-supported model
-        /// </summary>
-        public const int FREE_FILES_PER_PERIOD = 25;
-
-        /// <summary>
-        /// Gets the number of bonus files earned per video ad watched
-        /// Higher reward incentivizes video ad engagement
-        /// </summary>
-        public const int BONUS_FILES_PER_VIDEO_AD = 50;
-
-        /// <summary>
-        /// Gets the number of bonus files earned per ad click-through
-        /// Lower than video to prioritize video ad engagement
-        /// </summary>
-        public const int BONUS_FILES_PER_CLICK = 5;
-
-        /// <summary>
-        /// Gets whether the user has reached the free file limit
-        /// </summary>
-        public bool HasReachedFreeLimit
-        {
-            get
-            {
-                if (IsPro) return false;
-                return FilesProcessedCount >= (FREE_FILES_PER_PERIOD + BonusFilesFromAds);
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of files remaining in free tier
-        /// </summary>
-        public int RemainingFreeFiles
-        {
-            get
-            {
-                if (IsPro) return int.MaxValue;
-                var total = FREE_FILES_PER_PERIOD + BonusFilesFromAds;
-                return Math.Max(0, total - FilesProcessedCount);
-            }
-        }
 
         /// <summary>
         /// Gets whether the user has an active speed boost from watching ads
@@ -137,7 +89,6 @@ namespace SyncMedia.Core.Models
             if (!PeriodStartDate.HasValue || (DateTime.Now - PeriodStartDate.Value).TotalDays >= 30)
             {
                 FilesProcessedCount = 0;
-                BonusFilesFromAds = 0;
                 PeriodStartDate = DateTime.Now;
             }
         }

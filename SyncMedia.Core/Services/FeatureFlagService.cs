@@ -70,24 +70,27 @@ namespace SyncMedia.Core.Services
 
         /// <summary>
         /// Get the throttle delay in milliseconds based on files processed
-        /// Progressive throttling: more files = more delay
+        /// Progressive throttling: more files = progressively more delay
+        /// Ad interactions reset the counter to 0, removing throttle
         /// </summary>
         public int GetThrottleDelayMs()
         {
             if (!ShouldThrottle) return 0;
 
             // Progressive throttling formula
-            // 0-50 files: 500ms delay
-            // 51-75 files: 1000ms delay  
-            // 76+ files: 2000ms delay
+            // Delay increases by 100ms for every 10 files processed
+            // 0 files: 0ms
+            // 10 files: 100ms
+            // 50 files: 500ms
+            // 100 files: 1000ms (1 second)
+            // 200 files: 2000ms (2 seconds)
+            // 500 files: 5000ms (5 seconds)
+            // Caps at 10 seconds to avoid extreme delays
             var filesProcessed = _licenseInfo.FilesProcessedCount;
+            var delay = (filesProcessed / 10) * 100;
             
-            if (filesProcessed < 50)
-                return 500;
-            else if (filesProcessed < 75)
-                return 1000;
-            else
-                return 2000;
+            // Cap at 10 seconds maximum
+            return Math.Min(delay, 10000);
         }
 
         /// <summary>

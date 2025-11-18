@@ -56,7 +56,6 @@ namespace SyncMedia.Core.Services
                         ExpirationDate = ParseDate(root.Element("ExpirationDate")?.Value),
                         FilesProcessedCount = int.Parse(root.Element("FilesProcessedCount")?.Value ?? "0"),
                         PeriodStartDate = ParseDate(root.Element("PeriodStartDate")?.Value),
-                        BonusFilesFromAds = int.Parse(root.Element("BonusFilesFromAds")?.Value ?? "0"),
                         SpeedBoostExpirationDate = ParseDate(root.Element("SpeedBoostExpirationDate")?.Value),
                         MachineId = root.Element("MachineId")?.Value,
                         IsStoreLicense = bool.Parse(root.Element("IsStoreLicense")?.Value ?? "false")
@@ -97,8 +96,7 @@ namespace SyncMedia.Core.Services
             {
                 IsPro = false,
                 FilesProcessedCount = 0,
-                PeriodStartDate = DateTime.Now,
-                BonusFilesFromAds = 0
+                PeriodStartDate = DateTime.Now
             };
             SaveLicense();
         }
@@ -116,7 +114,6 @@ namespace SyncMedia.Core.Services
                     new XElement("ExpirationDate", _currentLicense.ExpirationDate?.ToString("o") ?? ""),
                     new XElement("FilesProcessedCount", _currentLicense.FilesProcessedCount),
                     new XElement("PeriodStartDate", _currentLicense.PeriodStartDate?.ToString("o") ?? ""),
-                    new XElement("BonusFilesFromAds", _currentLicense.BonusFilesFromAds),
                     new XElement("SpeedBoostExpirationDate", _currentLicense.SpeedBoostExpirationDate?.ToString("o") ?? ""),
                     new XElement("MachineId", _currentLicense.MachineId ?? ""),
                     new XElement("IsStoreLicense", _currentLicense.IsStoreLicense)
@@ -143,20 +140,12 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
-        /// Add bonus files from watching a video ad
+        /// Reset the files processed counter (called when user watches ad or clicks)
+        /// This removes throttling and gives the user a fresh start
         /// </summary>
-        public void AddBonusFilesFromVideoAd()
+        public void ResetFilesProcessedCounter()
         {
-            _currentLicense.BonusFilesFromAds += LicenseInfo.BONUS_FILES_PER_VIDEO_AD;
-            SaveLicense();
-        }
-
-        /// <summary>
-        /// Add bonus files from ad click-through
-        /// </summary>
-        public void AddBonusFilesFromClick()
-        {
-            _currentLicense.BonusFilesFromAds += LicenseInfo.BONUS_FILES_PER_CLICK;
+            _currentLicense.FilesProcessedCount = 0;
             SaveLicense();
         }
 

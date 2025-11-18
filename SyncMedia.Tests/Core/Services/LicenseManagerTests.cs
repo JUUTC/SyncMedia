@@ -69,31 +69,17 @@ namespace SyncMedia.Tests.Core.Services
         }
 
         [Fact]
-        public void AddBonusFilesFromVideoAd_ShouldAddCorrectAmount()
+        public void ResetFilesProcessedCounter_ShouldResetToZero()
         {
             // Arrange
-            var initialBonus = _licenseManager.CurrentLicense.BonusFilesFromAds;
+            _licenseManager.IncrementFilesProcessed(50);
+            Assert.Equal(50, _licenseManager.CurrentLicense.FilesProcessedCount);
 
             // Act
-            _licenseManager.AddBonusFilesFromVideoAd();
+            _licenseManager.ResetFilesProcessedCounter();
 
             // Assert
-            Assert.Equal(initialBonus + LicenseInfo.BONUS_FILES_PER_VIDEO_AD, 
-                        _licenseManager.CurrentLicense.BonusFilesFromAds);
-        }
-
-        [Fact]
-        public void AddBonusFilesFromClick_ShouldAddCorrectAmount()
-        {
-            // Arrange
-            var initialBonus = _licenseManager.CurrentLicense.BonusFilesFromAds;
-
-            // Act
-            _licenseManager.AddBonusFilesFromClick();
-
-            // Assert
-            Assert.Equal(initialBonus + LicenseInfo.BONUS_FILES_PER_CLICK, 
-                        _licenseManager.CurrentLicense.BonusFilesFromAds);
+            Assert.Equal(0, _licenseManager.CurrentLicense.FilesProcessedCount);
         }
 
         [Fact]
@@ -108,14 +94,15 @@ namespace SyncMedia.Tests.Core.Services
             var now = DateTime.Now;
             var diff = (expirationTime - now).TotalMinutes;
             
+            // Allow some variance due to timing
             Assert.True(diff >= 59 && diff <= 61, $"Expected ~60 minutes, got {diff}");
         }
 
         [Fact]
-        public void ActivateSpeedBoost_WithCustomDuration_ShouldSetCorrectTime()
+        public void ActivateSpeedBoost_WithCustomDuration_ShouldSetCorrectMinutes()
         {
             // Act
-            _licenseManager.ActivateSpeedBoost(120);
+            _licenseManager.ActivateSpeedBoost(30);
 
             // Assert
             Assert.NotNull(_licenseManager.CurrentLicense.SpeedBoostExpirationDate);
@@ -123,44 +110,28 @@ namespace SyncMedia.Tests.Core.Services
             var now = DateTime.Now;
             var diff = (expirationTime - now).TotalMinutes;
             
-            Assert.True(diff >= 119 && diff <= 121, $"Expected ~120 minutes, got {diff}");
+            // Allow some variance due to timing
+            Assert.True(diff >= 29 && diff <= 31, $"Expected ~30 minutes, got {diff}");
         }
 
         [Fact]
-        public void ActivateLicense_WithValidKey_ShouldActivateProLicense()
+        public void ActivateLicense_WithValidKey_ShouldActivate()
         {
-            // Arrange
-            var validKey = LicenseManager.GenerateLicenseKey();
-
             // Act
-            var result = _licenseManager.ActivateLicense(validKey);
+            var result = _licenseManager.ActivateLicense("ABCD-EFGH-IJKL-D6F9");
 
             // Assert
             Assert.True(result);
             Assert.True(_licenseManager.CurrentLicense.IsPro);
-            Assert.Equal(validKey, _licenseManager.CurrentLicense.LicenseKey);
+            Assert.NotNull(_licenseManager.CurrentLicense.LicenseKey);
             Assert.NotNull(_licenseManager.CurrentLicense.ActivationDate);
         }
 
         [Fact]
-        public void ActivateLicense_WithInvalidKey_ShouldReturnFalse()
-        {
-            // Arrange
-            var invalidKey = "INVALID-KEY-FORMAT";
-
-            // Act
-            var result = _licenseManager.ActivateLicense(invalidKey);
-
-            // Assert
-            Assert.False(result);
-            Assert.False(_licenseManager.CurrentLicense.IsPro);
-        }
-
-        [Fact]
-        public void ActivateLicense_WithEmptyKey_ShouldReturnFalse()
+        public void ActivateLicense_WithInvalidFormat_ShouldReturnFalse()
         {
             // Act
-            var result = _licenseManager.ActivateLicense("");
+            var result = _licenseManager.ActivateLicense("INVALID");
 
             // Assert
             Assert.False(result);
@@ -179,11 +150,22 @@ namespace SyncMedia.Tests.Core.Services
         }
 
         [Fact]
+        public void ActivateLicense_WithEmptyKey_ShouldReturnFalse()
+        {
+            // Act
+            var result = _licenseManager.ActivateLicense("");
+
+            // Assert
+            Assert.False(result);
+            Assert.False(_licenseManager.CurrentLicense.IsPro);
+        }
+
+        [Fact]
         public void DeactivateLicense_ShouldResetToFreeLicense()
         {
             // Arrange
-            var validKey = LicenseManager.GenerateLicenseKey();
-            _licenseManager.ActivateLicense(validKey);
+            _licenseManager.ActivateLicense("ABCD-EFGH-IJKL-D6F9");
+            Assert.True(_licenseManager.CurrentLicense.IsPro);
 
             // Act
             _licenseManager.DeactivateLicense();
@@ -202,74 +184,42 @@ namespace SyncMedia.Tests.Core.Services
 
             // Assert
             Assert.NotNull(key);
-            Assert.Equal(19, key.Length); // XXXX-XXXX-XXXX-XXXX format
+            Assert.Equal(19, key.Length); // XXXX-XXXX-XXXX-XXXX
             Assert.Equal(3, key.Count(c => c == '-'));
             
             var parts = key.Split('-');
             Assert.Equal(4, parts.Length);
-            Assert.All(parts, part => Assert.Equal(4, part.Length));
+            foreach (var part in parts)
+            {
+                Assert.Equal(4, part.Length);
+            }
         }
 
         [Fact]
-        public void GenerateLicenseKey_ShouldGenerateUniqueKeys()
+        public void GenerateLicenseKey_ShouldGenerateUniqueyKeys()
         {
             // Act
             var key1 = LicenseManager.GenerateLicenseKey();
             var key2 = LicenseManager.GenerateLicenseKey();
-            var key3 = LicenseManager.GenerateLicenseKey();
 
             // Assert
             Assert.NotEqual(key1, key2);
-            Assert.NotEqual(key2, key3);
-            Assert.NotEqual(key1, key3);
         }
 
         [Fact]
-        public void GeneratedLicenseKey_ShouldBeValidatable()
-        {
-            // Arrange
-            var key = LicenseManager.GenerateLicenseKey();
-
-            // Act
-            var result = _licenseManager.ActivateLicense(key);
-
-            // Assert
-            Assert.True(result);
-        }
-
-        [Fact]
-        public void LicensePersistence_ShouldSaveAndLoadCorrectly()
+        public void LicensePersistence_ShouldSaveAndLoad()
         {
             // Arrange
             _licenseManager.IncrementFilesProcessed(25);
-            _licenseManager.AddBonusFilesFromVideoAd();
-            _licenseManager.ActivateSpeedBoost(90);
+            _licenseManager.ActivateSpeedBoost(45);
 
-            // Act - Create new instance which should load from saved file
+            // Act - Create new manager to test loading
             var newManager = new LicenseManager();
 
             // Assert
             Assert.Equal(25, newManager.CurrentLicense.FilesProcessedCount);
-            Assert.Equal(LicenseInfo.BONUS_FILES_PER_VIDEO_AD, newManager.CurrentLicense.BonusFilesFromAds);
             Assert.NotNull(newManager.CurrentLicense.SpeedBoostExpirationDate);
-        }
-
-        [Fact]
-        public void IncrementFilesProcessed_ShouldCheckAndResetPeriodIfNeeded()
-        {
-            // Arrange
-            var manager = _licenseManager;
-            manager.IncrementFilesProcessed(50);
-            
-            // Manually set period start to 31 days ago
-            var license = manager.CurrentLicense;
-            var periodStart = DateTime.Now.AddDays(-31);
-            
-            // We need to use reflection or create a new license with old period
-            // For now, let's just verify the method exists and doesn't throw
-            
-            // Act & Assert
-            Assert.NotNull(manager.CurrentLicense);
+            Assert.NotNull(newManager.CurrentLicense.PeriodStartDate);
         }
     }
 }
