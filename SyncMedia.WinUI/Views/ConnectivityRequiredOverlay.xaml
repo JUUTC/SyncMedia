@@ -79,6 +79,19 @@
                     </Button.KeyboardAccelerators>
                 </Button>
 
+                <!-- Watch Ad button (for file limit scenario) -->
+                <Button x:Name="WatchAdButton"
+                        Content="Watch Video Ad (+20 Files + Speed Boost)"
+                        Style="{StaticResource AccentButtonStyle}"
+                        HorizontalAlignment="Center"
+                        MinWidth="200"
+                        Visibility="Collapsed"
+                        Click="WatchAdButton_Click">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="W" Modifiers="Control"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+
                 <!-- Upgrade to Pro button -->
                 <Button x:Name="UpgradeButton"
                         Content="Upgrade to Pro (No Ads, Works Offline)"
