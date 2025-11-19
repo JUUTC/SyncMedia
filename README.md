@@ -88,6 +88,36 @@ See [Windows Store Migration Guide](WINDOWS_STORE_MIGRATION.md) for detailed ins
 
 The application follows a clean architecture with separation of concerns. See [ARCHITECTURE.md](SyncMedia/ARCHITECTURE.md) for detailed documentation.
 
+### Core Library Features
+
+SyncMedia.Core provides a robust, production-ready foundation:
+
+- **Error Handling**: Centralized error management with `IErrorHandler` interface
+- **Logging**: Structured logging using Microsoft.Extensions.Logging
+- **Input Validation**: Secure path validation with `PathValidator` to prevent path traversal attacks
+- **Testing**: Comprehensive test suite with 139+ tests and 27%+ code coverage
+
+### Code Quality
+
+- ✅ Exception handling in all async methods
+- ✅ Centralized error management
+- ✅ Input validation on all file paths
+- ✅ Structured logging for diagnostics
+- ✅ Unit tests for business logic
+- ✅ Cross-platform compatibility
+
+## Testing
+
+Run the test suite:
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with coverage
+dotnet test /p:CollectCoverage=true
+```
+
 ## License
 
 See [LICENSE](LICENSE) file for details.
