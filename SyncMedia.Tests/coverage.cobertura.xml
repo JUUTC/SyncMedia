@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<coverage line-rate="0.4929" branch-rate="0.5112" version="1.9" timestamp="1763591235" lines-covered="669" lines-valid="1357" branches-covered="228" branches-valid="446">
+<coverage line-rate="0.5342" branch-rate="0.5201" version="1.9" timestamp="1763591477" lines-covered="725" lines-valid="1357" branches-covered="232" branches-valid="446">
   <sources>
     <source>/home/runner/work/SyncMedia/SyncMedia/SyncMedia.Core/</source>
   </sources>
   <packages>
-    <package name="SyncMedia.Core" line-rate="0.4929" branch-rate="0.5112" complexity="576">
+    <package name="SyncMedia.Core" line-rate="0.5342" branch-rate="0.5201" complexity="576">
       <classes>
         <class name="SyncMedia.Core.XmlData" filename="XmlData.cs" line-rate="0" branch-rate="0" complexity="30">
           <methods>
@@ -3064,64 +3064,64 @@
             <line number="447" hits="0" branch="False" />
           </lines>
         </class>
-        <class name="SyncMedia.Core.Models.AchievementData" filename="Models/AchievementData.cs" line-rate="0" branch-rate="1" complexity="9">
+        <class name="SyncMedia.Core.Models.AchievementData" filename="Models/AchievementData.cs" line-rate="1" branch-rate="1" complexity="9">
           <methods>
-            <method name="get_Id" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Id" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="5" hits="0" branch="False" />
+                <line number="5" hits="9" branch="False" />
               </lines>
             </method>
-            <method name="get_Name" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Name" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="6" hits="0" branch="False" />
+                <line number="6" hits="9" branch="False" />
               </lines>
             </method>
-            <method name="get_Description" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Description" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="7" hits="0" branch="False" />
+                <line number="7" hits="9" branch="False" />
               </lines>
             </method>
-            <method name="get_UnlockCriteria" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_UnlockCriteria" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="8" hits="0" branch="False" />
+                <line number="8" hits="9" branch="False" />
               </lines>
             </method>
-            <method name="get_IconGlyph" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_IconGlyph" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="9" hits="0" branch="False" />
+                <line number="9" hits="9" branch="False" />
               </lines>
             </method>
-            <method name="get_IsUnlocked" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_IsUnlocked" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="10" hits="0" branch="False" />
+                <line number="10" hits="5" branch="False" />
               </lines>
             </method>
-            <method name="get_UnlockedDate" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_UnlockedDate" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="11" hits="0" branch="False" />
+                <line number="11" hits="5" branch="False" />
               </lines>
             </method>
-            <method name="get_Progress" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Progress" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="12" hits="0" branch="False" />
+                <line number="12" hits="8" branch="False" />
               </lines>
             </method>
-            <method name="get_Target" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_Target" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="13" hits="0" branch="False" />
+                <line number="13" hits="8" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="5" hits="0" branch="False" />
-            <line number="6" hits="0" branch="False" />
-            <line number="7" hits="0" branch="False" />
-            <line number="8" hits="0" branch="False" />
-            <line number="9" hits="0" branch="False" />
-            <line number="10" hits="0" branch="False" />
-            <line number="11" hits="0" branch="False" />
-            <line number="12" hits="0" branch="False" />
-            <line number="13" hits="0" branch="False" />
+            <line number="5" hits="9" branch="False" />
+            <line number="6" hits="9" branch="False" />
+            <line number="7" hits="9" branch="False" />
+            <line number="8" hits="9" branch="False" />
+            <line number="9" hits="9" branch="False" />
+            <line number="10" hits="5" branch="False" />
+            <line number="11" hits="5" branch="False" />
+            <line number="12" hits="8" branch="False" />
+            <line number="13" hits="8" branch="False" />
           </lines>
         </class>
         <class name="SyncMedia.Core.Models.GamificationData" filename="Models/GamificationData.cs" line-rate="1" branch-rate="1" complexity="13">
@@ -4328,18 +4328,18 @@
             <line number="23" hits="1" branch="False" />
           </lines>
         </class>
-        <class name="SyncMedia.Core.Helpers.PerformanceBenchmark" filename="Helpers/PerformanceBenchmark.cs" line-rate="0" branch-rate="0" complexity="30">
+        <class name="SyncMedia.Core.Helpers.PerformanceBenchmark" filename="Helpers/PerformanceBenchmark.cs" line-rate="0.3764" branch-rate="0.10710000000000001" complexity="30">
           <methods>
-            <method name="AutoTuneParallelThreshold" signature="(System.String,System.Int32)" line-rate="0" branch-rate="0" complexity="16">
+            <method name="AutoTuneParallelThreshold" signature="(System.String,System.Int32)" line-rate="0.2" branch-rate="0.0625" complexity="16">
               <lines>
-                <line number="37" hits="0" branch="False" />
-                <line number="38" hits="0" branch="True" condition-coverage="0% (0/2)">
+                <line number="37" hits="1" branch="False" />
+                <line number="38" hits="1" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
-                    <condition number="14" type="jump" coverage="0%" />
+                    <condition number="14" type="jump" coverage="50%" />
                   </conditions>
                 </line>
-                <line number="39" hits="0" branch="False" />
-                <line number="40" hits="0" branch="False" />
+                <line number="39" hits="1" branch="False" />
+                <line number="40" hits="1" branch="False" />
                 <line number="43" hits="0" branch="False" />
                 <line number="44" hits="0" branch="False" />
                 <line number="45" hits="0" branch="False" />
@@ -4385,40 +4385,40 @@
                     <condition number="276" type="jump" coverage="0%" />
                   </conditions>
                 </line>
-                <line number="74" hits="0" branch="False" />
+                <line number="74" hits="1" branch="False" />
               </lines>
             </method>
-            <method name="BenchmarkFileProcessing" signature="(System.Collections.Generic.List`1&lt;System.String&gt;)" line-rate="0" branch-rate="0" complexity="2">
+            <method name="BenchmarkFileProcessing" signature="(System.Collections.Generic.List`1&lt;System.String&gt;)" line-rate="0.88" branch-rate="0.5" complexity="2">
               <lines>
-                <line number="80" hits="0" branch="False" />
-                <line number="81" hits="0" branch="False" />
-                <line number="84" hits="0" branch="False" />
-                <line number="85" hits="0" branch="True" condition-coverage="0% (0/2)">
+                <line number="80" hits="1" branch="False" />
+                <line number="81" hits="1" branch="False" />
+                <line number="84" hits="1" branch="False" />
+                <line number="85" hits="3" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
-                    <condition number="50" type="jump" coverage="0%" />
+                    <condition number="50" type="jump" coverage="50%" />
                   </conditions>
                 </line>
                 <line number="86" hits="0" branch="False" />
                 <line number="87" hits="0" branch="False" />
                 <line number="88" hits="0" branch="False" />
-                <line number="89" hits="0" branch="False" />
-                <line number="90" hits="0" branch="False" />
-                <line number="93" hits="0" branch="False" />
-                <line number="94" hits="0" branch="False" />
-                <line number="95" hits="0" branch="False" />
-                <line number="96" hits="0" branch="False" />
-                <line number="98" hits="0" branch="False" />
-                <line number="100" hits="0" branch="False" />
-                <line number="101" hits="0" branch="False" />
-                <line number="102" hits="0" branch="False" />
-                <line number="103" hits="0" branch="False" />
-                <line number="104" hits="0" branch="False" />
-                <line number="105" hits="0" branch="False" />
-                <line number="106" hits="0" branch="False" />
-                <line number="107" hits="0" branch="False" />
-                <line number="108" hits="0" branch="False" />
-                <line number="109" hits="0" branch="False" />
-                <line number="110" hits="0" branch="False" />
+                <line number="89" hits="1" branch="False" />
+                <line number="90" hits="1" branch="False" />
+                <line number="93" hits="1" branch="False" />
+                <line number="94" hits="1" branch="False" />
+                <line number="95" hits="1" branch="False" />
+                <line number="96" hits="1" branch="False" />
+                <line number="98" hits="1" branch="False" />
+                <line number="100" hits="1" branch="False" />
+                <line number="101" hits="1" branch="False" />
+                <line number="102" hits="1" branch="False" />
+                <line number="103" hits="1" branch="False" />
+                <line number="104" hits="1" branch="False" />
+                <line number="105" hits="1" branch="False" />
+                <line number="106" hits="1" branch="False" />
+                <line number="107" hits="1" branch="False" />
+                <line number="108" hits="1" branch="False" />
+                <line number="109" hits="1" branch="False" />
+                <line number="110" hits="1" branch="False" />
               </lines>
             </method>
             <method name="SimulateFileProcessing" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
@@ -4433,16 +4433,16 @@
                 <line number="126" hits="0" branch="False" />
               </lines>
             </method>
-            <method name="CalculateRecommendedThreshold" signature="(System.Int32,System.Double)" line-rate="0" branch-rate="0" complexity="4">
+            <method name="CalculateRecommendedThreshold" signature="(System.Int32,System.Double)" line-rate="0.5555" branch-rate="0.25" complexity="4">
               <lines>
-                <line number="132" hits="0" branch="False" />
-                <line number="134" hits="0" branch="True" condition-coverage="0% (0/2)">
+                <line number="132" hits="1" branch="False" />
+                <line number="134" hits="1" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
-                    <condition number="15" type="jump" coverage="0%" />
+                    <condition number="15" type="jump" coverage="50%" />
                   </conditions>
                 </line>
-                <line number="135" hits="0" branch="False" />
-                <line number="136" hits="0" branch="False" />
+                <line number="135" hits="1" branch="False" />
+                <line number="136" hits="1" branch="False" />
                 <line number="140" hits="0" branch="True" condition-coverage="0% (0/2)">
                   <conditions>
                     <condition number="41" type="jump" coverage="0%" />
@@ -4451,7 +4451,7 @@
                 <line number="141" hits="0" branch="False" />
                 <line number="142" hits="0" branch="False" />
                 <line number="145" hits="0" branch="False" />
-                <line number="146" hits="0" branch="False" />
+                <line number="146" hits="1" branch="False" />
               </lines>
             </method>
             <method name="GetSystemProfile" signature="()" line-rate="0" branch-rate="1" complexity="1">
@@ -4494,14 +4494,14 @@
             </method>
           </methods>
           <lines>
-            <line number="37" hits="0" branch="False" />
-            <line number="38" hits="0" branch="True" condition-coverage="0% (0/2)">
+            <line number="37" hits="1" branch="False" />
+            <line number="38" hits="1" branch="True" condition-coverage="50% (1/2)">
               <conditions>
-                <condition number="14" type="jump" coverage="0%" />
+                <condition number="14" type="jump" coverage="50%" />
               </conditions>
             </line>
-            <line number="39" hits="0" branch="False" />
-            <line number="40" hits="0" branch="False" />
+            <line number="39" hits="1" branch="False" />
+            <line number="40" hits="1" branch="False" />
             <line number="43" hits="0" branch="False" />
             <line number="44" hits="0" branch="False" />
             <line number="45" hits="0" branch="False" />
@@ -4547,36 +4547,36 @@
                 <condition number="276" type="jump" coverage="0%" />
               </conditions>
             </line>
-            <line number="74" hits="0" branch="False" />
-            <line number="80" hits="0" branch="False" />
-            <line number="81" hits="0" branch="False" />
-            <line number="84" hits="0" branch="False" />
-            <line number="85" hits="0" branch="True" condition-coverage="0% (0/2)">
+            <line number="74" hits="1" branch="False" />
+            <line number="80" hits="1" branch="False" />
+            <line number="81" hits="1" branch="False" />
+            <line number="84" hits="1" branch="False" />
+            <line number="85" hits="3" branch="True" condition-coverage="50% (1/2)">
               <conditions>
-                <condition number="50" type="jump" coverage="0%" />
+                <condition number="50" type="jump" coverage="50%" />
               </conditions>
             </line>
             <line number="86" hits="0" branch="False" />
             <line number="87" hits="0" branch="False" />
             <line number="88" hits="0" branch="False" />
-            <line number="89" hits="0" branch="False" />
-            <line number="90" hits="0" branch="False" />
-            <line number="93" hits="0" branch="False" />
-            <line number="94" hits="0" branch="False" />
-            <line number="95" hits="0" branch="False" />
-            <line number="96" hits="0" branch="False" />
-            <line number="98" hits="0" branch="False" />
-            <line number="100" hits="0" branch="False" />
-            <line number="101" hits="0" branch="False" />
-            <line number="102" hits="0" branch="False" />
-            <line number="103" hits="0" branch="False" />
-            <line number="104" hits="0" branch="False" />
-            <line number="105" hits="0" branch="False" />
-            <line number="106" hits="0" branch="False" />
-            <line number="107" hits="0" branch="False" />
-            <line number="108" hits="0" branch="False" />
-            <line number="109" hits="0" branch="False" />
-            <line number="110" hits="0" branch="False" />
+            <line number="89" hits="1" branch="False" />
+            <line number="90" hits="1" branch="False" />
+            <line number="93" hits="1" branch="False" />
+            <line number="94" hits="1" branch="False" />
+            <line number="95" hits="1" branch="False" />
+            <line number="96" hits="1" branch="False" />
+            <line number="98" hits="1" branch="False" />
+            <line number="100" hits="1" branch="False" />
+            <line number="101" hits="1" branch="False" />
+            <line number="102" hits="1" branch="False" />
+            <line number="103" hits="1" branch="False" />
+            <line number="104" hits="1" branch="False" />
+            <line number="105" hits="1" branch="False" />
+            <line number="106" hits="1" branch="False" />
+            <line number="107" hits="1" branch="False" />
+            <line number="108" hits="1" branch="False" />
+            <line number="109" hits="1" branch="False" />
+            <line number="110" hits="1" branch="False" />
             <line number="116" hits="0" branch="False" />
             <line number="118" hits="0" branch="False" />
             <line number="120" hits="0" branch="False" />
@@ -4585,14 +4585,14 @@
             <line number="123" hits="0" branch="False" />
             <line number="125" hits="0" branch="False" />
             <line number="126" hits="0" branch="False" />
-            <line number="132" hits="0" branch="False" />
-            <line number="134" hits="0" branch="True" condition-coverage="0% (0/2)">
+            <line number="132" hits="1" branch="False" />
+            <line number="134" hits="1" branch="True" condition-coverage="50% (1/2)">
               <conditions>
-                <condition number="15" type="jump" coverage="0%" />
+                <condition number="15" type="jump" coverage="50%" />
               </conditions>
             </line>
-            <line number="135" hits="0" branch="False" />
-            <line number="136" hits="0" branch="False" />
+            <line number="135" hits="1" branch="False" />
+            <line number="136" hits="1" branch="False" />
             <line number="140" hits="0" branch="True" condition-coverage="0% (0/2)">
               <conditions>
                 <condition number="41" type="jump" coverage="0%" />
@@ -4601,7 +4601,7 @@
             <line number="141" hits="0" branch="False" />
             <line number="142" hits="0" branch="False" />
             <line number="145" hits="0" branch="False" />
-            <line number="146" hits="0" branch="False" />
+            <line number="146" hits="1" branch="False" />
             <line number="152" hits="0" branch="False" />
             <line number="153" hits="0" branch="False" />
             <line number="154" hits="0" branch="False" />
@@ -4634,52 +4634,52 @@
             <line number="176" hits="0" branch="False" />
           </lines>
         </class>
-        <class name="SyncMedia.Core.Helpers.PerformanceBenchmark/BenchmarkResult" filename="Helpers/PerformanceBenchmark.cs" line-rate="0" branch-rate="1" complexity="7">
+        <class name="SyncMedia.Core.Helpers.PerformanceBenchmark/BenchmarkResult" filename="Helpers/PerformanceBenchmark.cs" line-rate="1" branch-rate="1" complexity="7">
           <methods>
-            <method name="get_FileCount" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_FileCount" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="24" hits="0" branch="False" />
+                <line number="24" hits="4" branch="False" />
               </lines>
             </method>
-            <method name="get_DegreeOfParallelism" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_DegreeOfParallelism" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="25" hits="0" branch="False" />
+                <line number="25" hits="3" branch="False" />
               </lines>
             </method>
-            <method name="get_SequentialTimeMs" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_SequentialTimeMs" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="26" hits="0" branch="False" />
+                <line number="26" hits="6" branch="False" />
               </lines>
             </method>
-            <method name="get_ParallelTimeMs" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_ParallelTimeMs" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="27" hits="0" branch="False" />
+                <line number="27" hits="6" branch="False" />
               </lines>
             </method>
-            <method name="get_SpeedupFactor" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_SpeedupFactor" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="28" hits="0" branch="False" />
+                <line number="28" hits="5" branch="False" />
               </lines>
             </method>
-            <method name="get_ParallelIsFaster" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_ParallelIsFaster" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="29" hits="0" branch="False" />
+                <line number="29" hits="7" branch="False" />
               </lines>
             </method>
-            <method name="get_RecommendedThreshold" signature="()" line-rate="0" branch-rate="1" complexity="1">
+            <method name="get_RecommendedThreshold" signature="()" line-rate="1" branch-rate="1" complexity="1">
               <lines>
-                <line number="30" hits="0" branch="False" />
+                <line number="30" hits="3" branch="False" />
               </lines>
             </method>
           </methods>
           <lines>
-            <line number="24" hits="0" branch="False" />
-            <line number="25" hits="0" branch="False" />
-            <line number="26" hits="0" branch="False" />
-            <line number="27" hits="0" branch="False" />
-            <line number="28" hits="0" branch="False" />
-            <line number="29" hits="0" branch="False" />
-            <line number="30" hits="0" branch="False" />
+            <line number="24" hits="4" branch="False" />
+            <line number="25" hits="3" branch="False" />
+            <line number="26" hits="6" branch="False" />
+            <line number="27" hits="6" branch="False" />
+            <line number="28" hits="5" branch="False" />
+            <line number="29" hits="7" branch="False" />
+            <line number="30" hits="3" branch="False" />
           </lines>
         </class>
         <class name="SyncMedia.Core.Helpers.SystemPerformanceProfile" filename="Helpers/PerformanceBenchmark.cs" line-rate="0" branch-rate="1" complexity="7">
@@ -4736,7 +4736,7 @@
             <line number="195" hits="0" branch="False" />
           </lines>
         </class>
-        <class name="SyncMedia.Core.Helpers.PerformanceOptimizer" filename="Helpers/PerformanceOptimizer.cs" line-rate="0" branch-rate="0" complexity="14">
+        <class name="SyncMedia.Core.Helpers.PerformanceOptimizer" filename="Helpers/PerformanceOptimizer.cs" line-rate="0.1142" branch-rate="0.1" complexity="14">
           <methods>
             <method name="ComputeHashOptimized" signature="(System.String)" line-rate="0" branch-rate="1" complexity="1">
               <lines>
@@ -4793,23 +4793,23 @@
                 <line number="80" hits="0" branch="False" />
               </lines>
             </method>
-            <method name="ProcessFilesParallel" signature="(System.Collections.Generic.IEnumerable`1&lt;T&gt;,System.Action`1&lt;T&gt;,System.Int32)" line-rate="0" branch-rate="0" complexity="2">
+            <method name="ProcessFilesParallel" signature="(System.Collections.Generic.IEnumerable`1&lt;T&gt;,System.Action`1&lt;T&gt;,System.Int32)" line-rate="0.7272" branch-rate="0.5" complexity="2">
               <lines>
-                <line number="89" hits="0" branch="False" />
-                <line number="90" hits="0" branch="True" condition-coverage="0% (0/2)">
+                <line number="89" hits="1" branch="False" />
+                <line number="90" hits="1" branch="True" condition-coverage="50% (1/2)">
                   <conditions>
-                    <condition number="7" type="jump" coverage="0%" />
+                    <condition number="7" type="jump" coverage="50%" />
                   </conditions>
                 </line>
                 <line number="91" hits="0" branch="False" />
                 <line number="92" hits="0" branch="False" />
                 <line number="93" hits="0" branch="False" />
-                <line number="95" hits="0" branch="False" />
-                <line number="96" hits="0" branch="False" />
-                <line number="97" hits="0" branch="False" />
-                <line number="98" hits="0" branch="False" />
-                <line number="100" hits="0" branch="False" />
-                <line number="101" hits="0" branch="False" />
+                <line number="95" hits="1" branch="False" />
+                <line number="96" hits="1" branch="False" />
+                <line number="97" hits="1" branch="False" />
+                <line number="98" hits="1" branch="False" />
+                <line number="100" hits="1" branch="False" />
+                <line number="101" hits="1" branch="False" />
               </lines>
             </method>
             <method name="QuickDuplicateCheck" signature="(System.String,System.String)" line-rate="0" branch-rate="0" complexity="2">
@@ -4905,21 +4905,21 @@
             <line number="77" hits="0" branch="False" />
             <line number="79" hits="0" branch="False" />
             <line number="80" hits="0" branch="False" />
-            <line number="89" hits="0" branch="False" />
-            <line number="90" hits="0" branch="True" condition-coverage="0% (0/2)">
+            <line number="89" hits="1" branch="False" />
+            <line number="90" hits="1" branch="True" condition-coverage="50% (1/2)">
               <conditions>
-                <condition number="7" type="jump" coverage="0%" />
+                <condition number="7" type="jump" coverage="50%" />
               </conditions>
             </line>
             <line number="91" hits="0" branch="False" />
             <line number="92" hits="0" branch="False" />
             <line number="93" hits="0" branch="False" />
-            <line number="95" hits="0" branch="False" />
-            <line number="96" hits="0" branch="False" />
-            <line number="97" hits="0" branch="False" />
-            <line number="98" hits="0" branch="False" />
-            <line number="100" hits="0" branch="False" />
-            <line number="101" hits="0" branch="False" />
+            <line number="95" hits="1" branch="False" />
+            <line number="96" hits="1" branch="False" />
+            <line number="97" hits="1" branch="False" />
+            <line number="98" hits="1" branch="False" />
+            <line number="100" hits="1" branch="False" />
+            <line number="101" hits="1" branch="False" />
             <line number="107" hits="0" branch="False" />
             <line number="108" hits="0" branch="False" />
             <line number="109" hits="0" branch="False" />
