@@ -15,4 +15,11 @@
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- Include Python scripts for AI-powered duplicate detection -->
+    <None Include="Python\**\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

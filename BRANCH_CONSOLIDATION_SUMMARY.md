@@ -32,6 +32,14 @@
    - Input validation on all file paths
    - Minor conflicts resolved (README.md and csproj files)
 
+4. **copilot/fix-16197614-47582342-68e40e96-662d-4183-8d3f-df6c3a4ce098** (AI features cherry-picked)
+   - AdvancedDuplicateDetectionService (Python/imagededup integration)
+   - Python scripts for AI-powered duplicate detection
+   - Support for multiple detection methods (PHash, DHash, WHash, CNN)
+   - GPU acceleration support for CNN-based detection
+   - Python bundling infrastructure
+   - Cherry-picked AI features only, test conflicts avoided
+
 ### Identified for Deletion 🗑️
 
 1. **copilot/migrate-to-windows-app-storage** (33 commits)
@@ -57,25 +65,26 @@
      - Best practices folder structure refactoring
    - **Action:** DELETE BRANCH but document features for potential porting
 
-### Deferred for Future Work 📋
+### Partially Integrated 🔄
 
 1. **copilot/fix-16197614-47582342-68e40e96-662d-4183-8d3f-df6c3a4ce098** (21 commits)
-   - **Status:** CONFLICTS with integrate branch
-   - **Reason:** Both branches modified the same test files with different improvements
-   - **Valuable Content:**
-     - AdvancedDuplicateDetectionService (Python/imagededup integration)
-     - Python bundling for AI-powered duplicate detection
+   - **Status:** AI features INTEGRATED, test improvements DEFERRED
+   - **Reason:** Both this branch and integrate branch modified the same test files with different improvements
+   - **Integrated Features:**
+     - ✅ AdvancedDuplicateDetectionService (Python/imagededup integration)
+     - ✅ Python bundling for AI-powered duplicate detection
+     - ✅ Support for PHash, DHash, WHash, and CNN detection methods
+     - ✅ GPU acceleration support
+   - **Deferred for Future Work:**
      - Cross-platform compatibility improvements
      - Linux enhancement roadmap (30+ features)
      - Store policy compliance documentation
      - Multiple planning and analysis documents
      - Third-party licenses file
      - FilePreviewControl XAML component
-   - **Test Overlap:** Both branches improved test coverage but in different ways:
-     - integrate: 210 tests, 49% coverage (comprehensive error handling tests)
-     - fix: 32 passing tests (fixed FluentAssertions issues, API compatibility)
-   - **Decision:** Chose integrate branch for superior test coverage and error handling
-   - **Action:** Document features for future cherry-picking or reimplementation
+     - Test improvements (32 passing tests with FluentAssertions fixes)
+   - **Test Overlap:** Chose integrate branch tests (210 tests, 49% coverage) over fix branch tests
+   - **Action:** AI features integrated; remaining features documented for future cherry-picking
 
 ## Architecture Summary
 
@@ -91,6 +100,9 @@ The repository now uses **WinUI 3 architecture** with the following structure:
 
 ### Currently Implemented ✅
 - MD5-based duplicate detection
+- **AI-powered duplicate detection (Python/imagededup integration)**
+- **Support for PHash, DHash, WHash, and CNN detection methods**
+- **GPU acceleration for CNN-based detection**
 - Media file organization by date
 - Naming list customization
 - MSIX packaging for Microsoft Store
@@ -107,8 +119,6 @@ The repository now uses **WinUI 3 architecture** with the following structure:
 - Comprehensive test coverage (49%)
 
 ### Documented for Future Implementation 📝
-- AI-powered duplicate detection (Python/imagededup)
-- GPU acceleration (10-100x faster for Pro users)
 - Bundled Python for Store distribution
 - Linux compatibility enhancements
 - Cross-platform improvements
@@ -124,15 +134,15 @@ The repository now uses **WinUI 3 architecture** with the following structure:
 1. ✅ Merge feature/deep-review-improvements
 2. ✅ Merge copilot/add-microsoft-ads-features
 3. ✅ Merge copilot/integrate-sync-engine-ui
-4. 🗑️ Delete copilot/migrate-to-windows-app-storage (superseded)
-5. 🗑️ Delete copilot/review-existing-features-options (incomplete)
-6. 🗑️ Delete copilot/upgrade-to-dotnet-10 (wrong architecture)
+4. ✅ Cherry-pick AI features from copilot/fix-16197614-47582342-68e40e96-662d-4183-8d3f-df6c3a4ce098
+5. 🗑️ Delete copilot/migrate-to-windows-app-storage (superseded)
+6. 🗑️ Delete copilot/review-existing-features-options (incomplete)
+7. 🗑️ Delete copilot/upgrade-to-dotnet-10 (wrong architecture)
 
 ### Future Considerations
-1. 📋 Review copilot/fix-* branch for cherry-pickable features:
-   - AdvancedDuplicateDetectionService implementation
-   - Python integration code
-   - Linux compatibility documentation
+1. 📋 Review remaining features from copilot/fix-* branch for cherry-picking:
+   - Cross-platform compatibility documentation
+   - Linux enhancement roadmap
    - Store compliance documentation
    - FilePreviewControl component
 2. 📋 Consider porting features from upgrade-to-dotnet-10:
