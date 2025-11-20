@@ -1,3 +1,5 @@
+using SyncMedia.Core.Common;
+
 namespace SyncMedia.Core.Interfaces
 {
     /// <summary>

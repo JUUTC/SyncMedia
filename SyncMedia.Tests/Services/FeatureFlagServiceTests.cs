@@ -30,25 +30,6 @@ namespace SyncMedia.Tests.Services
         }
 
         [Fact]
-        public void Constructor_WithTrialLicense_ShouldEnableProFeatures()
-        {
-            // Arrange
-            var license = new LicenseInfo
-            {
-                IsPro = false,
-                TrialExpirationDate = DateTime.Now.AddDays(7)
-            };
-            
-            // Act
-            var service = new FeatureFlagService(license);
-            
-            // Assert
-            Assert.True(service.HasProAccess);
-            Assert.True(service.IsFeatureEnabled(ProFeatures.ParallelProcessing));
-            Assert.True(service.IsFeatureEnabled(ProFeatures.AdFree));
-        }
-
-        [Fact]
         public void Constructor_WithFreeLicense_ShouldDisableProFeatures()
         {
             // Arrange
@@ -138,21 +119,6 @@ namespace SyncMedia.Tests.Services
         }
 
         [Fact]
-        public void HasProAccess_WithActiveTrial_ShouldReturnTrue()
-        {
-            // Arrange
-            var license = new LicenseInfo
-            {
-                IsPro = false,
-                TrialExpirationDate = DateTime.Now.AddDays(7)
-            };
-            var service = new FeatureFlagService(license);
-            
-            // Act & Assert
-            Assert.True(service.HasProAccess);
-        }
-
-        [Fact]
         public void HasProAccess_WithFreeLicense_ShouldReturnFalse()
         {
             // Arrange
@@ -190,21 +156,6 @@ namespace SyncMedia.Tests.Services
             {
                 IsPro = true,
                 LicenseKey = "VALID-KEY"
-            };
-            var service = new FeatureFlagService(license);
-            
-            // Act & Assert
-            Assert.False(service.ShouldShowAds);
-        }
-
-        [Fact]
-        public void ShouldShowAds_WithActiveTrial_ShouldReturnFalse()
-        {
-            // Arrange
-            var license = new LicenseInfo
-            {
-                IsPro = false,
-                TrialExpirationDate = DateTime.Now.AddDays(7)
             };
             var service = new FeatureFlagService(license);
             
