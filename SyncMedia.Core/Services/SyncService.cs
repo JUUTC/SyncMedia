@@ -6,6 +6,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using SyncMedia.Core.Helpers;
 using SyncMedia.Core.Models;
 
@@ -40,18 +41,34 @@ namespace SyncMedia.Core.Services
         };
 
         // Progress reporting
-        public event EventHandler<SyncProgressEventArgs> ProgressChanged;
-        public event EventHandler<FileProcessedEventArgs> FileProcessed;
-        public event EventHandler<SyncCompletedEventArgs> SyncCompleted;
+        public event EventHandler<SyncProgressEventArgs>? ProgressChanged;
+        public event EventHandler<FileProcessedEventArgs>? FileProcessed;
+        public event EventHandler<SyncCompletedEventArgs>? SyncCompleted;
 
         private List<string> _storedHashes = new List<string>();
         private List<string> _namingExclusions = new List<string>();
         private SyncStatistics _statistics = new SyncStatistics();
         private DateTime _syncStartTime;
+        private readonly ILogger<SyncService>? _logger;
+        private readonly IErrorHandler? _errorHandler;
 
+        /// <summary>
+        /// Initializes a new instance of the SyncService class
+        /// </summary>
         public SyncService()
         {
             LoadConfiguration();
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the SyncService class with logging and error handling
+        /// </summary>
+        /// <param name="logger">Logger instance for diagnostics</param>
+        /// <param name="errorHandler">Error handler for centralized error management</param>
+        public SyncService(ILogger<SyncService>? logger, IErrorHandler? errorHandler) : this()
+        {
+            _logger = logger;
+            _errorHandler = errorHandler;
         }
 
         private void LoadConfiguration()
@@ -72,41 +89,89 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
-        /// Start sync operation
+        /// Start sync operation with input validation, error handling, and logging
         /// </summary>
+        /// <param name="sourceFolder">Source folder path</param>
+        /// <param name="destinationFolder">Destination folder path</param>
+        /// <param name="options">Sync options</param>
+        /// <param name="cancellationToken">Cancellation token</param>
+        /// <returns>Sync result with statistics</returns>
         public async Task<SyncResult> StartSyncAsync(
             string sourceFolder,
             string destinationFolder,
             SyncOptions options,
             CancellationToken cancellationToken = default)
         {
+            _logger?.LogInformation("Starting sync operation from {SourceFolder} to {DestinationFolder}", 
+                sourceFolder, destinationFolder);
+            
             _syncStartTime = DateTime.Now;
             _statistics = new SyncStatistics();
+            _statistics.StartTime = _syncStartTime;
 
             try
             {
-                if (!Directory.Exists(sourceFolder))
-                    throw new DirectoryNotFoundException($"Source folder not found: {sourceFolder}");
+                // Validate input paths
+                if (!PathValidator.IsValidDirectoryPath(sourceFolder, mustExist: false, out var sourceError))
+                {
+                    var errorMsg = $"Invalid source folder: {sourceError}";
+                    _logger?.LogError(errorMsg);
+                    _errorHandler?.LogError(errorMsg, "StartSyncAsync");
+                    throw new ArgumentException(errorMsg, nameof(sourceFolder));
+                }
 
+                if (!PathValidator.IsValidDirectoryPath(destinationFolder, mustExist: false, out var destError))
+                {
+                    var errorMsg = $"Invalid destination folder: {destError}";
+                    _logger?.LogError(errorMsg);
+                    _errorHandler?.LogError(errorMsg, "StartSyncAsync");
+                    throw new ArgumentException(errorMsg, nameof(destinationFolder));
+                }
+
+                // Check source exists
+                if (!Directory.Exists(sourceFolder))
+                {
+                    var errorMsg = $"Source folder not found: {sourceFolder}";
+                    _logger?.LogError(errorMsg);
+                    _errorHandler?.LogError(errorMsg, "StartSyncAsync");
+                    throw new DirectoryNotFoundException(errorMsg);
+                }
+
+                // Create destination if it doesn't exist
                 if (!Directory.Exists(destinationFolder))
+                {
+                    _logger?.LogInformation("Creating destination folder: {DestinationFolder}", destinationFolder);
                     Directory.CreateDirectory(destinationFolder);
+                }
 
                 // Get all files from source
+                _logger?.LogInformation("Scanning source folder for files...");
                 var files = await Task.Run(() => GetFilesRecursive(sourceFolder, options), cancellationToken);
                 
                 _statistics.TotalFiles = files.Count;
+                _logger?.LogInformation("Found {FileCount} files to process", files.Count);
 
                 // Process files
                 for (int i = 0; i < files.Count; i++)
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
+                        _logger?.LogWarning("Sync operation cancelled by user");
                         _statistics.Status = "Cancelled";
                         break;
                     }
 
                     var filePath = files[i];
-                    await ProcessFileAsync(filePath, sourceFolder, destinationFolder, options, cancellationToken);
+                    try
+                    {
+                        await ProcessFileAsync(filePath, sourceFolder, destinationFolder, options, cancellationToken);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger?.LogError(ex, "Error processing file: {FilePath}", filePath);
+                        _errorHandler?.HandleException(ex, customMessage: $"Error processing file: {filePath}");
+                        _statistics.ErrorFiles++;
+                    }
 
                     // Report progress
                     _statistics.ProcessedFiles = i + 1;
@@ -123,11 +188,15 @@ namespace SyncMedia.Core.Services
                 }
 
                 // Save updated hashes
+                _logger?.LogDebug("Saving updated hash list");
                 XmlData.AddUpdateAppSettings("Hashes", string.Join("|", _storedHashes));
 
                 _statistics.Status = cancellationToken.IsCancellationRequested ? "Cancelled" : "Completed";
                 _statistics.EndTime = DateTime.Now;
                 _statistics.Duration = _statistics.EndTime - _syncStartTime;
+
+                _logger?.LogInformation("Sync completed: {Status}. Processed {ProcessedFiles}/{TotalFiles} files in {Duration}",
+                    _statistics.Status, _statistics.ProcessedFiles, _statistics.TotalFiles, _statistics.Duration);
 
                 // Raise completion event
                 SyncCompleted?.Invoke(this, new SyncCompletedEventArgs
@@ -145,8 +214,13 @@ namespace SyncMedia.Core.Services
             }
             catch (Exception ex)
             {
+                _logger?.LogError(ex, "Sync operation failed with error: {ErrorMessage}", ex.Message);
+                _errorHandler?.HandleException(ex, customMessage: "Sync operation failed");
+                
                 _statistics.Status = "Failed";
                 _statistics.ErrorMessage = ex.Message;
+                _statistics.EndTime = DateTime.Now;
+                _statistics.Duration = _statistics.EndTime - _syncStartTime;
                 
                 return new SyncResult
                 {

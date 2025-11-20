@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="SyncMedia.WinUI.Views.ConnectivityRequiredOverlay"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource AcrylicBackgroundFillColorDefaultBrush}">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Semi-transparent overlay -->
+        <Border Background="{ThemeResource SolidBackgroundFillColorBaseBrush}" 
+                Opacity="0.95"
+                HorizontalAlignment="Stretch"
+                VerticalAlignment="Stretch"/>
+
+        <!-- Content -->
+        <StackPanel HorizontalAlignment="Center" 
+                    VerticalAlignment="Center" 
+                    MaxWidth="500"
+                    Spacing="24"
+                    Padding="32">
+
+            <!-- Icon -->
+            <FontIcon Glyph="&#xE774;" 
+                      FontSize="72"
+                      Foreground="{ThemeResource SystemAccentColor}"
+                      HorizontalAlignment="Center"/>
+
+            <!-- Title -->
+            <TextBlock Text="Internet Connection Required"
+                       Style="{StaticResource TitleTextBlockStyle}"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"/>
+
+            <!-- Message -->
+            <TextBlock x:Name="MessageText"
+                       TextAlignment="Center"
+                       TextWrapping="Wrap"
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       LineHeight="24">
+                <Run Text="The free version of SyncMedia requires an active internet connection to display advertisements."/>
+                <LineBreak/><LineBreak/>
+                <Run Text="Please connect to the internet to continue using SyncMedia, or upgrade to Pro for offline access."/>
+            </TextBlock>
+
+            <!-- Status indicator -->
+            <StackPanel Orientation="Horizontal" 
+                        HorizontalAlignment="Center"
+                        Spacing="12">
+                <ProgressRing x:Name="CheckingProgressRing" 
+                              Width="20" 
+                              Height="20"
+                              IsActive="True"/>
+                <TextBlock x:Name="StatusText" 
+                           Text="Checking connection..."
+                           Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+            </StackPanel>
+
+            <!-- Actions -->
+            <StackPanel Spacing="12" 
+                        HorizontalAlignment="Center"
+                        Margin="0,16,0,0">
+                
+                <!-- Retry button -->
+                <Button x:Name="RetryButton"
+                        Content="Retry Connection"
+                        Style="{StaticResource AccentButtonStyle}"
+                        HorizontalAlignment="Center"
+                        MinWidth="200"
+                        Click="RetryButton_Click">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="R" Modifiers="Control"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <!-- Watch Ad button (for file limit scenario) -->
+                <Button x:Name="WatchAdButton"
+                        Content="Watch Video Ad (+20 Files + Speed Boost)"
+                        Style="{StaticResource AccentButtonStyle}"
+                        HorizontalAlignment="Center"
+                        MinWidth="200"
+                        Visibility="Collapsed"
+                        Click="WatchAdButton_Click">
+                    <Button.KeyboardAccelerators>
+                        <KeyboardAccelerator Key="W" Modifiers="Control"/>
+                    </Button.KeyboardAccelerators>
+                </Button>
+
+                <!-- Upgrade to Pro button -->
+                <Button x:Name="UpgradeButton"
+                        Content="Upgrade to Pro (No Ads, Works Offline)"
+                        HorizontalAlignment="Center"
+                        MinWidth="200"
+                        Click="UpgradeButton_Click"/>
+
+                <!-- More info -->
+                <HyperlinkButton Content="Why is internet required?"
+                                 HorizontalAlignment="Center"
+                                 Click="MoreInfoButton_Click"/>
+            </StackPanel>
+
+            <!-- Additional info panel (collapsed by default) -->
+            <Border x:Name="InfoPanel"
+                    Visibility="Collapsed"
+                    Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                    BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                    BorderThickness="1"
+                    CornerRadius="8"
+                    Padding="16"
+                    Margin="0,8,0,0">
+                <StackPanel Spacing="8">
+                    <TextBlock Text="About Internet Requirement" 
+                               FontWeight="SemiBold"/>
+                    <TextBlock TextWrapping="Wrap" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                        The free version is ad-supported to keep SyncMedia free. Advertisements require an active internet connection to load and display.
+                    </TextBlock>
+                    <TextBlock TextWrapping="Wrap" 
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                        <Run Text="Upgrade to Pro to remove ads and use SyncMedia completely offline."/>
+                    </TextBlock>
+                </StackPanel>
+            </Border>
+
+        </StackPanel>
+    </Grid>
+</Page>

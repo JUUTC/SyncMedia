@@ -28,30 +28,38 @@ namespace SyncMedia.Core.Models
         public DateTime? ExpirationDate { get; set; }
 
         /// <summary>
-        /// Gets or sets the trial expiration date (14 days from first launch)
+        /// Gets or sets the number of files processed in current period (free tier)
         /// </summary>
-        public DateTime? TrialExpirationDate { get; set; }
+        public int FilesProcessedCount { get; set; }
 
         /// <summary>
-        /// Gets whether the user is currently in a trial period
+        /// Gets or sets the start date of current processing period
         /// </summary>
-        public bool IsInTrial => TrialExpirationDate.HasValue && DateTime.Now < TrialExpirationDate.Value;
+        public DateTime? PeriodStartDate { get; set; }
 
         /// <summary>
-        /// Gets whether the trial has expired
+        /// Gets or sets the expiration date for ad-earned speed boost
         /// </summary>
-        public bool IsTrialExpired => TrialExpirationDate.HasValue && DateTime.Now >= TrialExpirationDate.Value;
+        public DateTime? SpeedBoostExpirationDate { get; set; }
 
         /// <summary>
-        /// Gets the number of days remaining in the trial
+        /// Gets or sets the machine ID (for hardware-bound licenses)
         /// </summary>
-        public int TrialDaysRemaining
+        public string MachineId { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether this is a store-purchased license (requires online validation)
+        /// </summary>
+        public bool IsStoreLicense { get; set; }
+
+        /// <summary>
+        /// Gets whether the user has an active speed boost from watching ads
+        /// </summary>
+        public bool HasActiveSpeedBoost
         {
             get
             {
-                if (!TrialExpirationDate.HasValue) return 0;
-                var remaining = (TrialExpirationDate.Value - DateTime.Now).Days;
-                return Math.Max(0, remaining);
+                return SpeedBoostExpirationDate.HasValue && DateTime.Now < SpeedBoostExpirationDate.Value;
             }
         }
 
@@ -70,6 +78,18 @@ namespace SyncMedia.Core.Models
                     return true;
                 }
                 return false;
+            }
+        }
+
+        /// <summary>
+        /// Resets the processing period if 30 days have passed
+        /// </summary>
+        public void CheckAndResetPeriod()
+        {
+            if (!PeriodStartDate.HasValue || (DateTime.Now - PeriodStartDate.Value).TotalDays >= 30)
+            {
+                FilesProcessedCount = 0;
+                PeriodStartDate = DateTime.Now;
             }
         }
     }

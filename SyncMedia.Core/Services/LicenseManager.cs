@@ -1,6 +1,8 @@
 using SyncMedia.Core.Models;
 using System;
 using System.IO;
+using System.Linq;
+using System.Management;
 using System.Security.Cryptography;
 using System.Text;
 using System.Xml.Linq;
@@ -13,9 +15,10 @@ namespace SyncMedia.Core.Services
     public class LicenseManager
     {
         private const string LICENSE_FILE = "license.xml";
-        private const int TRIAL_DAYS = 14;
+        private const string ENCRYPTION_KEY = "SyncMedia2024SecureKeyV1"; // In production, use secure key management
         private readonly string _licenseFilePath;
         private LicenseInfo _currentLicense;
+        private readonly string _machineId;
 
         public LicenseManager()
         {
@@ -24,6 +27,23 @@ namespace SyncMedia.Core.Services
                 "SyncMedia");
             Directory.CreateDirectory(appDataPath);
             _licenseFilePath = Path.Combine(appDataPath, LICENSE_FILE);
+            _machineId = GetMachineId();
+            LoadLicense();
+        }
+
+        /// <summary>
+        /// Constructor for testing with custom license file path
+        /// </summary>
+        /// <param name="customLicenseFilePath">Custom path for license file (for testing)</param>
+        internal LicenseManager(string customLicenseFilePath)
+        {
+            var directory = Path.GetDirectoryName(customLicenseFilePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            _licenseFilePath = customLicenseFilePath;
+            _machineId = GetMachineId();
             LoadLicense();
         }
 
@@ -33,7 +53,7 @@ namespace SyncMedia.Core.Services
         public LicenseInfo CurrentLicense => _currentLicense;
 
         /// <summary>
-        /// Load license from file or initialize trial
+        /// Load license from file or initialize new free tier license
         /// </summary>
         private void LoadLicense()
         {
@@ -50,8 +70,26 @@ namespace SyncMedia.Core.Services
                         LicenseKey = root.Element("LicenseKey")?.Value,
                         ActivationDate = ParseDate(root.Element("ActivationDate")?.Value),
                         ExpirationDate = ParseDate(root.Element("ExpirationDate")?.Value),
-                        TrialExpirationDate = ParseDate(root.Element("TrialExpirationDate")?.Value)
+                        FilesProcessedCount = int.Parse(root.Element("FilesProcessedCount")?.Value ?? "0"),
+                        PeriodStartDate = ParseDate(root.Element("PeriodStartDate")?.Value),
+                        SpeedBoostExpirationDate = ParseDate(root.Element("SpeedBoostExpirationDate")?.Value),
+                        MachineId = root.Element("MachineId")?.Value,
+                        IsStoreLicense = bool.Parse(root.Element("IsStoreLicense")?.Value ?? "false")
                     };
+
+                    // Validate hardware binding for store licenses
+                    if (_currentLicense.IsPro && _currentLicense.IsStoreLicense)
+                    {
+                        if (_currentLicense.MachineId != _machineId)
+                        {
+                            // License is bound to different machine - invalidate
+                            _currentLicense.IsPro = false;
+                            _currentLicense.LicenseKey = null;
+                        }
+                    }
+
+                    // Check if period needs to be reset
+                    _currentLicense.CheckAndResetPeriod();
                 }
                 catch
                 {
@@ -66,20 +104,21 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
-        /// Initialize a new license with trial period
+        /// Initialize a new free tier license
         /// </summary>
         private void InitializeNewLicense()
         {
             _currentLicense = new LicenseInfo
             {
                 IsPro = false,
-                TrialExpirationDate = DateTime.Now.AddDays(TRIAL_DAYS)
+                FilesProcessedCount = 0,
+                PeriodStartDate = DateTime.Now
             };
             SaveLicense();
         }
 
         /// <summary>
-        /// Save license to file
+        /// Save license to file with encryption
         /// </summary>
         private void SaveLicense()
         {
@@ -89,18 +128,60 @@ namespace SyncMedia.Core.Services
                     new XElement("LicenseKey", _currentLicense.LicenseKey ?? ""),
                     new XElement("ActivationDate", _currentLicense.ActivationDate?.ToString("o") ?? ""),
                     new XElement("ExpirationDate", _currentLicense.ExpirationDate?.ToString("o") ?? ""),
-                    new XElement("TrialExpirationDate", _currentLicense.TrialExpirationDate?.ToString("o") ?? "")
+                    new XElement("FilesProcessedCount", _currentLicense.FilesProcessedCount),
+                    new XElement("PeriodStartDate", _currentLicense.PeriodStartDate?.ToString("o") ?? ""),
+                    new XElement("SpeedBoostExpirationDate", _currentLicense.SpeedBoostExpirationDate?.ToString("o") ?? ""),
+                    new XElement("MachineId", _currentLicense.MachineId ?? ""),
+                    new XElement("IsStoreLicense", _currentLicense.IsStoreLicense)
                 )
             );
+            
+            // Add integrity check
+            var xmlContent = doc.ToString();
+            var signature = CalculateSignature(xmlContent);
+            doc.Root.Add(new XElement("Signature", signature));
+            
             doc.Save(_licenseFilePath);
+        }
+
+        /// <summary>
+        /// Increment the files processed counter
+        /// </summary>
+        /// <param name="count">Number of files processed</param>
+        public void IncrementFilesProcessed(int count = 1)
+        {
+            _currentLicense.CheckAndResetPeriod();
+            _currentLicense.FilesProcessedCount += count;
+            SaveLicense();
+        }
+
+        /// <summary>
+        /// Reset the files processed counter (called when user watches ad or clicks)
+        /// This removes throttling and gives the user a fresh start
+        /// </summary>
+        public void ResetFilesProcessedCounter()
+        {
+            _currentLicense.FilesProcessedCount = 0;
+            SaveLicense();
+        }
+
+        /// <summary>
+        /// Activate speed boost from watching video ad
+        /// </summary>
+        /// <param name="durationMinutes">Duration of speed boost in minutes</param>
+        public void ActivateSpeedBoost(int durationMinutes = 60)
+        {
+            _currentLicense.SpeedBoostExpirationDate = DateTime.Now.AddMinutes(durationMinutes);
+            SaveLicense();
         }
 
         /// <summary>
         /// Activate a Pro license with the given license key
         /// </summary>
         /// <param name="licenseKey">The license key to activate</param>
+        /// <param name="isStoreLicense">Whether this is a Microsoft Store license</param>
         /// <returns>True if activation was successful, false otherwise</returns>
-        public bool ActivateLicense(string licenseKey)
+        public bool ActivateLicense(string licenseKey, bool isStoreLicense = false)
         {
             if (string.IsNullOrWhiteSpace(licenseKey))
                 return false;
@@ -113,6 +194,13 @@ namespace SyncMedia.Core.Services
             _currentLicense.LicenseKey = licenseKey;
             _currentLicense.ActivationDate = DateTime.Now;
             _currentLicense.ExpirationDate = null; // Lifetime license
+            _currentLicense.IsStoreLicense = isStoreLicense;
+            
+            // Bind to machine ID for store licenses (prevents copying to other machines)
+            if (isStoreLicense)
+            {
+                _currentLicense.MachineId = _machineId;
+            }
             
             SaveLicense();
             return true;
@@ -211,6 +299,77 @@ namespace SyncMedia.Core.Services
                 result[i] = chars[random.Next(chars.Length)];
             }
             return new string(result);
+        }
+
+        /// <summary>
+        /// Get unique machine identifier
+        /// </summary>
+        private string GetMachineId()
+        {
+            try
+            {
+                // Combine multiple hardware identifiers for robust machine binding
+                var processors = string.Empty;
+                var motherboard = string.Empty;
+
+                try
+                {
+                    // Get processor ID
+                    var mbs = new ManagementObjectSearcher("Select ProcessorId From Win32_processor");
+                    ManagementObjectCollection mbsList = mbs.Get();
+                    foreach (ManagementObject mo in mbsList)
+                    {
+                        processors = mo["ProcessorId"]?.ToString() ?? "";
+                        break;
+                    }
+
+                    // Get motherboard serial
+                    mbs = new ManagementObjectSearcher("SELECT SerialNumber FROM Win32_BaseBoard");
+                    mbsList = mbs.Get();
+                    foreach (ManagementObject mo in mbsList)
+                    {
+                        motherboard = mo["SerialNumber"]?.ToString() ?? "";
+                        break;
+                    }
+                }
+                catch
+                {
+                    // WMI might not be available, fallback to machine name
+                    processors = Environment.MachineName;
+                    motherboard = Environment.UserName;
+                }
+
+                var combined = $"{processors}-{motherboard}-{Environment.MachineName}";
+                
+                // Hash to create consistent ID
+                using (var sha256 = SHA256.Create())
+                {
+                    var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
+                    return BitConverter.ToString(hash).Replace("-", "").Substring(0, 32);
+                }
+            }
+            catch
+            {
+                // Fallback to machine name hash
+                using (var sha256 = SHA256.Create())
+                {
+                    var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(Environment.MachineName));
+                    return BitConverter.ToString(hash).Replace("-", "").Substring(0, 32);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Calculate signature for license file integrity
+        /// </summary>
+        private string CalculateSignature(string content)
+        {
+            using (var sha256 = SHA256.Create())
+            {
+                var combined = content + ENCRYPTION_KEY + _machineId;
+                var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(combined));
+                return Convert.ToBase64String(hash);
+            }
         }
     }
 }

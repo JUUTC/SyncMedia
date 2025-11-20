@@ -2,11 +2,19 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.UI.Xaml;
 using SyncMedia.Core;
+using SyncMedia.Core.Interfaces;
+using SyncMedia.Core.Models;
+using SyncMedia.Core.Services;
+using System;
 
 namespace SyncMedia.WinUI.ViewModels;
 
 public partial class SettingsViewModel : ObservableObject
 {
+    private readonly IAdvertisingService _advertisingService;
+    private readonly LicenseManager _licenseManager;
+    private readonly FeatureFlagService _featureFlagService;
+
     [ObservableProperty]
     private bool proVersion = false;
 
@@ -37,8 +45,26 @@ public partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string licenseType = "Free";
 
-    public SettingsViewModel()
+    [ObservableProperty]
+    private int filesProcessed = 0;
+
+    [ObservableProperty]
+    private int filesRemaining = 0;
+
+    [ObservableProperty]
+    private int bonusFiles = 0;
+
+    [ObservableProperty]
+    private bool hasSpeedBoost = false;
+
+    [ObservableProperty]
+    private string speedBoostStatus = "";
+
+    public SettingsViewModel(IAdvertisingService advertisingService, LicenseManager licenseManager, FeatureFlagService featureFlagService)
     {
+        _advertisingService = advertisingService;
+        _licenseManager = licenseManager;
+        _featureFlagService = featureFlagService;
         LoadSettings();
     }
 
@@ -50,8 +76,8 @@ public partial class SettingsViewModel : ObservableObject
         FilePreviewEnabled = bool.Parse(data.ReadValue("FilePreviewEnabled") ?? "true");
         PerformanceOptimizationsEnabled = bool.Parse(data.ReadValue("PerformanceOptimizationsEnabled") ?? "false");
         
-        // Pro features (Phase 4)
-        ProVersion = bool.Parse(data.ReadValue("ProVersion") ?? "false");
+        // Pro features
+        ProVersion = _licenseManager.CurrentLicense.IsPro;
         AdvancedDuplicateDetectionEnabled = bool.Parse(data.ReadValue("AdvancedDuplicateDetectionEnabled") ?? "false");
         SimilarityThreshold = int.Parse(data.ReadValue("SimilarityThreshold") ?? "70");
         GpuAccelerationEnabled = bool.Parse(data.ReadValue("GpuAccelerationEnabled") ?? "false");
@@ -66,8 +92,29 @@ public partial class SettingsViewModel : ObservableObject
             _ => ElementTheme.Default
         };
 
-        // Update license type
-        LicenseType = ProVersion ? "Pro" : "Free";
+        // Update license type and file counts
+        UpdateLicenseInfo();
+    }
+
+    private void UpdateLicenseInfo()
+    {
+        var license = _licenseManager.CurrentLicense;
+        LicenseType = license.IsPro ? "Pro" : "Free";
+        FilesProcessed = license.FilesProcessedCount;
+        FilesRemaining = license.RemainingFreeFiles;
+        BonusFiles = license.BonusFilesFromAds;
+        HasSpeedBoost = license.HasActiveSpeedBoost;
+        
+        if (HasSpeedBoost && license.SpeedBoostExpirationDate.HasValue)
+        {
+            var remaining = license.SpeedBoostExpirationDate.Value - DateTime.Now;
+            SpeedBoostStatus = $"Active ({remaining.Minutes} min remaining)";
+        }
+        else
+        {
+            SpeedBoostStatus = "Inactive";
+        }
+    }
     }
 
     partial void OnFilePreviewEnabledChanged(bool value)
@@ -147,6 +194,26 @@ public partial class SettingsViewModel : ObservableObject
         ProVersion = true;
         LicenseType = "Pro";
         SaveSetting("ProVersion", "true");
+        
+        // Activate the license in LicenseManager
+        // In production, this would validate a real license key from the store
+        var testLicenseKey = LicenseManager.GenerateLicenseKey();
+        _licenseManager.ActivateLicense(testLicenseKey);
+        
+        // Refresh feature flags
+        _featureFlagService.RefreshFeatureFlags();
+        
+        // Update ad visibility - hide ads for Pro users
+        _advertisingService.UpdateAdVisibility(_featureFlagService.ShouldShowAds);
+        
+        // Refresh license info display
+        UpdateLicenseInfo();
+    }
+
+    [RelayCommand]
+    private void RefreshLicenseInfo()
+    {
+        UpdateLicenseInfo();
     }
 
     [RelayCommand]
