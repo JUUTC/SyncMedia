@@ -1,16 +1,26 @@
 using System.Collections.Generic;
-using System.Linq;
 using Xunit;
-using SyncMedia.Models;
+using SyncMedia.Core.Models;
 
 namespace SyncMedia.Tests.Models
 {
     public class GamificationDataTests
     {
         [Fact]
-        public void GamificationData_InitialState_ShouldHaveZeroValues()
+        public void Constructor_ShouldInitializeAchievementsList()
         {
-            // Arrange & Act
+            // Act
+            var data = new GamificationData();
+            
+            // Assert
+            Assert.NotNull(data.Achievements);
+            Assert.Empty(data.Achievements);
+        }
+
+        [Fact]
+        public void Constructor_ShouldInitializeWithZeroValues()
+        {
+            // Act
             var data = new GamificationData();
             
             // Assert
@@ -19,15 +29,13 @@ namespace SyncMedia.Tests.Models
             Assert.Equal(0, data.TotalFilesLifetime);
             Assert.Equal(0, data.TotalDuplicatesLifetime);
             Assert.Equal(0, data.TotalBytesLifetime);
-            Assert.NotNull(data.Achievements);
-            Assert.Empty(data.Achievements);
         }
-        
+
         [Fact]
-        public void ResetSessionPoints_ShouldResetToZero()
+        public void ResetSessionPoints_ShouldSetSessionPointsToZero()
         {
             // Arrange
-            var data = new GamificationData { SessionPoints = 1000 };
+            var data = new GamificationData { SessionPoints = 100 };
             
             // Act
             data.ResetSessionPoints();
@@ -35,63 +43,82 @@ namespace SyncMedia.Tests.Models
             // Assert
             Assert.Equal(0, data.SessionPoints);
         }
-        
+
         [Fact]
-        public void AddSessionPoints_ShouldIncreaseBothSessionAndTotal()
+        public void AddSessionPoints_ShouldIncreaseBothSessionAndTotalPoints()
+        {
+            // Arrange
+            var data = new GamificationData
+            {
+                SessionPoints = 50,
+                TotalPoints = 200
+            };
+            
+            // Act
+            data.AddSessionPoints(100);
+            
+            // Assert
+            Assert.Equal(150, data.SessionPoints);
+            Assert.Equal(300, data.TotalPoints);
+        }
+
+        [Fact]
+        public void AddSessionPoints_MultipleAdds_ShouldAccumulateCorrectly()
         {
             // Arrange
             var data = new GamificationData();
             
             // Act
-            data.AddSessionPoints(100);
             data.AddSessionPoints(50);
+            data.AddSessionPoints(30);
+            data.AddSessionPoints(20);
             
             // Assert
-            Assert.Equal(150, data.SessionPoints);
-            Assert.Equal(150, data.TotalPoints);
+            Assert.Equal(100, data.SessionPoints);
+            Assert.Equal(100, data.TotalPoints);
         }
-        
+
         [Fact]
-        public void UpdateLifetimeStats_ShouldAddToLifetimeValues()
+        public void UpdateLifetimeStats_ShouldAddStatsToLifetimeTotals()
         {
             // Arrange
             var data = new GamificationData
             {
-                TotalFilesLifetime = 100,
+                TotalFilesLifetime = 50,
                 TotalDuplicatesLifetime = 10,
-                TotalBytesLifetime = 1000000
+                TotalBytesLifetime = 1024 * 1024 * 100
             };
             
             var stats = new SyncStatistics
             {
-                TotalFilesProcessed = 50,
+                TotalFilesProcessed = 20,
                 DuplicatesFound = 5,
-                TotalBytesProcessed = 500000
+                TotalBytesProcessed = 1024 * 1024 * 50
             };
             
             // Act
             data.UpdateLifetimeStats(stats);
             
             // Assert
-            Assert.Equal(150, data.TotalFilesLifetime);
+            Assert.Equal(70, data.TotalFilesLifetime);
             Assert.Equal(15, data.TotalDuplicatesLifetime);
-            Assert.Equal(1500000, data.TotalBytesLifetime);
+            Assert.Equal(1024 * 1024 * 150, data.TotalBytesLifetime);
         }
-        
+
         [Fact]
         public void HasAchievement_WithExistingAchievement_ShouldReturnTrue()
         {
             // Arrange
             var data = new GamificationData();
-            data.Achievements.Add("TestAchievement");
+            data.Achievements.Add("FirstTen");
             
             // Act
-            var result = data.HasAchievement("TestAchievement");
+            var hasAchievement = data.HasAchievement("FirstTen");
             
             // Assert
-            Assert.True(result);
+            Assert.True(hasAchievement);
         }
-        
+
         [Fact]
         public void HasAchievement_WithNonExistingAchievement_ShouldReturnFalse()
         {
@@ -99,37 +126,73 @@ namespace SyncMedia.Tests.Models
             var data = new GamificationData();
             
             // Act
-            var result = data.HasAchievement("NonExisting");
+            var hasAchievement = data.HasAchievement("FirstTen");
             
             // Assert
-            Assert.False(result);
+            Assert.False(hasAchievement);
         }
-        
+
         [Fact]
-        public void AddAchievement_ShouldAddNewAchievement()
+        public void AddAchievement_NewAchievement_ShouldAddToList()
         {
             // Arrange
             var data = new GamificationData();
             
             // Act
-            data.AddAchievement("NewAchievement");
+            data.AddAchievement("FirstTen");
             
             // Assert
-            Assert.Contains("NewAchievement", data.Achievements);
+            Assert.Contains("FirstTen", data.Achievements);
         }
-        
+
         [Fact]
-        public void AddAchievement_WithDuplicate_ShouldNotAddTwice()
+        public void AddAchievement_DuplicateAchievement_ShouldNotAddAgain()
         {
             // Arrange
             var data = new GamificationData();
-            data.Achievements.Add("Achievement1");
+            data.AddAchievement("FirstTen");
             
             // Act
-            data.AddAchievement("Achievement1");
+            data.AddAchievement("FirstTen");
             
             // Assert
-            Assert.Equal(1, data.Achievements.Count(a => a == "Achievement1"));
+            Assert.Single(data.Achievements);
+        }
+
+        [Fact]
+        public void AddAchievement_MultipleAchievements_ShouldAddAll()
+        {
+            // Arrange
+            var data = new GamificationData();
+            
+            // Act
+            data.AddAchievement("FirstTen");
+            data.AddAchievement("Century");
+            data.AddAchievement("Speedster");
+            
+            // Assert
+            Assert.Equal(3, data.Achievements.Count);
+            Assert.Contains("FirstTen", data.Achievements);
+            Assert.Contains("Century", data.Achievements);
+            Assert.Contains("Speedster", data.Achievements);
+        }
+
+        [Fact]
+        public void ResetSessionPoints_ShouldNotAffectTotalPoints()
+        {
+            // Arrange
+            var data = new GamificationData
+            {
+                SessionPoints = 100,
+                TotalPoints = 500
+            };
+            
+            // Act
+            data.ResetSessionPoints();
+            
+            // Assert
+            Assert.Equal(0, data.SessionPoints);
+            Assert.Equal(500, data.TotalPoints); // Total should remain unchanged
         }
     }
 }

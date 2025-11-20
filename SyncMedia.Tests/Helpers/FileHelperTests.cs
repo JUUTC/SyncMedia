@@ -1,6 +1,7 @@
 using System;
+using System.IO;
 using Xunit;
-using SyncMedia.Helpers;
+using SyncMedia.Core.Helpers;
 
 namespace SyncMedia.Tests.Helpers
 {
@@ -10,10 +11,14 @@ namespace SyncMedia.Tests.Helpers
         [InlineData(".jpg", true)]
         [InlineData(".jpeg", true)]
         [InlineData(".png", true)]
+        [InlineData(".gif", true)]
         [InlineData(".webp", true)]
+        [InlineData(".heic", true)]
+        [InlineData(".JPG", true)] // Case insensitive
         [InlineData(".mp4", false)]
-        [InlineData(".mov", false)]
-        public void IsImageFile_ShouldReturnCorrectValue(string extension, bool expected)
+        [InlineData(".txt", false)]
+        [InlineData(".doc", false)]
+        public void IsImageFile_ShouldReturnCorrectResult(string extension, bool expected)
         {
             // Act
             var result = FileHelper.IsImageFile(extension);
@@ -21,15 +26,18 @@ namespace SyncMedia.Tests.Helpers
             // Assert
             Assert.Equal(expected, result);
         }
-        
+
         [Theory]
         [InlineData(".mp4", true)]
         [InlineData(".mov", true)]
         [InlineData(".avi", true)]
+        [InlineData(".wmv", true)]
         [InlineData(".webm", true)]
+        [InlineData(".mkv", true)]
+        [InlineData(".MP4", true)] // Case insensitive
         [InlineData(".jpg", false)]
-        [InlineData(".png", false)]
-        public void IsVideoFile_ShouldReturnCorrectValue(string extension, bool expected)
+        [InlineData(".txt", false)]
+        public void IsVideoFile_ShouldReturnCorrectResult(string extension, bool expected)
         {
             // Act
             var result = FileHelper.IsVideoFile(extension);
@@ -37,13 +45,18 @@ namespace SyncMedia.Tests.Helpers
             // Assert
             Assert.Equal(expected, result);
         }
-        
+
         [Theory]
         [InlineData(".jpg", true)]
+        [InlineData(".png", true)]
         [InlineData(".mp4", true)]
+        [InlineData(".mov", true)]
+        [InlineData(".webp", true)]
+        [InlineData(".webm", true)]
         [InlineData(".txt", false)]
         [InlineData(".doc", false)]
-        public void IsMediaFile_ShouldReturnCorrectValue(string extension, bool expected)
+        [InlineData(".pdf", false)]
+        public void IsMediaFile_ShouldReturnCorrectResult(string extension, bool expected)
         {
             // Act
             var result = FileHelper.IsMediaFile(extension);
@@ -51,22 +64,20 @@ namespace SyncMedia.Tests.Helpers
             // Assert
             Assert.Equal(expected, result);
         }
-        
-        [Fact]
-        public void CleanFileName_ShouldRemoveNumbers()
+
+        [Theory]
+        [InlineData("IMG_2024-01-15_001.jpg", "img__")]
+        [InlineData("Video-2023-12-25.mp4", "video")]
+        [InlineData("Photo123.png", "photo")]
+        public void CleanFileName_ShouldRemoveDatesAndExtensions(string filename, string expected)
         {
-            // Arrange
-            var filename = "photo2024-01-15.jpg";
-            
             // Act
             var result = FileHelper.CleanFileName(filename);
             
             // Assert
-            Assert.DoesNotContain("2024", result);
-            Assert.DoesNotContain("01", result);
-            Assert.DoesNotContain("15", result);
+            Assert.Equal(expected, result);
         }
-        
+
         [Fact]
         public void CleanFileName_ShouldConvertToLowerCase()
         {
@@ -81,22 +92,23 @@ namespace SyncMedia.Tests.Helpers
             Assert.DoesNotContain("P", result);
             Assert.DoesNotContain("J", result);
         }
-        
+
         [Fact]
-        public void CleanFileName_ShouldRemoveExtensions()
+        public void CleanFileName_ShouldRemoveSpecialCharacters()
         {
             // Arrange
-            var filename = "photo.jpg";
+            var filename = "photo,test.file.jpg";
             
             // Act
             var result = FileHelper.CleanFileName(filename);
             
             // Assert
-            Assert.DoesNotContain(".jpg", result);
+            Assert.DoesNotContain(",", result);
+            Assert.DoesNotContain(".", result);
         }
-        
+
         [Fact]
-        public void RemoveFolderPath_ShouldRemoveDatePattern()
+        public void RemoveFolderPath_ShouldRemoveDatePatterns()
         {
             // Arrange
             var filename = "2024/01/15/photo.jpg";
@@ -107,74 +119,96 @@ namespace SyncMedia.Tests.Helpers
             // Assert
             Assert.DoesNotContain("2024/01/15", result);
         }
-        
-        [Fact]
-        public void FormatFileDateTime_ShouldFormatCorrectly()
+
+        [Theory]
+        [InlineData("2024-01-15", "2024-01-15")]
+        [InlineData("2024-12-31", "2024-12-31")]
+        [InlineData("2023-05-20", "2023-05-20")]
+        public void FormatFileDateTime_ShouldFormatCorrectly(string dateString, string expected)
         {
             // Arrange
-            var date = new DateTime(2024, 3, 7);
+            var date = DateTime.Parse(dateString);
             
             // Act
             var result = FileHelper.FormatFileDateTime(date);
             
             // Assert
-            Assert.Equal("2024-03-07", result);
+            Assert.Equal(expected, result);
         }
-        
+
         [Fact]
-        public void ValidateFolderPath_WithNull_ShouldReturnFalse()
-        {
-            // Act
-            var result = FileHelper.ValidateFolderPath(null);
-            
-            // Assert
-            Assert.False(result);
-        }
-        
-        [Fact]
-        public void ValidateFolderPath_WithEmptyString_ShouldReturnFalse()
-        {
-            // Act
-            var result = FileHelper.ValidateFolderPath(string.Empty);
-            
-            // Assert
-            Assert.False(result);
-        }
-        
-        [Fact]
-        public void ValidateFolderPath_WithWhitespace_ShouldReturnFalse()
-        {
-            // Act
-            var result = FileHelper.ValidateFolderPath("   ");
-            
-            // Assert
-            Assert.False(result);
-        }
-        
-        [Fact]
-        public void ValidateFolderPath_WithNonExistingPath_ShouldReturnFalse()
+        public void FormatFileDateTime_ShouldPadMonthAndDay()
         {
             // Arrange
-            var path = "/non/existing/path/12345";
+            var date = new DateTime(2024, 1, 5);
             
             // Act
-            var result = FileHelper.ValidateFolderPath(path);
+            var result = FileHelper.FormatFileDateTime(date);
             
             // Assert
-            Assert.False(result);
+            Assert.Equal("2024-01-05", result);
         }
-        
+
         [Fact]
-        public void ValidateFolderPath_WithExistingPath_ShouldReturnTrue()
+        public void ValidateFolderPath_WithExistingDirectory_ShouldReturnTrue()
         {
             // Arrange
-            var path = "/tmp";
+            var tempPath = Path.GetTempPath();
             
             // Act
-            var result = FileHelper.ValidateFolderPath(path);
+            var result = FileHelper.ValidateFolderPath(tempPath);
             
             // Assert
             Assert.True(result);
+        }
+
+        [Fact]
+        public void ValidateFolderPath_WithNonExistentDirectory_ShouldReturnFalse()
+        {
+            // Arrange
+            var nonExistentPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+            
+            // Act
+            var result = FileHelper.ValidateFolderPath(nonExistentPath);
+            
+            // Assert
+            Assert.False(result);
+        }
+
+        [Theory]
+        [InlineData("", false)]
+        [InlineData("   ", false)]
+        public void ValidateFolderPath_WithInvalidInput_ShouldReturnFalse(string path, bool expected)
+        {
+            // Act
+            var result = FileHelper.ValidateFolderPath(path);
+            
+            // Assert
+            Assert.Equal(expected, result);
+        }
+        
+        [Fact]
+        public void ValidateFolderPath_WithNullInput_ShouldReturnFalse()
+        {
+            // Act
+            var result = FileHelper.ValidateFolderPath(null!);
+            
+            // Assert
+            Assert.False(result);
+        }
+
+        [Fact]
+        public void RemoveFolderStructure_WithBackslash_ShouldTrimLeadingSlashes()
+        {
+            // Arrange
+            var fullPath = @"\\folder\\file.jpg";
+            var nodate = @"\\test";
+            
+            // Act
+            var result = FileHelper.RemoveFolderStructure(fullPath, nodate);
+            
+            // Assert
+            Assert.False(result.StartsWith("\\"));
         }
     }
 }

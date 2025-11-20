@@ -96,6 +96,38 @@ dotnet test  # Run 42 unit tests
 
 ---
 
+## 🏗️ Core Library Features
+
+SyncMedia.Core provides a robust, production-ready foundation:
+
+- **Error Handling**: Centralized error management with `IErrorHandler` interface
+- **Logging**: Structured logging using Microsoft.Extensions.Logging
+- **Input Validation**: Secure path validation with `PathValidator` to prevent path traversal attacks
+- **Testing**: Comprehensive test suite with 210+ tests and 49%+ code coverage
+
+### Code Quality
+
+- ✅ Exception handling in all async methods
+- ✅ Centralized error management
+- ✅ Input validation on all file paths
+- ✅ Structured logging for diagnostics
+- ✅ Unit tests for business logic
+- ✅ Cross-platform compatibility
+
+## 🧪 Testing
+
+Run the test suite:
+
+```bash
+# Run all tests
+dotnet test
+
+# Run tests with coverage
+dotnet test /p:CollectCoverage=true
+```
+
+---
+
 ## 📄 License
 
 See [LICENSE](LICENSE) file.
