@@ -17,10 +17,9 @@ namespace SyncMedia.Tests.Core.Services
             _testLicensePath = Path.Combine(Path.GetTempPath(), "SyncMediaTests_" + Guid.NewGuid().ToString());
             Directory.CreateDirectory(_testLicensePath);
             
-            // Set environment variable to use test path
-            Environment.SetEnvironmentVariable("LOCALAPPDATA", _testLicensePath);
-            
-            _licenseManager = new LicenseManager();
+            // Use the internal constructor with custom path for testing
+            var testLicenseFile = Path.Combine(_testLicensePath, "license.xml");
+            _licenseManager = new LicenseManager(testLicenseFile);
         }
 
         public void Dispose()
@@ -219,8 +218,9 @@ namespace SyncMedia.Tests.Core.Services
             _licenseManager.IncrementFilesProcessed(25);
             _licenseManager.ActivateSpeedBoost(45);
 
-            // Act - Create new manager to test loading
-            var newManager = new LicenseManager();
+            // Act - Create new manager with same test file to test loading
+            var testLicenseFile = Path.Combine(_testLicensePath, "license.xml");
+            var newManager = new LicenseManager(testLicenseFile);
 
             // Assert
             Assert.Equal(25, newManager.CurrentLicense.FilesProcessedCount);

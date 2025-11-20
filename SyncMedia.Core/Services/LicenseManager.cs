@@ -32,6 +32,22 @@ namespace SyncMedia.Core.Services
         }
 
         /// <summary>
+        /// Constructor for testing with custom license file path
+        /// </summary>
+        /// <param name="customLicenseFilePath">Custom path for license file (for testing)</param>
+        internal LicenseManager(string customLicenseFilePath)
+        {
+            var directory = Path.GetDirectoryName(customLicenseFilePath);
+            if (!string.IsNullOrEmpty(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            _licenseFilePath = customLicenseFilePath;
+            _machineId = GetMachineId();
+            LoadLicense();
+        }
+
+        /// <summary>
         /// Gets the current license information
         /// </summary>
         public LicenseInfo CurrentLicense => _currentLicense;
