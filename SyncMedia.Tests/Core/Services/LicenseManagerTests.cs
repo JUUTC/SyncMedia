@@ -72,8 +72,10 @@ namespace SyncMedia.Tests.Core.Services
         public void ResetFilesProcessedCounter_ShouldResetToZero()
         {
             // Arrange
+            var initialCount = _licenseManager.CurrentLicense.FilesProcessedCount;
             _licenseManager.IncrementFilesProcessed(50);
-            Assert.Equal(50, _licenseManager.CurrentLicense.FilesProcessedCount);
+            var afterIncrement = _licenseManager.CurrentLicense.FilesProcessedCount;
+            Assert.Equal(initialCount + 50, afterIncrement);
 
             // Act
             _licenseManager.ResetFilesProcessedCounter();
@@ -117,8 +119,11 @@ namespace SyncMedia.Tests.Core.Services
         [Fact]
         public void ActivateLicense_WithValidKey_ShouldActivate()
         {
+            // Arrange
+            var validKey = LicenseManager.GenerateLicenseKey();
+
             // Act
-            var result = _licenseManager.ActivateLicense("ABCD-EFGH-IJKL-D6F9");
+            var result = _licenseManager.ActivateLicense(validKey);
 
             // Assert
             Assert.True(result);
@@ -164,7 +169,8 @@ namespace SyncMedia.Tests.Core.Services
         public void DeactivateLicense_ShouldResetToFreeLicense()
         {
             // Arrange
-            _licenseManager.ActivateLicense("ABCD-EFGH-IJKL-D6F9");
+            var validKey = LicenseManager.GenerateLicenseKey();
+            _licenseManager.ActivateLicense(validKey);
             Assert.True(_licenseManager.CurrentLicense.IsPro);
 
             // Act
