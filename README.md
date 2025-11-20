@@ -52,18 +52,13 @@ Watch ad → Reset to 0ms ⚡
 
 ---
 
-## 📖 Complete Documentation
+## 📖 Documentation
 
-**For full documentation, see [COMPREHENSIVE_README.md](COMPREHENSIVE_README.md)**
-
-Includes:
-- Detailed architecture
-- Advertising integration
-- Testing guide
-- Build instructions
-- License protection
-- Microsoft Store deployment
-- FAQ
+- **[User Guide](docs/USER_GUIDE.md)** - Complete feature documentation and usage instructions
+- **[AI Features](docs/AI_POWERED_MEDIA_FEATURES.md)** - AI-powered duplicate detection guide
+- **[Advanced Duplicate Detection](docs/ADVANCED_DUPLICATE_DETECTION.md)** - Technical details on duplicate detection
+- **[Store Publishing](docs/STORE_PUBLISHING_GUIDE.md)** - Microsoft Store submission guide
+- **[Migration Guide](docs/WINDOWS_STORE_MIGRATION.md)** - Technical migration documentation
 
 
 ## 🛠️ Development
