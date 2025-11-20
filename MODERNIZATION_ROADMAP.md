@@ -265,11 +265,13 @@ public class ProVersionFlags : IFeatureFlags
 }
 ```
 
-#### 2. Advertising Integration
-- **SDK**: Microsoft Advertising SDK for Windows
-- **Placement**: Banner ads in main window
-- **Frequency**: Visible during idle, hidden during sync
-- **Privacy**: GDPR/CCPA compliant
+#### 2. Advertising Integration ✅ (Complete)
+- **SDK**: Microsoft Advertising SDK for Windows (Microsoft.Advertising.Xaml)
+- **Placement**: Banner ads (728x90) at bottom of main window
+- **Visibility**: Controlled by FeatureFlagService based on license status
+- **Privacy**: GDPR/CCPA compliant via Microsoft SDK
+- **Test IDs**: Using Microsoft test Application ID and Ad Unit ID
+- **Production**: Ready for production IDs from Partner Center
 
 #### 3. In-App Purchase
 - **SDK**: Windows.Services.Store
@@ -339,11 +341,11 @@ Using **idealo/imagededup** library for advanced duplicate detection:
    - ~500MB additional download for Pro version
 
 ### Implementation Tasks
-- [ ] Create shared Core library
-- [ ] Implement feature flag system
+- [x] Create shared Core library
+- [x] Implement feature flag system
 - [ ] Create Free app package
 - [ ] Create Pro app package
-- [ ] Integrate Microsoft Advertising SDK
+- [x] Integrate Microsoft Advertising SDK
 - [ ] Implement in-app purchase flow
 - [ ] Extract performance optimizations to Pro-only code
 - [ ] **Integrate imagededup for Pro duplicate detection**
@@ -352,7 +354,7 @@ Using **idealo/imagededup** library for advanced duplicate detection:
 - [ ] **Add GPU detection and fallback logic**
 - [ ] Test both versions thoroughly
 - [ ] Create separate Store listings
-- [ ] Update documentation for both versions
+- [x] Update documentation for both versions
 
 ### Monetization Strategy
 - **Free Version**: Ad revenue + IAP conversions

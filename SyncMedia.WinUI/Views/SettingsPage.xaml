@@ -14,7 +14,7 @@
 
             <!-- Pro Features Section -->
             <StackPanel Spacing="12" Margin="0,24,0,0">
-                <TextBlock Text="Pro Features" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Text="License & Usage" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 
                 <StackPanel Spacing="8" Padding="16" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
                             BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}" BorderThickness="1" CornerRadius="8">
@@ -36,6 +36,59 @@
                                 Style="{StaticResource AccentButtonStyle}"
                                 Visibility="{x:Bind ViewModel.ProVersion, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
                     </Grid>
+
+                    <!-- Free Tier Usage (only shown for free users) -->
+                    <StackPanel Spacing="8" 
+                                Visibility="{x:Bind ViewModel.ProVersion, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}"
+                                Padding="12"
+                                Background="{ThemeResource LayerFillColorDefaultBrush}"
+                                CornerRadius="4">
+                        <TextBlock Text="Free Tier Usage (30-day period)" FontWeight="SemiBold" FontSize="14"/>
+                        
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock>
+                                    <Run Text="Files processed: "/>
+                                    <Run Text="{x:Bind ViewModel.FilesProcessed, Mode=OneWay}" FontWeight="SemiBold"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Files remaining: "/>
+                                    <Run Text="{x:Bind ViewModel.FilesRemaining, Mode=OneWay}" FontWeight="SemiBold" Foreground="{ThemeResource SystemAccentColor}"/>
+                                </TextBlock>
+                                <TextBlock>
+                                    <Run Text="Bonus files earned: "/>
+                                    <Run Text="{x:Bind ViewModel.BonusFiles, Mode=OneWay}" FontWeight="SemiBold" Foreground="{ThemeResource SystemSuccessColor}"/>
+                                </TextBlock>
+                            </StackPanel>
+                            
+                            <Button Grid.Column="1"
+                                    Command="{x:Bind ViewModel.RefreshLicenseInfoCommand}"
+                                    Content="↻"
+                                    FontSize="16"
+                                    Width="32"
+                                    Height="32"
+                                    VerticalAlignment="Top"
+                                    ToolTipService.ToolTip="Refresh license info"/>
+                        </Grid>
+                        
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Speed Boost Status" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+                            <TextBlock Text="{x:Bind ViewModel.SpeedBoostStatus, Mode=OneWay}" 
+                                       FontWeight="SemiBold"
+                                       Foreground="{ThemeResource SystemAccentColor}"/>
+                        </StackPanel>
+                        
+                        <TextBlock TextWrapping="Wrap"
+                                   FontSize="11"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}">
+                            <Run Text="💡 Tip: Watch video ads to earn +20 bonus files and 60-minute speed boost!"/>
+                        </TextBlock>
+                    </StackPanel>
 
                     <!-- Advanced Duplicate Detection -->
                     <ToggleSwitch Header="Advanced Duplicate Detection" 
