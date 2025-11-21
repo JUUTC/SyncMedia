@@ -3,7 +3,7 @@
 # Generated: 2025-11-21
 # Purpose: Delete superseded and merged branches
 
-set -e  # Exit on error
+set -euo pipefail  # Exit on error, undefined variables, and pipeline failures
 
 echo "=========================================="
 echo "SyncMedia Branch Cleanup Script"
